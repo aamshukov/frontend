@@ -1,0 +1,353 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="..\..\Framework\Core\pch.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\data_provider.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\lexical_analyzer\lexical_analyzer.hpp">
+      <Filter>frontend\lexical_analyzer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\status.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\content.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\noncopyable.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\domain_helper.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\file_data_provider.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\logger.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\grammar\token.hpp">
+      <Filter>frontend\grammar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\grammar\symbol.hpp">
+      <Filter>frontend\grammar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\grammar\rule.hpp">
+      <Filter>frontend\grammar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\grammar\grammar.hpp">
+      <Filter>frontend\grammar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\unicode.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\fsa\fsa_state.hpp">
+      <Filter>frontend\fsa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\fsa\fsa_transition.hpp">
+      <Filter>frontend\fsa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\fsa\fsa.hpp">
+      <Filter>frontend\fsa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\fsa\fsa_algorithm.hpp">
+      <Filter>frontend\fsa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\counter.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\factory.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\fsa\fsa_visualization.hpp">
+      <Filter>frontend\fsa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\fsa\fsa_re.hpp">
+      <Filter>frontend\fsa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\text.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\singleton.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\fsa\fsa_state_set.hpp">
+      <Filter>frontend\fsa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\fsa\fsa_codegen.hpp">
+      <Filter>frontend\fsa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\enum.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\configurator.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\command_line.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\diagnostics.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\grammar\grammar_visualization.hpp">
+      <Filter>frontend\grammar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\grammar\grammar_algorithm.hpp">
+      <Filter>frontend\grammar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\flags.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\parser.hpp">
+      <Filter>frontend\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\tree.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\tree\cst.hpp">
+      <Filter>frontend\tree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\tree\ast.hpp">
+      <Filter>frontend\tree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\visitor.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\ll\ll_visualization.hpp">
+      <Filter>frontend\parser\ll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\ll\ll_algorithm.hpp">
+      <Filter>frontend\parser\ll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\parser_algorithm.hpp">
+      <Filter>frontend\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\backtracking\recursive_descent_parser.hpp">
+      <Filter>frontend\parser\recursive_descent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\ll\ll_parser.hpp">
+      <Filter>frontend\parser\ll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\lr\lr_parser.hpp">
+      <Filter>frontend\parser\lr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\lr\lr_visualization.hpp">
+      <Filter>frontend\parser\lr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\lr\lr_algorithm.hpp">
+      <Filter>frontend\parser\lr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\operator_precedence\precedence_algorithm.hpp">
+      <Filter>frontend\parser\precedence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\operator_precedence\precedence_visualization.hpp">
+      <Filter>frontend\parser\precedence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\operator_precedence\precedence_parser.hpp">
+      <Filter>frontend\parser\precedence</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\earley\earley_visualization.hpp">
+      <Filter>frontend\parser\earley</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\earley\earley_algorithm.hpp">
+      <Filter>frontend\parser\earley</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\earley\earley_parser.hpp">
+      <Filter>frontend\parser\earley</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\enumerate.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\semantics\symbol_table.hpp">
+      <Filter>frontend\semantics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\semantics\symbol_attribute.hpp">
+      <Filter>frontend\semantics</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="backend">
+      <UniqueIdentifier>{0d687137-274a-48e9-9f57-0314280cfef6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="backend\generator">
+      <UniqueIdentifier>{3b01e082-ca5d-4119-be87-100ca90ddb4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="backend\ir">
+      <UniqueIdentifier>{7ee24bbc-120a-4475-ab70-7781b5418737}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="backend\optimization">
+      <UniqueIdentifier>{6d9eb768-66f9-4537-b043-0be3f4f80141}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="controller">
+      <UniqueIdentifier>{02e5db76-c3d6-4432-a3f7-73a913e3873c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{d2550454-e046-4976-b928-a2e6ed05619f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend">
+      <UniqueIdentifier>{e0b2192b-6635-41d1-9cf6-eee9a1a564eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\grammar">
+      <UniqueIdentifier>{e7ba7e45-f897-480b-a5f5-f3e2f759d793}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\lexical_analyzer">
+      <UniqueIdentifier>{29575421-d8b1-4612-b799-083062c4a43c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\parser">
+      <UniqueIdentifier>{7ea925bb-950f-45e7-95b8-08f3e409ce7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\parser\earley">
+      <UniqueIdentifier>{fc47bb01-0d3b-40bb-ad78-f83dcbab06d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\semantics">
+      <UniqueIdentifier>{07fcf5a0-c802-4ce4-8292-8191eb22d8d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\fsa">
+      <UniqueIdentifier>{2a1c4217-44e3-497c-af00-e1b6506d793f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\tree">
+      <UniqueIdentifier>{2d2f0f1f-b4a1-451c-8257-b5d1dfbe900f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\parser\ll">
+      <UniqueIdentifier>{80060640-0a73-4257-8355-aa049da1117b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\parser\lr">
+      <UniqueIdentifier>{fa4c992e-574b-44d2-bc93-4b90fd53ca3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\parser\recursive_descent">
+      <UniqueIdentifier>{9f1c5b9f-b5de-4634-ba24-a75f062f8958}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\parser\precedence">
+      <UniqueIdentifier>{edb6ffdc-735d-4d2f-9ca8-ba7d18d389c6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\framework\core\pch.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\core\status.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\core\file_data_provider.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\core\content.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\core\logger.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\grammar\symbol.cpp">
+      <Filter>frontend\grammar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\grammar\rule.cpp">
+      <Filter>frontend\grammar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\grammar\grammar.cpp">
+      <Filter>frontend\grammar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\core\unicode.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\core\domain_helper.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\fsa\fsa_state.cpp">
+      <Filter>frontend\fsa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\fsa\fsa_transition.cpp">
+      <Filter>frontend\fsa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\fsa\fsa.cpp">
+      <Filter>frontend\fsa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\fsa\fsa_visualization.cpp">
+      <Filter>frontend\fsa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\fsa\fsa_re.cpp">
+      <Filter>frontend\fsa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\core\text.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\fsa\fsa_algorithm.cpp">
+      <Filter>frontend\fsa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\fsa\fsa_state_set.cpp">
+      <Filter>frontend\fsa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\fsa\fsa_codegen.cpp">
+      <Filter>frontend\fsa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\grammar\grammar_visualization.cpp">
+      <Filter>frontend\grammar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\grammar\grammar_algorithm.cpp">
+      <Filter>frontend\grammar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\parser\ll\ll_visualization.cpp">
+      <Filter>frontend\parser\ll</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\parser\ll\ll_algorithm.cpp">
+      <Filter>frontend\parser\ll</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\parser\parser_algorithm.cpp">
+      <Filter>frontend\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\parser\lr\lr_visualization.cpp">
+      <Filter>frontend\parser\lr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\parser\lr\lr_algorithm.cpp">
+      <Filter>frontend\parser\lr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\parser\operator_precedence\precedence_algorithm.cpp">
+      <Filter>frontend\parser\precedence</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\parser\operator_precedence\precedence_visualization.cpp">
+      <Filter>frontend\parser\precedence</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\parser\earley\earley_visualization.cpp">
+      <Filter>frontend\parser\earley</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\parser\earley\earley_algorithm.cpp">
+      <Filter>frontend\parser\earley</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\framework\frontend\lexical_analyzer\lexical_analyzer.inl">
+      <Filter>frontend\lexical_analyzer</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\parser\parser.inl">
+      <Filter>frontend\parser</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\tree\ast.inl">
+      <Filter>frontend\tree</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\tree\cst.inl">
+      <Filter>frontend\tree</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\parser\backtracking\recursive_descent_parser.inl">
+      <Filter>frontend\parser\recursive_descent</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\parser\ll\ll_parser.inl">
+      <Filter>frontend\parser\ll</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\parser\lr\lr_parser.inl">
+      <Filter>frontend\parser\lr</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\parser\operator_precedence\precedence_parser.inl">
+      <Filter>frontend\parser\precedence</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\parser\earley\earley_parser.inl">
+      <Filter>frontend\parser\earley</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\semantics\symbol_attribute.inl">
+      <Filter>frontend\semantics</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\semantics\symbol_table.inl">
+      <Filter>frontend\semantics</Filter>
+    </None>
+  </ItemGroup>
+</Project>

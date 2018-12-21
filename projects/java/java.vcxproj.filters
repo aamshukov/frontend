@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="core">
+      <UniqueIdentifier>{9aa861da-b63c-4e2a-9b7c-5d11b34ad80e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend">
+      <UniqueIdentifier>{6555e9bf-6b68-4c4c-be2f-c083afec4bd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\lexical_analyzer">
+      <UniqueIdentifier>{fffb1225-0deb-4d88-a80f-aaf2fd6c6772}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\grammar">
+      <UniqueIdentifier>{7abfcd8e-fff4-4493-9bbc-9b31eb9797b9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\framework\core\pch.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\languages\java\frontend\lexical_analyzer\java_lexical_analyzer.cpp">
+      <Filter>frontend\lexical_analyzer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\languages\java\frontend\grammar\java_token.cpp">
+      <Filter>frontend\grammar</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\languages\java\frontend\lexical_analyzer\java_lexical_analyzer.hpp">
+      <Filter>frontend\lexical_analyzer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\languages\java\frontend\grammar\java_token.hpp">
+      <Filter>frontend\grammar</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
