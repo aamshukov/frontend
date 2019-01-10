@@ -160,6 +160,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)..\libs\ICU\icu4c-60_2\lib64;$(SolutionDir)..\build\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>icudt.lib;icuind.lib;icuiod.lib;icutestd.lib;icutud.lib;icuucd.lib;framework.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackCommitSize>
+      </StackCommitSize>
+      <StackReserveSize>
+      </StackReserveSize>
     </Link>
     <PostBuildEvent>
       <Command>xcopy $(TargetPath) $(SolutionDir)..\build\$(PlatformTarget)\$(Configuration)\ /F /Y</Command>

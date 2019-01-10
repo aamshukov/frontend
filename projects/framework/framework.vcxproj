@@ -34,6 +34,7 @@
     <ClInclude Include="..\..\framework\core\noncopyable.hpp" />
     <ClInclude Include="..\..\Framework\Core\pch.hpp" />
     <ClInclude Include="..\..\framework\core\singleton.hpp" />
+    <ClInclude Include="..\..\framework\core\statistics.hpp" />
     <ClInclude Include="..\..\framework\core\status.hpp" />
     <ClInclude Include="..\..\framework\core\file_data_provider.hpp" />
     <ClInclude Include="..\..\framework\core\text.hpp" />
@@ -116,6 +117,12 @@
     <ClCompile Include="..\..\framework\frontend\parser\parser_algorithm.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <MASM Include="..\..\framework\backend\generator\x64\gen.asm">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Soft\nasm\nasm.exe -f win64 -gcv8 -l $(ProjectDir)..\..\Framework\backend\generator\x64\gen.lst $(ProjectDir)..\..\Framework\backend\generator\x64\gen.asm</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Projects\fe\framework\backend\generator\x64\gen.obj</Outputs>
+    </MASM>
     <None Include="..\..\framework\frontend\lexical_analyzer\lexical_analyzer.inl" />
     <None Include="..\..\framework\frontend\parser\backtracking\recursive_descent_parser.inl" />
     <None Include="..\..\framework\frontend\parser\earley\earley_parser.inl" />
@@ -164,6 +171,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -270,5 +278,6 @@ xcopy $(SolutionDir)..\libs\ICU\icu4c-60_2\bin64\*.dll $(SolutionDir)..\build\$(
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
   </ImportGroup>
 </Project>

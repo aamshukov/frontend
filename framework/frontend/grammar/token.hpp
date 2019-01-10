@@ -84,7 +84,7 @@ struct token
             offset = INVALID_VALUE;
             length = INVALID_VALUE;
 
-            flags = flags::clear;
+            flags = flags::clear | flags::genuine;
         }
 
         codepoints_type codepoints(const datum_type* content) const

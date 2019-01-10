@@ -44,6 +44,7 @@
 #include <core\content.hpp>
 
 #include <core\diagnostics.hpp>
+#include <core\statistics.hpp>
 
 #include <frontend\lexical_analyzer\lexical_analyzer.hpp>
 

@@ -937,7 +937,7 @@ void grammar_algorithm::build_first_set(grammar& gr, uint8_t k, bool build_eff)
                                   rhs_fus_prime.emplace_back(fas_prime[symb]);
                               });
 
-                // instead of TRUNKk(F'(u1) F'(u2) ... F'(uN)) using infix-op instead { Fi-1(Y1) (+)k Fi-1(Y2) (+)k ... (+) Fi-1(Yn) } ∪ Fi-1(Y1)
+                // instead of TRUNKk(F'(u1) F'(u2) ... F'(uN)) using infix-op { Fi-1(Y1) (+)k Fi-1(Y2) (+)k ... (+) Fi-1(Yn) } ∪ Fi-1(Y1)
                 sets_type rhs_fus_prime_result;
 
                 infix_operator(rhs_fus_prime, k, rhs_fus_prime_result);
@@ -975,7 +975,7 @@ void grammar_algorithm::build_first_set(grammar& gr, uint8_t k, bool build_eff)
             if(fa != fa_prime)
             {
                 changing = true;
-                break; // no break if need to keep going to print current sets
+                //break; // no break if need to keep going to print current sets
             }
         }
     }
@@ -1165,7 +1165,7 @@ void grammar_algorithm::build_follow_set(grammar& gr, uint8_t k)
 
     // 1. FL(S) = {λ} or {$}
     flas.emplace(follow_set_type::value_type(gr.start_symbol(), sets_type { set_type { symbol::epsilon } }));
-    // flas.emplace(follow_set_type::value_type(gr.start_symbol(), sets_type { set_type { symbol::eof } }));
+    //flas.emplace(follow_set_type::value_type(gr.start_symbol(), sets_type { set_type { symbol::eof } }));
 
     // 2. for each A ∈ N-{S} do FL(A) = Ø
     //  follow sets are empty by default
@@ -1697,7 +1697,7 @@ void grammar_algorithm::apply_left_factoring(grammar& gr)
         const auto& nonterminal((*(gr.pool().find(nonterminal_kvp.first))).second);
 
         auto nonterminal_it(gr.nt_rules().find((*nonterminal).name()));
-        auto& nonterminal_rules((*nonterminal_it).second); // take address, as code below might modify nonterminal rules
+        auto& nonterminal_rules((*nonterminal_it).second); // take non-const address, as code below might modify nonterminal rules
 
         std::sort(nonterminal_rules.begin(),
                   nonterminal_rules.end(),
@@ -2094,7 +2094,18 @@ void grammar_algorithm::infix_operator(const std::vector<typename grammar_algori
         //  0 0 1
         //  ...
         //  1 1 2
-        std::vector<std::vector<std::size_t>> cartesian_product_result = cartesian_product(indices);
+        std::vector<std::vector<std::size_t>> cartesian_product_result(cartesian_product(indices));
+
+        //if(sets.size() == 1) // cartesian product result must be empty
+        //{
+        //    cartesian_product_result.emplace_back(std::vector<std::size_t>());
+
+        //    std::vector<std::vector<std::size_t>> s = { {} };
+
+        //    std::size_t j = 0;
+
+        //    std::for_each(sets[0].begin(), sets[0].end(), [&cartesian_product_result, &j](const auto&){ cartesian_product_result[0].emplace_back(j++); });
+        //}
 
         // combine
         sets_type result_sets;

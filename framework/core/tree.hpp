@@ -17,7 +17,6 @@ struct tree
     nodes_type kids;
 };
 
-
 END_NAMESPACE
 
 #endif // __TREE_H__

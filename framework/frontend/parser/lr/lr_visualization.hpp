@@ -24,7 +24,7 @@ class lr_visualization : private noncopyable
         using lr_item_type = lr_algorithm::lr_item_type;
         using lr_items_type = lr_algorithm::lr_items_type;
 
-        using lr_collection_element_type = lr_algorithm::lr_collection_element_type;
+        using lr_collection_element_type = lr_algorithm::lr_collection_type;
         using lr_canonical_collection_type = lr_algorithm::lr_canonical_collection_type;
 
         using lr_goto_function_type = lr_algorithm::lr_goto_function_type;

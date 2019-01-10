@@ -25,31 +25,29 @@ class lr_algorithm : private noncopyable
 
         struct lr_item
         {
-            std::size_t id;            // unique id
-            rule_type   production;    // production (rule)
-            uint32_t    dot_position;  // dot - position in rhs,
-                                       // if dot_position = rhs.size() it means it points to the end of the rhs
-            set_type    la;            // lookahead for LR(k)/LALR(k) where k > 0
+            rule_type   rule;   // production (rule)
+            uint32_t    dot;    // dot - position in rhs, if dot_position = rhs.size() it means it points to the end of the rhs
+
+            sets_type   la;     // lookahead for LR(k)/LALR(k) where k > 0, for LALR(k) might be set
 
             bool operator == (const lr_item& other)
             {
-                return (*production).id() == (*other.production).id() && dot_position == other.dot_position && la == other.la;
+                return (*rule).id() == (*other.rule).id() && dot == other.dot && la == other.la;
             }
         };
 
         using lr_item_type = std::shared_ptr<lr_item>;
         using lr_items_type = std::vector<lr_item_type>;
 
-        struct lr_collection_element
+        struct lr_collection
         {
             std::size_t   id;
             flags         flags;
             lr_items_type items;
-
         };
 
-        using lr_collection_element_type = std::shared_ptr<lr_collection_element>;
-        using lr_canonical_collection_type = std::map<uint32_t, lr_collection_element_type>;
+        using lr_collection_type = std::shared_ptr<lr_collection>;
+        using lr_canonical_collection_type = std::map<uint32_t, lr_collection_type>;
 
         using lr_goto_function_type = std::map<uint32_t, symbol_type>;
 

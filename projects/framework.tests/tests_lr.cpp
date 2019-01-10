@@ -44,6 +44,7 @@
 #include <core\content.hpp>
 
 #include <core\diagnostics.hpp>
+#include <core\statistics.hpp>
 
 #include <frontend\lexical_analyzer\lexical_analyzer.hpp>
 
@@ -73,22 +74,28 @@ void test_lr_table()
 
     uint8_t k = 1;
 
-    {
-        lr_algorithm::lr_items_type items;
+    grammar_algorithm::build_nullability_set(gr);
+    grammar_algorithm::build_first_set(gr, k);
+    grammar_algorithm::build_first_set(gr, k, true);
+    grammar_algorithm::build_follow_set(gr, k);
+    grammar_algorithm::build_la_set(gr, k);
 
-        grammar_algorithm::symbols_type symbols;
-        symbols.emplace_back(symbol::epsilon);
+    //{
+    //    lr_algorithm::lr_items_type items;
 
-        lr_algorithm::build_lr_items_set(gr, symbols, k, items);
-    }
-    {
-        lr_algorithm::lr_items_type items;
+    //    grammar_algorithm::symbols_type symbols;
+    //    symbols.emplace_back(symbol::epsilon);
 
-        grammar_algorithm::symbols_type symbols;
-        symbols.emplace_back(gr.pool()[L"S"]);
+    //    lr_algorithm::build_lr_items_set(gr, symbols, k, items);
+    //}
+    //{
+    //    lr_algorithm::lr_items_type items;
 
-        lr_algorithm::build_lr_items_set(gr, symbols, k, items);
-    }
+    //    grammar_algorithm::symbols_type symbols;
+    //    symbols.emplace_back(gr.pool()[L"S"]);
+
+    //    lr_algorithm::build_lr_items_set(gr, symbols, k, items);
+    //}
     {
         lr_algorithm::lr_items_type items;
 

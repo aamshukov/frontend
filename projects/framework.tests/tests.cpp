@@ -43,6 +43,7 @@
 #include <core\content.hpp>
 
 #include <core\diagnostics.hpp>
+#include <core\statistics.hpp>
 
 #include <frontend\lexical_analyzer\lexical_analyzer.hpp>
 
@@ -242,10 +243,15 @@ void test_operator_precedence();
 void test_eff();
 void test_lr_table();
 
+extern "C" double CombineA(int a, int b, int c, int d, int e, double f);
+extern "C" void _start();
+
 int main()
 {
     USINGNAMESPACE(core)
     USINGNAMESPACE(frontend)
+
+    std::cout << "CombineA: " << CombineA(1,2,3,4, 5, 6.1) << std::endl;
 
     auto id = static_cast<uint32_t>(-1);
     std::int32_t id0 = static_cast<int32_t>(id);

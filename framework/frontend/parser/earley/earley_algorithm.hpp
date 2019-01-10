@@ -28,7 +28,7 @@ class earley_algorithm : private noncopyable
         struct core_item
         {
             uint32_t  id;           // unique id
-            rule_type production;   // production (rule)
+            rule_type rule;   // production (rule)
             uint32_t  dot_position; // dot - position in rhs,
                                     // if dot_position = rhs.size() it means it points to the end of the rhs
         };

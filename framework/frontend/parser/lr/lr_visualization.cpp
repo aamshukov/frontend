@@ -25,14 +25,10 @@ string_type lr_visualization::decorate_lr_item(const typename lr_visualization::
 {
     string_type result;
 
-    char_type buffer[64];
+    result += L"[ ";
 
-    for(const auto& sym : (*(*item).production).lhs())
+    for(const auto& sym : (*(*item).rule).lhs())
     {
-        snwprintf(buffer, array_size(buffer), TRUNCATE, L"[%4zd] ", (*item).id);
-
-        result += buffer;
-
         if((*sym).terminal() && (*sym).id() != (*symbol::epsilon).id() && (*sym).id() != (*symbol::op_mark).id())
         {
             result += L"'";
@@ -50,11 +46,11 @@ string_type lr_visualization::decorate_lr_item(const typename lr_visualization::
 
     result += L": ";
 
-    for(const auto& [k, sym] : enumerate((*(*item).production).rhs()))
+    for(const auto& [k, sym] : enumerate((*(*item).rule).rhs()))
     {
-        if(k == (*item).dot_position)
+        if(k == (*item).dot)
         {
-            result += L" . ";
+            result += L". ";
         }
 
         if((*sym).terminal() && (*sym).id() != (*symbol::epsilon).id() && (*sym).id() != (*symbol::op_mark).id())
@@ -72,10 +68,19 @@ string_type lr_visualization::decorate_lr_item(const typename lr_visualization::
         result += L" ";
     }
 
-    if((*item).dot_position == (*(*item).production).rhs().size())
+    if((*item).dot == (*(*item).rule).rhs().size())
     {
-        result += L" .";
+        result += L". , ";
     }
+    else
+    {
+        result += L", ";
+    }
+
+    result += grammar_visualization::decorate_sets((*item).la, false);
+
+    result += L"]";
+    result += L"\n";
 
     return result;
 }
@@ -93,11 +98,16 @@ string_type lr_visualization::decorate_lr_items(const typename lr_visualization:
                      content << decorate_lr_item(item).c_str();
                  });
 
-    content << std::endl;
-
     result = content.str();
 
     return result;
 }
 
 END_NAMESPACE
+
+
+
+    //char_type buffer[64];
+        //snwprintf(buffer, array_size(buffer), TRUNCATE, L"[%4zd] ", (*item).id);
+
+        //result += buffer;

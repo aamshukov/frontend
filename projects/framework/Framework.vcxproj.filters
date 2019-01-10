@@ -166,6 +166,9 @@
     <ClInclude Include="..\..\framework\frontend\semantics\symbol_attribute.hpp">
       <Filter>frontend\semantics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\core\statistics.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="backend">
@@ -221,6 +224,9 @@
     </Filter>
     <Filter Include="frontend\parser\precedence">
       <UniqueIdentifier>{edb6ffdc-735d-4d2f-9ca8-ba7d18d389c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="backend\generator\x64">
+      <UniqueIdentifier>{99edacde-fd9e-49ea-aabb-23e15810fa7a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -349,5 +355,10 @@
     <None Include="..\..\framework\frontend\semantics\symbol_table.inl">
       <Filter>frontend\semantics</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="..\..\framework\backend\generator\x64\gen.asm">
+      <Filter>backend\generator\x64</Filter>
+    </MASM>
   </ItemGroup>
 </Project>
