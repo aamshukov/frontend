@@ -10,10 +10,12 @@ BEGIN_NAMESPACE(core)
 
 enum class flags : uint64_t
 {
-    clear = 0x00,
-    marked = 0x01,
-    genuine = 0x02,
-    synthetic = 0x04 // additional (artificial) tokens which are inserted into the token stream ...
+    clear     = 0x00,
+    nothing   = 0x00,
+    marked    = 0x01,
+    genuine   = 0x02,
+    synthetic = 0x04, // additional (artificial) tokens which are inserted into the token stream ...
+    final     = 0x08
 };
 
 using T = std::underlying_type_t <flags>;

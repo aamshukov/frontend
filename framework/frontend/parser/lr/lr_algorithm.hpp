@@ -23,6 +23,8 @@ class lr_algorithm : private noncopyable
         using set_type = grammar::set_type;
         using sets_type = grammar::sets_type;
 
+        using counter_type = counter;
+
         struct lr_item
         {
             rule_type   rule;   // production (rule)
@@ -39,36 +41,102 @@ class lr_algorithm : private noncopyable
         using lr_item_type = std::shared_ptr<lr_item>;
         using lr_items_type = std::vector<lr_item_type>;
 
-        struct lr_collection
+        struct lr_transition;
+
+        using lr_transition_type = std::shared_ptr<lr_transition>;
+        using lr_transitions_type = std::map<symbol_type, lr_transition_type, symbol::symbol_key_comparator>;
+
+        using flags_type = flags;
+
+        struct lr_state // automaton state with set of items
         {
-            std::size_t   id;
-            flags         flags;
-            lr_items_type items;
+            uint32_t            id;            // unique id
+
+            lr_items_type       items;         // list of items
+            lr_transitions_type transitions;   // outcomming transitions
+
+            flags_type          flags;         // flags
+
+            bool operator == (const lr_state& other)
+            {
+                bool result = items.size() == other.items.size();
+
+                if(result)
+                {
+                    for(std::size_t i = 0, n = items.size(); i < n; i++)
+                    {
+                        if(!(*items[i] == *other.items[i]))
+                        {
+                            result = false;
+                            break;
+                        }
+                    }
+                }
+
+                return result;
+            }
         };
 
-        using lr_collection_type = std::shared_ptr<lr_collection>;
-        using lr_canonical_collection_type = std::map<uint32_t, lr_collection_type>;
+        using lr_state_type = std::shared_ptr<lr_state>;
+        using lr_states_type = std::vector<lr_state_type>;
 
-        using lr_goto_function_type = std::map<uint32_t, symbol_type>;
+        struct lr_transition
+        {
+            lr_state_type state;  // to state
+            symbol_type   symbol; // predicate
+
+            bool operator == (const lr_transition& other)
+            {
+                return (*symbol).id() == (*other.symbol).id() && (*state).id == (*other.state).id;
+            }
+        };
+
+        using lr_goto_table_type = std::map<std::pair<uint32_t, uint32_t>, uint32_t>;
+
+
+
+
+
+        using lr_canonical_collection_type = std::vector<lr_items_type>;
+
+
+        //??
 
         using lr_action_table_row_type = std::vector<std::optional<rule_type>>;
         using lr_action_table_type = std::vector<lr_action_table_row_type>;
 
         using lr_goto_table_row_type = std::vector<std::optional<uint32_t>>;
-        using lr_goto_table_type = std::vector<lr_goto_table_row_type>;
+        //using lr_goto_table_type = std::vector<lr_goto_table_row_type>;
 
-        static bool lr_items_equal(const lr_item_type& lhs, const lr_item_type& rhs);
-        static bool has_lr_item(const lr_items_type& items, const lr_item_type& item);
+    private:
+        static bool             lr_items_equal(const lr_item_type& lhs, const lr_item_type& rhs);
+        static bool             has_lr_item(const lr_items_type& items, const lr_item_type& item);
+
+        static bool             lr_states_equal(const lr_state_type& lhs, const lr_state_type& rhs);
+        static bool             has_lr_state(const lr_states_type& states, const lr_state_type& state);
 
     public:
-        static void build_lr_items_set(const grammar& gr, const symbols_type& symbols, uint8_t k, lr_items_type& result); // symbols = viable prefix
-        static void build_lr_items_canonical_collection(const grammar& gr, uint8_t k, lr_canonical_collection_type& result);
+        static void             calculate_lr_closure(const grammar& gr, uint8_t k, const lr_state_type& state);
+
+        static lr_state_type    calculate_lr_goto(const grammar& gr,
+                                                  uint8_t k,
+                                                  const lr_state_type& state, // I
+                                                  const symbol_type& symb);   // X
+
+        static void             build_goto_table(const grammar& gr, const lr_states_type& states, lr_algorithm::lr_goto_table_type& result);
+
+        static void             build_lr_automaton(const grammar& gr, uint8_t k, lr_states_type& result);
+
+        static void             build_lr_table(const grammar& gr, uint8_t k, lr_action_table_type& action_table_result, lr_goto_table_type& goto_table_result);
 
     public:
-        static void build_lr_table(const grammar& gr, uint8_t k, lr_action_table_type& action_table, lr_goto_table_type& goto_table);
+        static void             build_lr_canonical_collection(const grammar& gr, uint8_t k, lr_canonical_collection_type& result);
 
-        static void build_lalr_table_yacc(const grammar& gr, uint8_t k, lr_action_table_type& action_table, lr_goto_table_type& goto_table);
-        static void build_lalr_table_deremer(const grammar& gr, uint8_t k, lr_action_table_type& action_table, lr_goto_table_type& goto_table);
+    public:
+        static void             build_lr_items_set_for_viable_prefix(const grammar& gr,
+                                                                     const symbols_type& symbols, // symbols = viable prefix
+                                                                     uint8_t k,
+                                                                     lr_items_type& result);
 };
 
 END_NAMESPACE

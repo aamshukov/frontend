@@ -19,6 +19,7 @@ class counter : private noncopyable
         uint32_t    number();
         uint32_t    value();
 
+        void        rewind();
         void        reset(uint32_t count = 0);
 };
 
@@ -35,6 +36,11 @@ inline uint32_t counter::number()
 inline uint32_t counter::value()
 {
     return my_count;
+}
+
+inline void counter::rewind()
+{
+    my_count--;
 }
 
 inline void counter::reset(uint32_t count)

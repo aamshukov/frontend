@@ -828,7 +828,6 @@ void grammar_algorithm::build_first_set(grammar& gr, uint8_t k, bool build_eff)
 
     // 1. for each a ∈ T do F'(a) = {a}
     // FIRSTk(a) = { { a } }
-    // FIRSTk(λ) = { { λ } }
     for(const auto& terminal : terminals)
     {
         if(build_eff && (*terminal).id() == (*symbol::epsilon).id())
@@ -837,6 +836,26 @@ void grammar_algorithm::build_first_set(grammar& gr, uint8_t k, bool build_eff)
         }
 
         fas.emplace(first_set_type::value_type(terminal, sets_type { set_type { terminal } }));
+    }
+
+    // FIRSTk(λ) = { { λ } }
+    if(!build_eff)
+    {
+        if((*symbol::epsilon).first_sets().empty())
+        {
+            fas.emplace(first_set_type::value_type(symbol::epsilon, sets_type { set_type { symbol::epsilon } }));
+        }
+    }
+    // FIRSTk($) = { { $ } }
+    if((*symbol::eof).first_sets().empty())
+    {
+        fas.emplace(first_set_type::value_type(symbol::eof, sets_type { set_type { symbol::eof } }));
+    }
+
+    // FIRSTk(#) = { { # } }
+    if((*symbol::op_mark).first_sets().empty())
+    {
+        fas.emplace(first_set_type::value_type(symbol::op_mark, sets_type { set_type { symbol::op_mark } }));
     }
 
     // 2. for each A ∈ N do F(A) = {λ} if A is nullable or empty otherwise
@@ -998,6 +1017,7 @@ void grammar_algorithm::build_first_set(grammar& gr, uint8_t k, bool build_eff)
         }
     }
 
+    // visualization
     if(build_eff)
     {
         log_info(L"EFF SETS:");
@@ -2095,17 +2115,6 @@ void grammar_algorithm::infix_operator(const std::vector<typename grammar_algori
         //  ...
         //  1 1 2
         std::vector<std::vector<std::size_t>> cartesian_product_result(cartesian_product(indices));
-
-        //if(sets.size() == 1) // cartesian product result must be empty
-        //{
-        //    cartesian_product_result.emplace_back(std::vector<std::size_t>());
-
-        //    std::vector<std::vector<std::size_t>> s = { {} };
-
-        //    std::size_t j = 0;
-
-        //    std::for_each(sets[0].begin(), sets[0].end(), [&cartesian_product_result, &j](const auto&){ cartesian_product_result[0].emplace_back(j++); });
-        //}
 
         // combine
         sets_type result_sets;

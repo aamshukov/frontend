@@ -68,7 +68,9 @@ void test_lr_table()
 {
     grammar gr;
 
-    gr.load(LR"(D:\Projects\fe\grammars\LR.Aho.G5.29.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\LR.Aho.G5.29.txt)");
+    gr.load(LR"(D:\Projects\fe\grammars\LR.Aho.G.4.55.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\GruneJacobsBook.LR.9.32.txt)");
 
     std::wcout << grammar_visualization::decorate_grammar(gr) << std::endl;
 
@@ -86,7 +88,7 @@ void test_lr_table()
     //    grammar_algorithm::symbols_type symbols;
     //    symbols.emplace_back(symbol::epsilon);
 
-    //    lr_algorithm::build_lr_items_set(gr, symbols, k, items);
+    //    lr_algorithm::build_lr_items_set_for_viable_prefix(gr, symbols, k, items);
     //}
     //{
     //    lr_algorithm::lr_items_type items;
@@ -94,17 +96,17 @@ void test_lr_table()
     //    grammar_algorithm::symbols_type symbols;
     //    symbols.emplace_back(gr.pool()[L"S"]);
 
-    //    lr_algorithm::build_lr_items_set(gr, symbols, k, items);
+    //    lr_algorithm::build_lr_items_set_for_viable_prefix(gr, symbols, k, items);
     //}
-    {
-        lr_algorithm::lr_items_type items;
+    //{
+    //    lr_algorithm::lr_items_type items;
 
-        grammar_algorithm::symbols_type symbols;
-        symbols.emplace_back(gr.pool()[L"S"]);
-        symbols.emplace_back(gr.pool()[L"a"]);
+    //    grammar_algorithm::symbols_type symbols;
+    //    symbols.emplace_back(gr.pool()[L"S"]);
+    //    symbols.emplace_back(gr.pool()[L"a"]);
 
-        lr_algorithm::build_lr_items_set(gr, symbols, k, items);
-    }
+    //    lr_algorithm::build_lr_items_set_for_viable_prefix(gr, symbols, k, items);
+    //}
 
     lr_algorithm::lr_action_table_type action_table;
     lr_algorithm::lr_goto_table_type goto_table;

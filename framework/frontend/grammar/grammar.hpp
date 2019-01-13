@@ -16,6 +16,7 @@ class grammar : private noncopyable
         using symbols_type = rule::symbols_type;
 
         using pool_type = std::map<string_type, symbol_type>;
+        using pool_index_type = std::map<uint32_t, symbol_type>;
 
         using rule_type = std::shared_ptr<rule>;
         using rules_type = std::vector<rule_type>;
@@ -28,6 +29,7 @@ class grammar : private noncopyable
     private:
         rules_type              my_rules;
         pool_type               my_pool;
+        pool_index_type         my_indexed_pool;
         nts_rules_type          my_nt_rules;
 
     private:
@@ -44,6 +46,9 @@ class grammar : private noncopyable
 
         const pool_type&        pool() const;
         pool_type&              pool();
+
+        const pool_index_type&  indexed_pool() const;
+        pool_index_type&        indexed_pool();
 
         const nts_rules_type&   nt_rules() const;
         nts_rules_type&         nt_rules();
@@ -69,6 +74,16 @@ inline const typename grammar::pool_type& grammar::pool() const
 inline typename grammar::pool_type& grammar::pool()
 {
     return my_pool;
+}
+
+inline const typename grammar::pool_index_type& grammar::indexed_pool() const
+{
+    return my_indexed_pool;
+}
+
+inline typename grammar::pool_index_type& grammar::indexed_pool()
+{
+    return my_indexed_pool;
 }
 
 inline const typename grammar::nts_rules_type& grammar::nt_rules() const
