@@ -291,6 +291,7 @@ void lr_algorithm::build_lr_automaton(const grammar& gr, uint8_t k, typename lr_
 
                 if((*symb).id() == (*symbol::epsilon).id())
                 {
+                    // some books consider λ and some do not
                     continue; // λ is not counting
                 }
 
@@ -383,7 +384,50 @@ void lr_algorithm::build_lr_automaton(const grammar& gr, uint8_t k, typename lr_
     log_info(L"Built LR(%d) automaton.", k);
 }
 
-void lr_algorithm::build_goto_table(const grammar& gr, const typename lr_algorithm::lr_states_type& states, typename lr_algorithm::lr_goto_table_type& result)
+void lr_algorithm::build_action_table(const grammar& gr,
+                                      const typename lr_algorithm::lr_states_type& states,
+                                      typename lr_algorithm::lr_action_table_type& result)
+{
+    log_info(L"Building ACTION table ...");
+
+    lr_action_table_type action_table;
+
+    // build table
+    for(const auto& state : states)
+    {
+    state;
+        //for(const auto& symb_kvp : gr.pool())
+        //{
+        //    const auto& symb(symb_kvp.second);
+
+        //    const auto& transitions((*state).transitions);
+        //    const auto& transition_it(transitions.find(symb));
+
+        //    if(transition_it != (*state).transitions.end())
+        //    {
+        //        auto key(std::make_pair((*symb).id(), (*state).id));
+
+        //        if(goto_table.find(key) == goto_table.end())
+        //        {
+        //            goto_table.emplace(lr_goto_table_type::value_type(key, (*(*(*transition_it).second).state).id));
+        //        }
+        //    }
+        //}
+    }
+
+    // get result
+    result.swap(action_table);
+
+    // visualize
+    log_info(L"ACTION table:");
+    log_info(L"%s", lr_visualization::decorate_lr_action_table(gr, states, result).c_str());
+
+    log_info(L"Built ACTION table .");
+}
+
+void lr_algorithm::build_goto_table(const grammar& gr,
+                                    const typename lr_algorithm::lr_states_type& states,
+                                    typename lr_algorithm::lr_goto_table_type& result)
 {
     log_info(L"Building GOTO table ...");
 
@@ -434,6 +478,8 @@ action_table;
     build_lr_automaton(gr, k, automaton);
 
     build_goto_table(gr, automaton, goto_table);
+
+
 
 
     lr_canonical_collection_type canonical_collection;

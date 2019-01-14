@@ -30,19 +30,7 @@ class lr_visualization : private noncopyable
         using lr_transition_type = lr_algorithm::lr_transition_type;
         using lr_transitions_type = lr_algorithm::lr_transitions_type;
 
-        using lr_goto_table_type = lr_algorithm::lr_goto_table_type;
-
-
-
-        //using lr_collection_element_type = lr_algorithm::lr_collection_type;
-        //using lr_canonical_collection_type = lr_algorithm::lr_canonical_collection_type;
-
-        using lr_goto_function_type = lr_algorithm::lr_goto_table_type;
-
-        using lr_action_table_row_type = lr_algorithm::lr_action_table_row_type;
         using lr_action_table_type = lr_algorithm::lr_action_table_type;
-
-        using lr_goto_table_row_type = lr_algorithm::lr_goto_table_row_type;
         using lr_goto_table_type = lr_algorithm::lr_goto_table_type;
 
     public:
@@ -55,7 +43,12 @@ class lr_visualization : private noncopyable
         static string_type decorate_lr_state(const lr_state_type& state);
         static string_type decorate_lr_states(const lr_states_type& states);
 
-        static string_type decorate_lr_goto_table(const grammar& gr, const lr_states_type& states, const lr_goto_table_type& goto_table);
+        static string_type decorate_lr_action_table(const grammar& gr,
+                                                    const lr_states_type& states,
+                                                    const lr_action_table_type& result);
+        static string_type decorate_lr_goto_table(const grammar& gr,
+                                                  const lr_states_type& states,
+                                                  const lr_goto_table_type& result);
 };
 
 END_NAMESPACE

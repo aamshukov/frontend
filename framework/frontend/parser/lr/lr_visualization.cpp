@@ -141,7 +141,7 @@ string_type lr_visualization::decorate_lr_state(const lr_state_type& state)
     string_type result;
 
     char_type buffer[64];
-    snwprintf(buffer, array_size(buffer), TRUNCATE, L"[%4d %s] ", (*state).id, (((*state).flags & flags::final) == flags::final) ? L"*" : L"");
+    snwprintf(buffer, array_size(buffer), TRUNCATE, L"[%4d (%zd) %s] ", (*state).id, (*state).items.size(), (((*state).flags & flags::final) == flags::final) ? L"*" : L"");
 
     result += buffer;
     result += L"\n";
@@ -172,13 +172,73 @@ string_type lr_visualization::decorate_lr_states(const typename lr_visualization
     return result;
 }
 
+string_type lr_visualization::decorate_lr_action_table(const grammar& gr,
+                                                       const typename lr_visualization::lr_states_type& states,
+                                                       const typename lr_visualization::lr_action_table_type& action_table)
+{
+    string_type result;
+
+    const std::size_t table_cell_width = 8;
+
+    auto alignment = std::left;
+
+    std::wstringstream content;
+
+    content <<
+    std::endl <<
+    alignment << std::setw(table_cell_width) << std::setfill(L' ') << L' ';
+
+    for(const auto& symb_kvp : gr.pool())
+    {
+        const auto& pool_symb(symb_kvp.second);
+
+        content << alignment << std::setw(table_cell_width) << std::setfill(L' ') << (*pool_symb).name().c_str();
+    }
+
+    content << std::endl;
+
+    for(const auto& _ : gr.pool())
+    {
+        _;
+        content << alignment << std::setw(table_cell_width + 1) << std::setfill(L'-') << L"-";
+    }
+
+    content << std::endl;
+
+    for(std::size_t i = 0, n = states.size(); i < n; i++) // i = state id
+    {
+        content << alignment << std::setw(table_cell_width) << std::setfill(L' ') << std::to_wstring(i);
+
+        for(const auto& symb_kvp : gr.pool())
+        {
+            const auto& pool_symb(symb_kvp.second);
+
+            string_type entry_text = L" ";
+
+            const auto& key(std::make_pair((*pool_symb).id(), static_cast<uint32_t>(i)));
+
+            const auto& it(action_table.find(key));
+            
+            if(it != action_table.end())
+            {
+                entry_text = std::to_wstring((*it).second);
+            }
+
+            content << alignment << std::setw(table_cell_width) << std::setfill(L' ') << entry_text.c_str();
+        }
+
+        content << std::endl;
+    }
+
+    result = content.str();
+
+    return result;
+}
+
 string_type lr_visualization::decorate_lr_goto_table(const grammar& gr,
                                                      const typename lr_visualization::lr_states_type& states,
                                                      const typename lr_visualization::lr_goto_table_type& goto_table)
 {
-goto_table;
-gr;
-
     string_type result;
 
     const std::size_t table_cell_width = 8;

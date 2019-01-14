@@ -91,22 +91,14 @@ class lr_algorithm : private noncopyable
             }
         };
 
+        using lr_action_table_type = std::map<std::pair<uint32_t, uint32_t>, uint32_t>;
         using lr_goto_table_type = std::map<std::pair<uint32_t, uint32_t>, uint32_t>;
 
 
 
 
-
-        using lr_canonical_collection_type = std::vector<lr_items_type>;
-
-
         //??
-
-        using lr_action_table_row_type = std::vector<std::optional<rule_type>>;
-        using lr_action_table_type = std::vector<lr_action_table_row_type>;
-
-        using lr_goto_table_row_type = std::vector<std::optional<uint32_t>>;
-        //using lr_goto_table_type = std::vector<lr_goto_table_row_type>;
+        using lr_canonical_collection_type = std::vector<lr_items_type>;
 
     private:
         static bool             lr_items_equal(const lr_item_type& lhs, const lr_item_type& rhs);
@@ -123,9 +115,9 @@ class lr_algorithm : private noncopyable
                                                   const lr_state_type& state, // I
                                                   const symbol_type& symb);   // X
 
-        static void             build_goto_table(const grammar& gr, const lr_states_type& states, lr_algorithm::lr_goto_table_type& result);
-
         static void             build_lr_automaton(const grammar& gr, uint8_t k, lr_states_type& result);
+        static void             build_action_table(const grammar& gr, const lr_states_type& states, lr_algorithm::lr_action_table_type& result);
+        static void             build_goto_table(const grammar& gr, const lr_states_type& states, lr_algorithm::lr_goto_table_type& result);
 
         static void             build_lr_table(const grammar& gr, uint8_t k, lr_action_table_type& action_table_result, lr_goto_table_type& goto_table_result);
 

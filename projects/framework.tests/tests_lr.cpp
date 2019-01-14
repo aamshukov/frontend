@@ -69,8 +69,19 @@ void test_lr_table()
     grammar gr;
 
     //gr.load(LR"(D:\Projects\fe\grammars\LR.Aho.G5.29.txt)");
-    gr.load(LR"(D:\Projects\fe\grammars\LR.Aho.G.4.55.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\LR.Aho.G.4.55.txt)");
     //gr.load(LR"(D:\Projects\fe\grammars\GruneJacobsBook.LR.9.32.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\LR.2.Nigel.G5.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\LR.2.Nigel.G1.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\LR.2.Nigel.G3.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\LR.Sippu.6.7.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\LR.2+.Sippu.6.14.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\LR.1.Sippu.6.24.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\LR.1.Sippu.7.25.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\LR.1.Incremental.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\LR.1.Expr.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\LR.1.Chapter02Compilers6December.txt)");
+    gr.load(LR"(D:\Projects\fe\grammars\LR.1.bottom(2).txt)");
 
     std::wcout << grammar_visualization::decorate_grammar(gr) << std::endl;
 
