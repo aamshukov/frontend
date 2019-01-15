@@ -66,6 +66,8 @@
 #include <unicode/unistr.h>
 #include <unicode/ustdio.h>
 
+#undef max
+
 #define COMPANY uilab
 
 #define BEGIN_NAMESPACE(__x__) namespace COMPANY { ## namespace __x__ {

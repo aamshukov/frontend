@@ -70,7 +70,7 @@ void test_lr_table()
 
     //gr.load(LR"(D:\Projects\fe\grammars\LR.Aho.G5.29.txt)");
     //gr.load(LR"(D:\Projects\fe\grammars\LR.Aho.G.4.55.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\GruneJacobsBook.LR.9.32.txt)");
+    gr.load(LR"(D:\Projects\fe\grammars\GruneJacobsBook.LR.9.32.txt)");
     //gr.load(LR"(D:\Projects\fe\grammars\LR.2.Nigel.G5.txt)");
     //gr.load(LR"(D:\Projects\fe\grammars\LR.2.Nigel.G1.txt)");
     //gr.load(LR"(D:\Projects\fe\grammars\LR.2.Nigel.G3.txt)");
@@ -81,11 +81,11 @@ void test_lr_table()
     //gr.load(LR"(D:\Projects\fe\grammars\LR.1.Incremental.txt)");
     //gr.load(LR"(D:\Projects\fe\grammars\LR.1.Expr.txt)");
     //gr.load(LR"(D:\Projects\fe\grammars\LR.1.Chapter02Compilers6December.txt)");
-    gr.load(LR"(D:\Projects\fe\grammars\LR.1.bottom(2).txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\LR.1.bottom(2).txt)");
 
     std::wcout << grammar_visualization::decorate_grammar(gr) << std::endl;
 
-    uint8_t k = 1;
+    uint8_t k = 2;
 
     grammar_algorithm::build_nullability_set(gr);
     grammar_algorithm::build_first_set(gr, k);

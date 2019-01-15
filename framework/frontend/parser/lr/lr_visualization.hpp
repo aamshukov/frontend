@@ -44,6 +44,8 @@ class lr_visualization : private noncopyable
         static string_type decorate_lr_states(const lr_states_type& states);
 
         static string_type decorate_lr_action_table(const grammar& gr,
+                                                    uint8_t k,
+                                                    const sets_type& la_set,
                                                     const lr_states_type& states,
                                                     const lr_action_table_type& result);
         static string_type decorate_lr_goto_table(const grammar& gr,

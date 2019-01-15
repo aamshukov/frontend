@@ -11,9 +11,9 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-typename symbol::symbol_type symbol::epsilon(factory::create<symbol>(static_cast<uint32_t>(-1), L"e", symbol::kind::terminal));
-typename symbol::symbol_type symbol::eof(factory::create<symbol>(static_cast<uint32_t>(-2), L"$", symbol::kind::terminal));
-typename symbol::symbol_type symbol::op_mark(factory::create<symbol>(static_cast<uint32_t>(-3), L"#", symbol::kind::terminal));
+typename symbol::symbol_type symbol::epsilon(factory::create<symbol>(std::numeric_limits<int32_t>::max() - 1, L"e", symbol::kind::terminal));
+typename symbol::symbol_type symbol::eof(factory::create<symbol>(std::numeric_limits<int32_t>::max() - 2, L"$", symbol::kind::terminal));
+typename symbol::symbol_type symbol::op_mark(factory::create<symbol>(std::numeric_limits<int32_t>::max() - 3, L"#", symbol::kind::terminal));
 
 symbol::symbol(uint32_t id, const string_type& name, symbol::kind type)
       : my_id(id),

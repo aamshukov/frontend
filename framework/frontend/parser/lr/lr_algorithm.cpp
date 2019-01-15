@@ -57,6 +57,74 @@ bool lr_algorithm::has_lr_state(const typename lr_algorithm::lr_states_type& sta
                         }) != states.end();
 }
 
+void lr_algorithm::collect_grammar_la(const grammar& gr, uint8_t k, typename lr_algorithm::sets_type& result)
+{
+    // collect terminals
+    std::vector<symbol_type> terminals;
+
+    grammar_algorithm::collect_terminals(gr, terminals);
+
+    // calculate powerset
+    std::size_t power_set_size = 1i64 << terminals.size();
+
+    sets_type la_set;
+
+    for(std::size_t counter = 0; counter < power_set_size; counter++)
+    {
+        set_type la;
+
+        for(std::size_t i = 0, n = terminals.size(); i < n; i++)
+        {
+            if(counter & (1i64 << i)) 
+            {
+                la.emplace_back(terminals[i]);
+            }
+        }
+
+        la_set.emplace_back(la);
+    }
+
+    // build result
+    std::set<set_type> result_set;
+
+    for(auto& la : la_set)
+    {
+        if(la.size() > 0)
+        {
+            if(la.size() > 1) // 2+
+            {
+                // build permutations
+                do
+                {
+                    // resize up to k
+                    if(la.size() > k)
+                    {
+                        la.resize(k);
+                    }
+
+                    result_set.emplace(la);
+                }
+                while(std::next_permutation(la.begin(), la.end()));
+            }
+            else
+            {
+                result_set.emplace(la);
+            }
+        }
+    }
+
+    result_set.emplace(set_type { symbol::epsilon} );
+
+    std::copy(result_set.begin(), result_set.end(), std::back_inserter(result));
+
+    std::sort(result.begin(),
+              result.end(),
+              [](const typename grammar_algorithm::set_type& la1, const typename grammar_algorithm::set_type& la2)
+              {
+                  return grammar_algorithm::is_less(la1, la2);
+              });
+}
+
 void lr_algorithm::calculate_lr_closure(const grammar& gr, uint8_t k, const typename lr_algorithm::lr_state_type& state)
 {
     // Based on Aho.A.V Lam.M.S Sethi.R Ullman.J.D Compilers Principles Techniques And Tools (2ed), p.261
@@ -303,12 +371,12 @@ void lr_algorithm::build_lr_automaton(const grammar& gr, uint8_t k, typename lr_
                     continue;
                 }
 
-                const auto& it(std::find_if(states.begin(),
-                                            states.end(),
-                                            [&new_state](const typename lr_algorithm::lr_state_type& state0)
-                                            {
-                                                return *state0 == *new_state;
-                                            }));
+                const auto it(std::find_if(states.begin(),
+                                           states.end(),
+                                           [&new_state](const typename lr_algorithm::lr_state_type& state0)
+                                           {
+                                               return *state0 == *new_state;
+                                           }));
                 if(it != states.end())
                 {
                     new_state = *it;
@@ -385,34 +453,119 @@ void lr_algorithm::build_lr_automaton(const grammar& gr, uint8_t k, typename lr_
 }
 
 void lr_algorithm::build_action_table(const grammar& gr,
+                                      uint8_t k,
                                       const typename lr_algorithm::lr_states_type& states,
                                       typename lr_algorithm::lr_action_table_type& result)
 {
+    // Based on AU, Russian edition, page 444
+    //  f отображает Σ*k в множество {ошибка, перенос, допуск} U {свертка i | i — номер правила из Р, i >= 1}
+    //      а. f(u) = перенос, если [A -> β1 • β2, v] содержится в А, β2 != λ и u ∈ EFFk(β2 v)
+    //      б. f(u) = свертка i, если [A -> β •, u] содержится в A и A -> β правило из P с номером i, i >= 1
+    //      в. f(λ) = допуск, если [S' -> S •, λ] содержится в А
+    //      г. f(u) = ошибка в остальных случаях
     log_info(L"Building ACTION table ...");
 
     lr_action_table_type action_table;
 
     // build table
-    for(const auto& state : states)
+    sets_type la_set;
+
+    collect_grammar_la(gr, k, la_set);
+
+    sets_type active_la_set;
+
+    for(const auto& la_u : la_set) // la_u = u, f(u)
     {
-    state;
-        //for(const auto& symb_kvp : gr.pool())
-        //{
-        //    const auto& symb(symb_kvp.second);
+        auto action_table_size = action_table.size();
 
-        //    const auto& transitions((*state).transitions);
-        //    const auto& transition_it(transitions.find(symb));
+        std::vector<uint32_t> func_la; // f(u)
 
-        //    if(transition_it != (*state).transitions.end())
-        //    {
-        //        auto key(std::make_pair((*symb).id(), (*state).id));
+        std::for_each(la_u.begin(), la_u.end(), [&func_la](const auto& symb){ func_la.emplace_back((*symb).id()); });
 
-        //        if(goto_table.find(key) == goto_table.end())
-        //        {
-        //            goto_table.emplace(lr_goto_table_type::value_type(key, (*(*(*transition_it).second).state).id));
-        //        }
-        //    }
-        //}
+        for(const auto& state : states) // state = A - set of items
+        {
+            auto key(std::make_pair(func_la, (*state).id)); // [LAk, STATE]
+
+            for(const auto& item : (*state).items)
+            {
+                // а. f(u) = перенос, если [A -> β1 • β2, v] содержится в А, β2 != λ и u ∈ EFFk(β2 v)
+                if((*item).dot < (*(*item).rule).rhs().size())
+                {
+                    // calculate EFFk(β2 v) ...
+                    symbols_type eff_set_symbols;
+
+                    std::for_each((*(*item).rule).rhs().begin() + (*item).dot, (*(*item).rule).rhs().end(), [&eff_set_symbols](const auto& symb){ eff_set_symbols.emplace_back(symb); });
+
+                    if(!(*item).la.empty())
+                    {
+                        std::for_each((*item).la.front().begin(), (*item).la.front().end(), [&eff_set_symbols](const auto& symb){ eff_set_symbols.emplace_back(symb); });
+                    }
+
+                    sets_type eff_set;
+
+                    grammar_algorithm::build_first_set(eff_set_symbols, k, eff_set);
+
+                    // check if u belongs to EFFk(β2 u)
+                    if(std::find(eff_set.begin(), eff_set.end(), la_u) != eff_set.end())
+                    {
+                        if(action_table.find(key) == action_table.end())
+                        {
+                            action_table.emplace(lr_action_table_type::value_type(key, { static_cast<uint32_t>(lr_action::shift) }));
+                        }
+                    }
+                }
+                else // [A -> β •, u] or [S' -> S •, λ]
+                {
+                    std::vector<uint32_t> item_la; // u in [A -> β •, u]
+
+                    std::for_each((*item).la[0].begin(), // { { a b c } ... { q d } } as LR(k), only la[0] = { a b c } is used
+                                  (*item).la[0].end(),
+                                  [&item_la](const auto& symb){ item_la.emplace_back((*symb).id()); });
+
+                    // б. f(u) = свертка i, если [A -> β •, u] содержится в A и A -> β правило из P с номером i, i >= 1
+                    if((*(*item).rule).id() > 0) // always not the first rule
+                    {
+                        if(func_la == item_la) // considering f(u) and [A -> β •, u] and u == u
+                        {
+                            const auto it(action_table.find(key));
+
+                            if(it == action_table.end())
+                            {
+                                action_table.emplace(lr_action_table_type::value_type(key, { (*(*item).rule).id() }));
+                            }
+                            else
+                            {
+                                (*it).second.emplace_back((*(*item).rule).id());
+                            }
+                        }
+                    }
+                    // в. f(λ) = допуск, если [S' -> S •, λ] содержится в А
+                    else
+                    {
+                        if(func_la.size() == 1 && func_la[0] == (*symbol::epsilon).id() &&  // f(λ)
+                           item_la.size() == 1 && item_la[0] == (*symbol::epsilon).id())    // [S' -> S •, λ]
+                        {
+                            const auto it(action_table.find(key));
+
+                            if(it == action_table.end())
+                            {
+                                action_table.emplace(lr_action_table_type::value_type(key, { static_cast<uint32_t>(lr_action::accept) }));
+                            }
+                            else
+                            {
+                                log_info(L"ERROR: accepted state already exists.");
+                                (*it).second.emplace_back(static_cast<uint32_t>(lr_action::accept));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if(action_table_size != action_table.size())
+        {
+            active_la_set.emplace_back(la_u);
+        }
     }
 
     // get result
@@ -420,7 +573,7 @@ void lr_algorithm::build_action_table(const grammar& gr,
 
     // visualize
     log_info(L"ACTION table:");
-    log_info(L"%s", lr_visualization::decorate_lr_action_table(gr, states, result).c_str());
+    log_info(L"%s", lr_visualization::decorate_lr_action_table(gr, k, active_la_set, states, result).c_str());
 
     log_info(L"Built ACTION table .");
 }
@@ -477,7 +630,9 @@ action_table;
 
     build_lr_automaton(gr, k, automaton);
 
+    build_action_table(gr, k, automaton, action_table);
     build_goto_table(gr, automaton, goto_table);
+
 
 
 

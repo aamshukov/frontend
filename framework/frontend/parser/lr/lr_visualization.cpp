@@ -173,12 +173,17 @@ string_type lr_visualization::decorate_lr_states(const typename lr_visualization
 }
 
 string_type lr_visualization::decorate_lr_action_table(const grammar& gr,
+                                                       uint8_t k,
+                                                       const typename lr_visualization::sets_type& la_set,
                                                        const typename lr_visualization::lr_states_type& states,
                                                        const typename lr_visualization::lr_action_table_type& action_table)
 {
+action_table;//??
+gr;
+
     string_type result;
 
-    const std::size_t table_cell_width = 8;
+    const std::size_t table_cell_width = 8 * k;
 
     auto alignment = std::left;
 
@@ -188,16 +193,18 @@ string_type lr_visualization::decorate_lr_action_table(const grammar& gr,
     std::endl <<
     alignment << std::setw(table_cell_width) << std::setfill(L' ') << L' ';
 
-    for(const auto& symb_kvp : gr.pool())
+    for(const auto& la : la_set)
     {
-        const auto& pool_symb(symb_kvp.second);
-
-        content << alignment << std::setw(table_cell_width) << std::setfill(L' ') << (*pool_symb).name().c_str();
+        content <<
+        alignment <<
+        std::setw(table_cell_width) <<
+        std::setfill(L' ') <<
+        text::trim(grammar_visualization::decorate_set(la, false), L" ").c_str();
     }
 
     content << std::endl;
 
-    for(const auto& _ : gr.pool())
+    for(const auto& _ : la_set)
     {
         _;
         content << alignment << std::setw(table_cell_width + 1) << std::setfill(L'-') << L"-";
@@ -209,19 +216,42 @@ string_type lr_visualization::decorate_lr_action_table(const grammar& gr,
     {
         content << alignment << std::setw(table_cell_width) << std::setfill(L' ') << std::to_wstring(i);
 
-        for(const auto& symb_kvp : gr.pool())
+        for(const auto& la : la_set)
         {
-            const auto& pool_symb(symb_kvp.second);
+            string_type entry_text;
 
-            string_type entry_text = L" ";
+            std::vector<uint32_t> func_la; // f(u)
 
-            const auto& key(std::make_pair((*pool_symb).id(), static_cast<uint32_t>(i)));
+            std::for_each(la.begin(), la.end(), [&func_la](const auto& symb){ func_la.emplace_back((*symb).id()); });
 
-            const auto& it(action_table.find(key));
+            auto key(std::make_pair(func_la, static_cast<uint32_t>(i)));
+
+            auto it(action_table.find(key));
             
             if(it != action_table.end())
             {
-                entry_text = std::to_wstring((*it).second);
+                const auto& entry((*it).second);
+
+                std::for_each(entry.begin(),
+                              entry.end(),
+                              [&entry_text](const auto& e)
+                              {
+                                  if((lr_algorithm::lr_action)e == lr_algorithm::lr_action::shift)
+                                  {
+                                      entry_text += L"s";
+                                  }
+                                  else if(lr_algorithm::lr_action(e) == lr_algorithm::lr_action::accept)
+                                  {
+                                      entry_text += L"a";
+                                  }
+                                  else
+                                  {
+                                      entry_text += std::to_wstring(e);
+                                  }
+                                  entry_text += L',';
+                              });
+
+                entry_text = text::trim(entry_text, L",");
             }
 
             content << alignment << std::setw(table_cell_width) << std::setfill(L' ') << entry_text.c_str();
@@ -280,7 +310,7 @@ string_type lr_visualization::decorate_lr_goto_table(const grammar& gr,
 
             const auto& key(std::make_pair((*pool_symb).id(), static_cast<uint32_t>(i)));
 
-            const auto& it(goto_table.find(key));
+            const auto it(goto_table.find(key));
             
             if(it != goto_table.end())
             {
