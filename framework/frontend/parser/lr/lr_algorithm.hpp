@@ -50,10 +50,10 @@ class lr_algorithm : private noncopyable
 
         enum class lr_action : uint32_t
         {
-            shift = std::numeric_limits<uint32_t>::max() - 55555,
-            reduce,
-            accept,
-            error
+            shift = std::numeric_limits<uint32_t>::max() - 5,
+            reduce, // -4
+            accept, // -3
+            error   // -2
         };
 
         struct lr_state // automaton state with set of items
@@ -99,8 +99,8 @@ class lr_algorithm : private noncopyable
             }
         };
 
-        using lr_action_table_type = std::map<std::pair<std::vector<uint32_t>, uint32_t>, std::vector<uint32_t>>;
         using lr_goto_table_type = std::map<std::pair<uint32_t, uint32_t>, uint32_t>;
+        using lr_action_table_type = std::map<std::pair<std::vector<uint32_t>, uint32_t>, std::vector<uint32_t>>;
 
 
 
@@ -126,10 +126,17 @@ class lr_algorithm : private noncopyable
 
         static void             build_lr_automaton(const grammar& gr, uint8_t k, lr_states_type& result);
 
-        static void             build_action_table(const grammar& gr, uint8_t k, const lr_states_type& states, lr_algorithm::lr_action_table_type& result);
         static void             build_goto_table(const grammar& gr, const lr_states_type& states, lr_algorithm::lr_goto_table_type& result);
+        static void             build_action_table(const grammar& gr,
+                                                   uint8_t k,
+                                                   const lr_states_type& states,
+                                                   const lr_goto_table_type& goto_table,
+                                                   lr_algorithm::lr_action_table_type& result);
 
-        static void             build_lr_table(const grammar& gr, uint8_t k, lr_action_table_type& action_table_result, lr_goto_table_type& goto_table_result);
+        static void             build_lr_table(const grammar& gr,
+                                               uint8_t k,
+                                               lr_goto_table_type& goto_table_result,
+                                               lr_action_table_type& action_table_result);
 
     public:
         static void             build_lr_canonical_collection(const grammar& gr, uint8_t k, lr_canonical_collection_type& result);

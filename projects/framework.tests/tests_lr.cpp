@@ -69,8 +69,8 @@ void test_lr_table()
     grammar gr;
 
     //gr.load(LR"(D:\Projects\fe\grammars\LR.Aho.G5.29.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\LR.Aho.G.4.55.txt)");
-    gr.load(LR"(D:\Projects\fe\grammars\GruneJacobsBook.LR.9.32.txt)");
+    gr.load(LR"(D:\Projects\fe\grammars\LR.Aho.G.4.55.txt)");
+    //gr.load(LR"(D:\Projects\fe\grammars\GruneJacobsBook.LR.9.32.txt)");
     //gr.load(LR"(D:\Projects\fe\grammars\LR.2.Nigel.G5.txt)");
     //gr.load(LR"(D:\Projects\fe\grammars\LR.2.Nigel.G1.txt)");
     //gr.load(LR"(D:\Projects\fe\grammars\LR.2.Nigel.G3.txt)");
@@ -85,7 +85,7 @@ void test_lr_table()
 
     std::wcout << grammar_visualization::decorate_grammar(gr) << std::endl;
 
-    uint8_t k = 2;
+    uint8_t k = 1;
 
     grammar_algorithm::build_nullability_set(gr);
     grammar_algorithm::build_first_set(gr, k);
@@ -119,8 +119,8 @@ void test_lr_table()
     //    lr_algorithm::build_lr_items_set_for_viable_prefix(gr, symbols, k, items);
     //}
 
-    lr_algorithm::lr_action_table_type action_table;
     lr_algorithm::lr_goto_table_type goto_table;
+    lr_algorithm::lr_action_table_type action_table;
 
-    lr_algorithm::build_lr_table(gr, k, action_table, goto_table);
+    lr_algorithm::build_lr_table(gr, k, goto_table, action_table);
 }

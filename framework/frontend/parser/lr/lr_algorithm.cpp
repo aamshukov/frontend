@@ -452,9 +452,50 @@ void lr_algorithm::build_lr_automaton(const grammar& gr, uint8_t k, typename lr_
     log_info(L"Built LR(%d) automaton.", k);
 }
 
+void lr_algorithm::build_goto_table(const grammar& gr,
+                                    const typename lr_algorithm::lr_states_type& states,
+                                    typename lr_algorithm::lr_goto_table_type& result)
+{
+    log_info(L"Building GOTO table ...");
+
+    lr_goto_table_type goto_table;
+
+    // build table
+    for(const auto& state : states)
+    {
+        for(const auto& symb_kvp : gr.pool())
+        {
+            const auto& symb(symb_kvp.second);
+
+            const auto& transitions((*state).transitions);
+            const auto& transition_it(transitions.find(symb));
+
+            if(transition_it != (*state).transitions.end())
+            {
+                auto key(std::make_pair((*symb).id(), (*state).id));
+
+                if(goto_table.find(key) == goto_table.end())
+                {
+                    goto_table.emplace(lr_goto_table_type::value_type(key, (*(*(*transition_it).second).state).id));
+                }
+            }
+        }
+    }
+
+    // get result
+    result.swap(goto_table);
+
+    // visualize
+    log_info(L"GOTO table:");
+    log_info(L"%s", lr_visualization::decorate_lr_goto_table(gr, states, result).c_str());
+
+    log_info(L"Built GOTO table .");
+}
+
 void lr_algorithm::build_action_table(const grammar& gr,
                                       uint8_t k,
                                       const typename lr_algorithm::lr_states_type& states,
+                                      const typename lr_algorithm::lr_goto_table_type& goto_table,
                                       typename lr_algorithm::lr_action_table_type& result)
 {
     // Based on AU, Russian edition, page 444
@@ -476,7 +517,7 @@ void lr_algorithm::build_action_table(const grammar& gr,
 
     for(const auto& la_u : la_set) // la_u = u, f(u)
     {
-        auto action_table_size = action_table.size();
+        auto action_table_size = action_table.size(); // remember to check if need add current la_u for further consideration
 
         std::vector<uint32_t> func_la; // f(u)
 
@@ -491,10 +532,17 @@ void lr_algorithm::build_action_table(const grammar& gr,
                 // а. f(u) = перенос, если [A -> β1 • β2, v] содержится в А, β2 != λ и u ∈ EFFk(β2 v)
                 if((*item).dot < (*(*item).rule).rhs().size())
                 {
+                     if(!(*(*(*item).rule).rhs()[(*item).dot]).terminal()) // β2 must start from terminal
+                     {
+                        continue;
+                     }
+
                     // calculate EFFk(β2 v) ...
                     symbols_type eff_set_symbols;
 
-                    std::for_each((*(*item).rule).rhs().begin() + (*item).dot, (*(*item).rule).rhs().end(), [&eff_set_symbols](const auto& symb){ eff_set_symbols.emplace_back(symb); });
+                    std::for_each((*(*item).rule).rhs().begin() + (*item).dot,
+                                  (*(*item).rule).rhs().end(),
+                                  [&eff_set_symbols](const auto& symb){ eff_set_symbols.emplace_back(symb); });
 
                     if(!(*item).la.empty())
                     {
@@ -503,14 +551,28 @@ void lr_algorithm::build_action_table(const grammar& gr,
 
                     sets_type eff_set;
 
-                    grammar_algorithm::build_first_set(eff_set_symbols, k, eff_set);
+                    grammar_algorithm::build_eff_set(gr, eff_set_symbols, k, eff_set);
 
                     // check if u belongs to EFFk(β2 u)
                     if(std::find(eff_set.begin(), eff_set.end(), la_u) != eff_set.end())
                     {
                         if(action_table.find(key) == action_table.end())
                         {
-                            action_table.emplace(lr_action_table_type::value_type(key, { static_cast<uint32_t>(lr_action::shift) }));
+                            const auto& symb((*(*item).rule).rhs()[(*item).dot]);
+
+                            if((*symb).id() == (*symbol::epsilon).id())
+                            {
+                                continue; //??
+                            }
+
+                            auto goto_key(std::make_pair((*symb).id(), (*state).id));
+                            auto goto_entry((*goto_table.find(goto_key)).second);
+
+                            std::vector<uint32_t> value;
+
+                            value.emplace_back(-(int32_t)goto_entry); // shift represented as negative number
+
+                            action_table.emplace(lr_action_table_type::value_type(key, value));
                         }
                     }
                 }
@@ -573,65 +635,24 @@ void lr_algorithm::build_action_table(const grammar& gr,
 
     // visualize
     log_info(L"ACTION table:");
-    log_info(L"%s", lr_visualization::decorate_lr_action_table(gr, k, active_la_set, states, result).c_str());
+    log_info(L"%s", lr_visualization::decorate_lr_action_table(k, active_la_set, states, result).c_str());
 
     log_info(L"Built ACTION table .");
 }
 
-void lr_algorithm::build_goto_table(const grammar& gr,
-                                    const typename lr_algorithm::lr_states_type& states,
-                                    typename lr_algorithm::lr_goto_table_type& result)
-{
-    log_info(L"Building GOTO table ...");
-
-    lr_goto_table_type goto_table;
-
-    // build table
-    for(const auto& state : states)
-    {
-        for(const auto& symb_kvp : gr.pool())
-        {
-            const auto& symb(symb_kvp.second);
-
-            const auto& transitions((*state).transitions);
-            const auto& transition_it(transitions.find(symb));
-
-            if(transition_it != (*state).transitions.end())
-            {
-                auto key(std::make_pair((*symb).id(), (*state).id));
-
-                if(goto_table.find(key) == goto_table.end())
-                {
-                    goto_table.emplace(lr_goto_table_type::value_type(key, (*(*(*transition_it).second).state).id));
-                }
-            }
-        }
-    }
-
-    // get result
-    result.swap(goto_table);
-
-    // visualize
-    log_info(L"GOTO table:");
-    log_info(L"%s", lr_visualization::decorate_lr_goto_table(gr, states, result).c_str());
-
-    log_info(L"Built GOTO table .");
-}
-
 void lr_algorithm::build_lr_table(const grammar& gr,
                                   uint8_t k,
-                                  typename lr_algorithm::lr_action_table_type& action_table,
-                                  typename lr_algorithm::lr_goto_table_type& goto_table)
+                                  typename lr_algorithm::lr_goto_table_type& goto_table,
+                                  typename lr_algorithm::lr_action_table_type& action_table)
 {
-action_table;
     log_info(L"Building LR(k) table for k = %d ...", k);
 
     lr_states_type automaton;
 
     build_lr_automaton(gr, k, automaton);
 
-    build_action_table(gr, k, automaton, action_table);
     build_goto_table(gr, automaton, goto_table);
+    build_action_table(gr, k, automaton, goto_table, action_table);
 
 
 
@@ -940,14 +961,3 @@ result;
 }
 
 END_NAMESPACE
-
-
-
-
-                //log_info(L"%s", lr_visualization::decorate_lr_items(new_closure_items).c_str()); //??
-                //log_info(L"%s", lr_visualization::decorate_lr_item(new_item).c_str());
-
-
-                    //??string_type first_set_str;
-                    //??std::for_each(first_set_symbols.begin(), first_set_symbols.end(), [&first_set_str](const auto& symb){ first_set_str += (*symb).name(); });
-                    //??log_info(L"FIRST(%s) = %s", first_set_str.c_str(), grammar_visualization::decorate_sets(first_set).c_str());
