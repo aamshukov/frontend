@@ -66,32 +66,50 @@ USINGNAMESPACE(frontend)
 
 void test_lr_table()
 {
-    grammar gr;
+    std::vector<string_type> inputs  =
+    {
+        LR"(D:\Projects\fe\grammars\LR.Aho.G5.29.txt)",
+        LR"(D:\Projects\fe\grammars\LR.Aho.G.4.55.txt)",
+        LR"(D:\Projects\fe\grammars\LR.GruneJacobsBook.9.32.txt)",
+        LR"(D:\Projects\fe\grammars\LR.2.Nigel.G5.txt)",
+        LR"(D:\Projects\fe\grammars\LR.2.Nigel.G1.txt)",
+        LR"(D:\Projects\fe\grammars\LR.2.Nigel.G3.txt)",
+        LR"(D:\Projects\fe\grammars\LR.Sippu.6.7.txt)",
+        LR"(D:\Projects\fe\grammars\LR.2+.Sippu.6.14.txt)",
+        LR"(D:\Projects\fe\grammars\LR.1.Sippu.6.24.txt)",
+        LR"(D:\Projects\fe\grammars\LR.1.Sippu.7.25.txt)",
+        LR"(D:\Projects\fe\grammars\LR.1.Incremental.txt)",
+        LR"(D:\Projects\fe\grammars\LR.1.Expr.txt)",
+        LR"(D:\Projects\fe\grammars\LR.1.Chapter02Compilers6December.txt)",
+        LR"(D:\Projects\fe\grammars\LR.1.bottom(2).txt)",
 
-    //gr.load(LR"(D:\Projects\fe\grammars\LR.Aho.G5.29.txt)");
-    gr.load(LR"(D:\Projects\fe\grammars\LR.Aho.G.4.55.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\GruneJacobsBook.LR.9.32.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\LR.2.Nigel.G5.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\LR.2.Nigel.G1.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\LR.2.Nigel.G3.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\LR.Sippu.6.7.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\LR.2+.Sippu.6.14.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\LR.1.Sippu.6.24.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\LR.1.Sippu.7.25.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\LR.1.Incremental.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\LR.1.Expr.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\LR.1.Chapter02Compilers6December.txt)");
-    //gr.load(LR"(D:\Projects\fe\grammars\LR.1.bottom(2).txt)");
+        LR"(D:\Projects\fe\grammars\LR.1.shift.reduce.conflict.G1.txt)",
+        LR"(D:\Projects\fe\grammars\LR.1.shift.reduce.conflict.G2.txt)",
+        LR"(D:\Projects\fe\grammars\LR.1.reduce.reduce.conflict.G1.txt)"
+    };
 
-    std::wcout << grammar_visualization::decorate_grammar(gr) << std::endl;
+    for(const auto& input : inputs)
+    {
+        grammar gr;
 
-    uint8_t k = 1;
+        gr.load(input);
 
-    grammar_algorithm::build_nullability_set(gr);
-    grammar_algorithm::build_first_set(gr, k);
-    grammar_algorithm::build_first_set(gr, k, true);
-    grammar_algorithm::build_follow_set(gr, k);
-    grammar_algorithm::build_la_set(gr, k);
+        std::wcout << grammar_visualization::decorate_grammar(gr) << std::endl;
+
+        uint8_t k = 1;
+
+        grammar_algorithm::build_nullability_set(gr);
+        grammar_algorithm::build_first_set(gr, k);
+        grammar_algorithm::build_first_set(gr, k, true);
+        grammar_algorithm::build_follow_set(gr, k);
+        grammar_algorithm::build_la_set(gr, k);
+
+        lr_algorithm::lr_goto_table_type goto_table;
+        lr_algorithm::lr_action_table_type action_table;
+
+        lr_algorithm::build_lr_table(gr, k, goto_table, action_table);
+    }
+}
 
     //{
     //    lr_algorithm::lr_items_type items;
@@ -118,9 +136,3 @@ void test_lr_table()
 
     //    lr_algorithm::build_lr_items_set_for_viable_prefix(gr, symbols, k, items);
     //}
-
-    lr_algorithm::lr_goto_table_type goto_table;
-    lr_algorithm::lr_action_table_type action_table;
-
-    lr_algorithm::build_lr_table(gr, k, goto_table, action_table);
-}

@@ -48,9 +48,9 @@ class lr_algorithm : private noncopyable
 
         using flags_type = flags;
 
-        enum class lr_action : uint32_t
+        enum class lr_action : int32_t
         {
-            shift = std::numeric_limits<uint32_t>::max() - 5,
+            shift = std::numeric_limits<int32_t>::max() - 5,
             reduce, // -4
             accept, // -3
             error   // -2
@@ -100,7 +100,7 @@ class lr_algorithm : private noncopyable
         };
 
         using lr_goto_table_type = std::map<std::pair<uint32_t, uint32_t>, uint32_t>;
-        using lr_action_table_type = std::map<std::pair<std::vector<uint32_t>, uint32_t>, std::vector<uint32_t>>;
+        using lr_action_table_type = std::map<std::pair<std::vector<uint32_t>, uint32_t>, std::set<uint32_t>>;
 
 
 

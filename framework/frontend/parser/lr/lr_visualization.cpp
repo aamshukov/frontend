@@ -188,16 +188,20 @@ string_type lr_visualization::decorate_lr_goto_table(const grammar& gr,
     std::endl <<
     alignment << std::setw(table_cell_width) << std::setfill(L' ') << L' ';
 
-    for(const auto& symb_kvp : gr.pool())
-    {
-        const auto& pool_symb(symb_kvp.second);
+    // collect nonterminals
+    std::vector<symbol_type> nonterminals;
 
-        content << alignment << std::setw(table_cell_width) << std::setfill(L' ') << (*pool_symb).name().c_str();
+    grammar_algorithm::collect_nonterminals(gr, nonterminals);
+
+
+    for(const auto& nonterminal : nonterminals)
+    {
+        content << alignment << std::setw(table_cell_width) << std::setfill(L' ') << (*nonterminal).name().c_str();
     }
 
     content << std::endl;
 
-    for(const auto& _ : gr.pool())
+    for(const auto& _ : nonterminals)
     {
         _;
         content << alignment << std::setw(table_cell_width + 1) << std::setfill(L'-') << L"-";
@@ -209,13 +213,11 @@ string_type lr_visualization::decorate_lr_goto_table(const grammar& gr,
     {
         content << alignment << std::setw(table_cell_width) << std::setfill(L' ') << std::to_wstring(i);
 
-        for(const auto& symb_kvp : gr.pool())
+        for(const auto& nonterminal : nonterminals)
         {
-            const auto& pool_symb(symb_kvp.second);
-
             string_type entry_text = L" ";
 
-            const auto& key(std::make_pair((*pool_symb).id(), static_cast<uint32_t>(i)));
+            const auto& key(std::make_pair((*nonterminal).id(), static_cast<uint32_t>(i)));
 
             const auto it(goto_table.find(key));
             
@@ -242,7 +244,7 @@ string_type lr_visualization::decorate_lr_action_table(uint8_t k,
 {
     string_type result;
 
-    const std::size_t table_cell_width = 8 * k;
+    const std::size_t table_cell_width = 12 * k;
 
     auto alignment = std::left;
 
@@ -295,7 +297,7 @@ string_type lr_visualization::decorate_lr_action_table(uint8_t k,
                               entry.end(),
                               [&entry_text, i](const auto& e)
                               {
-                                  if(lr_algorithm::lr_action(e) == lr_algorithm::lr_action::accept)
+                                  if(lr_algorithm::lr_action((int)e) == lr_algorithm::lr_action::accept)
                                   {
                                       entry_text += L"a";
                                   }

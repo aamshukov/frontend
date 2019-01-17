@@ -530,7 +530,8 @@ void lr_algorithm::build_action_table(const grammar& gr,
             for(const auto& item : (*state).items)
             {
                 // а. f(u) = перенос, если [A -> β1 • β2, v] содержится в А, β2 != λ и u ∈ EFFk(β2 v)
-                if((*item).dot < (*(*item).rule).rhs().size())
+                if((*item).dot < (*(*item).rule).rhs().size() &&
+                   (*(*(*item).rule).rhs()[(*item).dot]).id() != (*symbol::epsilon).id()) // β2 != λ, this check is a hack to consider [A -> • λ, ...] and [A -> λ •, ...] as equal that allows reduce on λ ...
                 {
                      if(!(*(*(*item).rule).rhs()[(*item).dot]).terminal()) // β2 must start from terminal
                      {
@@ -556,23 +557,31 @@ void lr_algorithm::build_action_table(const grammar& gr,
                     // check if u belongs to EFFk(β2 u)
                     if(std::find(eff_set.begin(), eff_set.end(), la_u) != eff_set.end())
                     {
-                        if(action_table.find(key) == action_table.end())
+                        const auto& symb((*(*item).rule).rhs()[(*item).dot]);
+
+                        if((*symb).id() == (*symbol::epsilon).id())
                         {
-                            const auto& symb((*(*item).rule).rhs()[(*item).dot]);
+                            continue; // dont shift λ
+                        }
 
-                            if((*symb).id() == (*symbol::epsilon).id())
-                            {
-                                continue; //??
-                            }
+                        auto goto_key(std::make_pair((*symb).id(), (*state).id));
+                        auto goto_entry((*goto_table.find(goto_key)).second);
 
-                            auto goto_key(std::make_pair((*symb).id(), (*state).id));
-                            auto goto_entry((*goto_table.find(goto_key)).second);
+                        auto action_value = -(int32_t)goto_entry; // shift represented as negative number
 
-                            std::vector<uint32_t> value;
+                        const auto it(action_table.find(key));
 
-                            value.emplace_back(-(int32_t)goto_entry); // shift represented as negative number
+                        if(it == action_table.end())
+                        {
+                            std::set<uint32_t> value;
+
+                            value.emplace(action_value);
 
                             action_table.emplace(lr_action_table_type::value_type(key, value));
+                        }
+                        else
+                        {
+                            (*it).second.emplace(action_value);
                         }
                     }
                 }
@@ -589,15 +598,17 @@ void lr_algorithm::build_action_table(const grammar& gr,
                     {
                         if(func_la == item_la) // considering f(u) and [A -> β •, u] and u == u
                         {
+                            auto action_value = (*(*item).rule).id();
+
                             const auto it(action_table.find(key));
 
                             if(it == action_table.end())
                             {
-                                action_table.emplace(lr_action_table_type::value_type(key, { (*(*item).rule).id() }));
+                                action_table.emplace(lr_action_table_type::value_type(key, { action_value }));
                             }
                             else
                             {
-                                (*it).second.emplace_back((*(*item).rule).id());
+                               (*it).second.emplace(action_value);
                             }
                         }
                     }
@@ -616,7 +627,7 @@ void lr_algorithm::build_action_table(const grammar& gr,
                             else
                             {
                                 log_info(L"ERROR: accepted state already exists.");
-                                (*it).second.emplace_back(static_cast<uint32_t>(lr_action::accept));
+                                (*it).second.emplace(static_cast<uint32_t>(lr_action::accept));
                             }
                         }
                     }
@@ -658,9 +669,9 @@ void lr_algorithm::build_lr_table(const grammar& gr,
 
 
 
-    lr_canonical_collection_type canonical_collection;
+    //lr_canonical_collection_type canonical_collection;
 
-    build_lr_canonical_collection(gr, k, canonical_collection);
+    //build_lr_canonical_collection(gr, k, canonical_collection);
 
     log_info(L"Built LR(k) table for k = %d.", k);
 }
