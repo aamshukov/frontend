@@ -1141,7 +1141,7 @@ void grammar_algorithm::build_eff_set(const grammar& gr,
 
 void grammar_algorithm::build_follow_set(grammar& gr, uint8_t k)
 {
-    // Sudkump 2nd ed., p.501
+    // Sudkump 2nd ed., p.501 and Ronald C. Backhouse, p.110
     //  1. FL(S) = {λ}
     //  2. for each A ∈ N-{S} do FL(A) = Ø
     //  3. repeat
