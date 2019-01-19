@@ -68,8 +68,6 @@ class symbol
 
         bool                            my_erroneous;       // if a non-terminal can be part of a A -> 'error' rule
 
-        uint32_t                        my_state;           // state number for LR parsers
-
         sets_type                       my_first_sets;      // 'first set' is the set of terminals that can start a string that is derivable from this non-terminal
         sets_type                       my_eff_sets;        // 'epsilon-free first set', EFF
         sets_type                       my_follow_sets;     // 'follow set' is a set of terminals which may follow A (be immediately after A) in a valid derivation
@@ -113,9 +111,6 @@ class symbol
         
         associativity_type              associativity() const;
         associativity_type&             associativity();
-
-        uint32_t                        state() const;
-        uint32_t&                       state();
 
         bool                            erroneous() const;
         bool&                           erroneous();
@@ -214,16 +209,6 @@ inline symbol::associativity_type symbol::associativity() const
 inline symbol::associativity_type& symbol::associativity()
 {
     return my_associativity;
-}
-
-inline uint32_t symbol::state() const
-{
-    return my_state;
-}
-
-inline uint32_t& symbol::state()
-{
-    return my_state;
 }
 
 inline bool symbol::erroneous() const

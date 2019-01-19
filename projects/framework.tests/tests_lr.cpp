@@ -69,24 +69,26 @@ void test_lr_table()
     std::vector<string_type> inputs  =
     {
         LR"(D:\Projects\fe\grammars\LR.Aho.G5.29.txt)",
-        LR"(D:\Projects\fe\grammars\LR.Aho.G.4.55.txt)",
-        LR"(D:\Projects\fe\grammars\LR.GruneJacobsBook.9.32.txt)",
-        LR"(D:\Projects\fe\grammars\LR.2.Nigel.G5.txt)",
-        LR"(D:\Projects\fe\grammars\LR.2.Nigel.G1.txt)",
-        LR"(D:\Projects\fe\grammars\LR.2.Nigel.G3.txt)",
-        LR"(D:\Projects\fe\grammars\LR.Sippu.6.7.txt)",
-        LR"(D:\Projects\fe\grammars\LR.2+.Sippu.6.14.txt)",
-        LR"(D:\Projects\fe\grammars\LR.1.Sippu.6.24.txt)",
-        LR"(D:\Projects\fe\grammars\LR.1.Sippu.7.25.txt)",
-        LR"(D:\Projects\fe\grammars\LR.1.Incremental.txt)",
-        LR"(D:\Projects\fe\grammars\LR.1.Expr.txt)",
-        LR"(D:\Projects\fe\grammars\LR.1.Chapter02Compilers6December.txt)",
-        LR"(D:\Projects\fe\grammars\LR.1.bottom(2).txt)",
+        //LR"(D:\Projects\fe\grammars\LR.Aho.G.4.55.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.GruneJacobsBook.9.32.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.2.Nigel.G5.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.2.Nigel.G1.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.2.Nigel.G3.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.Sippu.6.7.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.2+.Sippu.6.14.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.1.Sippu.6.24.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.1.Sippu.7.25.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.1.Incremental.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.1.Expr.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.1.Chapter02Compilers6December.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.1.bottom(2).txt)",
 
-        LR"(D:\Projects\fe\grammars\LR.1.shift.reduce.conflict.G1.txt)",
-        LR"(D:\Projects\fe\grammars\LR.1.shift.reduce.conflict.G2.txt)",
-        LR"(D:\Projects\fe\grammars\LR.1.reduce.reduce.conflict.G1.txt)"
+        //LR"(D:\Projects\fe\grammars\LR.1.shift.reduce.conflict.G1.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.1.shift.reduce.conflict.G2.txt)",
+        //LR"(D:\Projects\fe\grammars\LR.1.reduce.reduce.conflict.G1.txt)"
     };
+
+    uint8_t k = 1;
 
     for(const auto& input : inputs)
     {
@@ -95,8 +97,6 @@ void test_lr_table()
         gr.load(input);
 
         std::wcout << grammar_visualization::decorate_grammar(gr) << std::endl;
-
-        uint8_t k = 1;
 
         grammar_algorithm::build_nullability_set(gr);
         grammar_algorithm::build_first_set(gr, k);

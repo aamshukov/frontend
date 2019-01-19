@@ -781,8 +781,7 @@ void grammar_algorithm::build_first_set(grammar& gr, uint8_t k, bool build_eff)
 {
     // FIRST(k) set
     //
-    // Based on AU, Russian edition, page 397 and on
-    // Sudkump p. 498
+    // Based on AU, Russian edition, page 397 and on Sudkump p. 498
     //  1. for each a ∈ T do F'(a) = {a}
     //  2. for each A ∈ N do F(A) = {λ} if A is nullable or empty otherwise
     //  3. repeat
@@ -1070,7 +1069,7 @@ void grammar_algorithm::build_first_set(const typename grammar_algorithm::symbol
     infix_operator(first_sets, k, result);
 
     // if all nullable add {λ}
-    if(std::all_of(symbols.begin(), symbols.end(), [](const auto& symb){ return (*symb).nullable(); }))
+    if(!symbols.empty() && std::all_of(symbols.begin(), symbols.end(), [](const auto& symb){ return (*symb).nullable(); }))
     {
         result.emplace_back(set_type { symbol::epsilon });
     }
@@ -1165,7 +1164,7 @@ void grammar_algorithm::build_follow_set(grammar& gr, uint8_t k)
     //     |      |
     // (0,1..K) (0,1..K)
     //
-    log_info(L"Building follow set for k = %d ...", k);
+    log_info(L"Building follow set for k = %d ..., Sudkamp", k);
 
     std::vector<symbol_type> nonterminals;
 
@@ -1254,7 +1253,7 @@ void grammar_algorithm::build_follow_set(grammar& gr, uint8_t k)
             {
                 // 3.2.3.1 L = TRUNCk(FIRSTk(ui+1) L)
                 const auto& ui1_nonterminal((*rule).rhs()[i + 1]); // ui+1
-                const auto& first_ui1((*ui1_nonterminal).first_sets()); // FIRSTk(ui+1)
+                auto first_ui1((*ui1_nonterminal).first_sets()); // FIRSTk(ui+1)
 
                 sets_type new_fl_prime_a; // holds TRUNCk(FIRSTk(ui+1) L)
 
@@ -1291,7 +1290,7 @@ void grammar_algorithm::build_follow_set(grammar& gr, uint8_t k)
             // FL(A)
             const auto& fla(flas[nonterminal]);
 
-            //log_info(L"F(%s)  = %s)", (*nonterminal).name().c_str(), grammar_visualization::decorate_sets(fla).c_str());
+            //log_info(L"F(%s)  = %s", (*nonterminal).name().c_str(), grammar_visualization::decorate_sets(fla).c_str());
 
             // FL'(A)
             const auto& fla_prime(flas_prime[nonterminal]);
@@ -1328,6 +1327,132 @@ void grammar_algorithm::build_follow_set(grammar& gr, uint8_t k)
     }
 
     log_info(L"Built follow set for k = %d.", k);
+}
+
+void grammar_algorithm::build_follow1_set(grammar& gr)
+{
+    // http://hypertextbookshop.com/transPL/Contents/01_Topics/03_Parsing/04_Section_4/02_page_2_-_First_Follow_and_Predict%20Sets.html
+    // http://marvin.cs.uidaho.edu/Teaching/CS445/firstfollow.txt
+    // for each nonterminal A in grammar G
+    //      Follow(A) := {} -- the empty set
+    // end for loop
+    //
+    // Follow(S) := {eof}, where S is the start symbol of G
+    //
+    // while there are changes to any Follow set loop
+    //     for each rule A -> X1 X2 ... Xn in grammar G loop
+    //       for each nonterminal Xi in the current rule loop
+    //          Follow(Xi) := Follow(Xi) union First(Xi+1 Xi+2 ... Xn) - { ε }
+    //          -- if i = n, First(Xi+1 Xi+2 ... Xn) = {ε}(the set containing the empty string)
+    //          if ε is in First(Xi+1 Xi+2 ... Xn) then
+    //             Follow(Xi) := Follow(Xi) union Follow(A)
+    //          end if
+    //       end for
+    //     end for
+    // end while
+    log_info(L"Building follow set for k = 1 ...");
+
+    // Follow(S) := {eof}, where S is the start symbol of G
+    (*gr.start_symbol()).follow_sets().emplace_back(set_type { symbol::epsilon });
+
+    // calculate
+    volatile bool changing = false;
+
+    do
+    {
+        changing = false; // reset repeat-gueard
+
+        // for each rule A -> X1 X2 ... Xn in grammar G loop
+        for(const auto& rule : gr.rules())
+        {
+            if((*rule).rhs_nonterminal_count() == 0) // ... at least one nonterminal must be in RHS, if not - skip
+            {
+                continue;
+            }
+
+            // for each nonterminal Xi in the current rule loop
+            for(std::size_t i = 0, n = (*rule).rhs().size(); i < n; i++)
+            {
+                const auto& nonterminal((*rule).rhs()[i]);
+
+                if((*nonterminal).terminal()) // skip terminals
+                {
+                    continue;
+                }
+
+                std::size_t follow_sets_count = (*nonterminal).follow_sets().size();
+
+                // Follow(Xi) := Follow(Xi) union First(Xi+1 Xi+2 ... Xn) - { ε }
+                // ... calculate First(Xi+1 Xi+2 ... Xn)
+                symbols_type tail_symbols;
+
+                std::for_each((*rule).rhs().begin() + i + 1, // +1 as Xi+1 Xi+2 ...
+                              (*rule).rhs().end(),
+                              [&tail_symbols](const auto& symb) { tail_symbols.emplace_back(symb); });
+
+                sets_type tail_first_set;
+
+                build_first_set(tail_symbols, 1, tail_first_set);
+
+                // ...  - { ε }
+                set_type epsilon_set { symbol::epsilon };
+
+                bool has_epsilon = std::find(tail_first_set.begin(), tail_first_set.end(), epsilon_set) != tail_first_set.end();
+
+                if(has_epsilon)
+                {
+                    tail_first_set.erase(std::remove_if(tail_first_set.begin(),
+                                                        tail_first_set.end(),
+                                                        [&epsilon_set](const auto& set)
+                                                        {
+                                                            return set == epsilon_set;
+                                                        }),
+                                                        tail_first_set.end());
+                }
+
+                // Follow(Xi) ... union First(Xi+1 Xi+2 ... Xn) - { ε }
+                std::for_each(tail_first_set.begin(),
+                              tail_first_set.end(),
+                              [&nonterminal](const auto& set)
+                              {
+                                  (*nonterminal).follow_sets().emplace_back(set);
+                              });
+
+                // if ε is in First(Xi+1 Xi+2 ... Xn) then
+                if(has_epsilon)
+                {
+                    // Follow(Xi) := Follow(Xi) union Follow(A)
+                    std::for_each((*(*rule).lhs()[0]).follow_sets().begin(), // A
+                                  (*(*rule).lhs()[0]).follow_sets().end(),
+                                  [&nonterminal](const auto& set)
+                                  {
+                                      (*nonterminal).follow_sets().emplace_back(set);
+                                  });
+                }
+
+                // make unique
+                make_vector_unique((*nonterminal).follow_sets());
+
+                if(!changing)
+                {
+                    changing = follow_sets_count != (*nonterminal).follow_sets().size();
+                }
+            }
+        }
+    }
+    while(changing);
+
+    // visualize
+    log_info(L"FOLLOW SETS:");
+    
+    for(const auto& pool_symbol_kvp : gr.pool())
+    {
+        const auto& pool_symbol(pool_symbol_kvp.second);
+
+        log_info(L"FOLLOW(%s) = %s", (*pool_symbol).name().c_str(), grammar_visualization::decorate_sets((*pool_symbol).follow_sets()).c_str());
+    }
+
+    log_info(L"Built follow set for k = 1.");
 }
 
 void grammar_algorithm::build_la_set(grammar& gr, uint8_t k)
@@ -2098,6 +2223,10 @@ void grammar_algorithm::infix_operator(const std::vector<typename grammar_algori
     {
         // build index vectors to calculate cartesian product for { a, ba } { aa, bbb } { cc, fd, gh }
         //                                                          [0,1]      [0,1]       [0,1,2]
+        // import itertools                                           ^          ^            ^
+        // sets = [ [0, 1], [0,1], [0,1,2] ]  -------------------------------------------------
+        // for i, element in enumerate(itertools.product(*sets)):
+        //     print(str(i) + ': ' + str(element))
         std::vector<std::vector<std::size_t>> indices;
 
         for(std::size_t i = 0, n = sets.size(); i < n; i++)
@@ -2110,10 +2239,18 @@ void grammar_algorithm::infix_operator(const std::vector<typename grammar_algori
         }
 
         // calculate cartesian product
-        //  0 0 0
-        //  0 0 1
-        //  ...
-        //  1 1 2
+        //  0: (0, 0, 0)
+        //  1: (0, 0, 1)
+        //  2: (0, 0, 2)
+        //  3: (0, 1, 0)
+        //  4: (0, 1, 1)
+        //  5: (0, 1, 2)
+        //  6: (1, 0, 0)
+        //  7: (1, 0, 1)
+        //  8: (1, 0, 2)
+        //  9: (1, 1, 0)
+        // 10: (1, 1, 1)
+        // 11: (1, 1, 2)
         std::vector<std::vector<std::size_t>> cartesian_product_result(cartesian_product(indices));
 
         // combine

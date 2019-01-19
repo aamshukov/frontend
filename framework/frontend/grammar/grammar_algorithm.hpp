@@ -86,6 +86,7 @@ class grammar_algorithm : private noncopyable
         static void         build_eff_set(const grammar& gr, const symbols_type& symbols, uint8_t k, sets_type& result);
 
         static void         build_follow_set(grammar& gr, uint8_t k);
+        static void         build_follow1_set(grammar& gr);
 
         static void         build_la_set(grammar& gr, uint8_t k);
         static void         build_la_set(const rule_type& rule, uint8_t k, sets_type& result);

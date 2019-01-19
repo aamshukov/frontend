@@ -243,6 +243,8 @@ void test_operator_precedence();
 void test_eff();
 void test_lr_table();
 
+void test_sets();
+
 extern "C" double CombineA(int a, int b, int c, int d, int e, double f);
 extern "C" void _start();
 
@@ -272,6 +274,8 @@ int main()
     operation_status status;
 
     logger::instance().initialize(LR"(d:\tmp\fe.log)", status);
+
+    test_sets();
 
     test_lr_table();
     test_eff();
@@ -3681,6 +3685,55 @@ void test_eff()
     grammar_algorithm::build_eff_set(gr, grammar_algorithm::set_type { gr.pool()[L"S"], gr.pool()[L"a"], gr.pool()[L"S"], gr.pool()[L"b"] }, k, eff);
     eff.clear();
 }
+
+void test_sets()
+{
+    std::vector<string_type> inputs  =
+    {
+        LR"(D:\Projects\fe\grammars\LR.G.No-First.txt)",
+        LR"(D:\Projects\fe\grammars\FirstSet.Sudkamp.G6.txt)",
+        LR"(D:\Projects\fe\grammars\Backhouse.G.3.2.3.txt)",
+    };
+
+    uint8_t k = 2;
+
+    for(const auto& input : inputs)
+    {
+        grammar gr;
+
+        gr.load(input);
+
+        std::wcout << grammar_visualization::decorate_grammar(gr) << std::endl;
+
+
+        grammar::symbol_type a(factory::create<symbol>(0, L"a", symbol::kind::terminal));
+        grammar::symbol_type b(factory::create<symbol>(1, L"b", symbol::kind::terminal));
+        grammar::symbol_type c(factory::create<symbol>(2, L"c", symbol::kind::terminal));
+
+        grammar_algorithm::sets_type new_fl_prime_a;
+
+        std::vector<grammar_algorithm::sets_type> infix_op_input;
+
+        infix_op_input.emplace_back(grammar_algorithm::sets_type{ grammar_algorithm::set_type{b}, grammar_algorithm::set_type{a,c} });
+        infix_op_input.emplace_back(grammar_algorithm::sets_type{ grammar_algorithm::set_type{c}});
+        infix_op_input.emplace_back(grammar_algorithm::sets_type{ grammar_algorithm::set_type{symbol::epsilon}});
+        infix_op_input.emplace_back(grammar_algorithm::sets_type{ grammar_algorithm::set_type{a}});
+
+        grammar_algorithm::infix_operator(infix_op_input, k, new_fl_prime_a); // TRUNCk(FIRSTk(ui+1) L)
+
+        grammar_algorithm::build_nullability_set(gr);
+        grammar_algorithm::build_first_set(gr, k);
+        grammar_algorithm::build_first_set(gr, k, true);
+        grammar_algorithm::build_follow_set(gr, k);
+        grammar_algorithm::build_la_set(gr, k);
+
+        lr_algorithm::lr_goto_table_type goto_table;
+        lr_algorithm::lr_action_table_type action_table;
+
+        lr_algorithm::build_lr_table(gr, k, goto_table, action_table);
+    }
+}
+
 
 // for %i in (d:\tmp\FSA\*.dot) do D:\Soft\graphviz\2.38\release\bin\dot -Tpng %i -o %i.png
 // D:\Soft\graphviz\2.38\release\bin\dot -Tpng d:\tmp\FSA\nfa.dot -o d:\tmp\FSA\nfa.dot.png

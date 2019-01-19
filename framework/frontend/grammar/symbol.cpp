@@ -25,7 +25,6 @@ symbol::symbol(uint32_t id, const string_type& name, symbol::kind type)
         my_precedence(0),
         my_associativity(symbol::associativity_type::left),
         my_erroneous(false),
-        my_state(0),
         my_flags(flags::clear)
 {
 }
@@ -49,8 +48,6 @@ symbol::symbol(const symbol& other)
         my_associativity = other.my_associativity;
 
         my_erroneous = other.my_erroneous;
-
-        my_state = other.my_state;
 
         my_first_sets = other.my_first_sets;
         my_follow_sets = other.my_follow_sets;
@@ -80,8 +77,6 @@ symbol::symbol(symbol&& other)
         my_associativity = other.my_associativity;
 
         my_erroneous = other.my_erroneous;
-
-        my_state = other.my_state;
 
         my_first_sets = std::move(other.my_first_sets);
         my_follow_sets = std::move(other.my_follow_sets);
@@ -114,8 +109,6 @@ const symbol& symbol::operator = (const symbol& other)
 
         my_erroneous = other.my_erroneous;
 
-        my_state = other.my_state;
-
         my_first_sets = other.my_first_sets;
         my_follow_sets = other.my_follow_sets;
 
@@ -146,8 +139,6 @@ symbol& symbol::operator = (symbol&& other)
         my_associativity = other.my_associativity;
 
         my_erroneous = other.my_erroneous;
-
-        my_state = other.my_state;
 
         my_first_sets = std::move(other.my_first_sets);
         my_follow_sets = std::move(other.my_follow_sets);

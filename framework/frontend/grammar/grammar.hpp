@@ -35,6 +35,9 @@ class grammar : private noncopyable
     private:
         static bool             char_to_skip(char_type ch, const char_type* delimiters);
 
+    private:
+        void                    cleanup();
+
     public:
                                 grammar();
                                ~grammar();

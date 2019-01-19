@@ -271,7 +271,23 @@ void grammar::load(const string_type& file_name)
 
     stream.close();
 
+    cleanup();
+
     log_info(L"Loaded grammar from the file '%s'.", file_name.c_str());
+}
+
+void grammar::cleanup()
+{
+    for(const auto& symb_kvp : my_pool)
+    {
+        const auto& pool_symb(symb_kvp.second);
+
+        (*pool_symb).first_sets().clear();
+        (*pool_symb).eff_sets().clear();
+        (*pool_symb).follow_sets().clear();
+
+        (*pool_symb).nullable() = false;
+    }
 }
 
 END_NAMESPACE
