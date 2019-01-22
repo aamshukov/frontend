@@ -918,8 +918,7 @@ void grammar_algorithm::build_first_set(grammar& gr, uint8_t k, bool build_eff)
             const auto& pool_symbol(pool_symbol_kvp.second);
 
             const auto& fa(fas[pool_symbol]); // F(A)
-
-            const auto fas_prime_it(fas_prime.find(pool_symbol)); // F'(A)
+            const auto fas_prime_it(fas_prime.find(pool_symbol)); // F'(A), copy
 
             if(fas_prime_it == fas_prime.end())
             {

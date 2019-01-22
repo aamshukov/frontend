@@ -35,9 +35,6 @@ class grammar : private noncopyable
     private:
         static bool             char_to_skip(char_type ch, const char_type* delimiters);
 
-    private:
-        void                    cleanup();
-
     public:
                                 grammar();
                                ~grammar();
@@ -57,6 +54,7 @@ class grammar : private noncopyable
         nts_rules_type&         nt_rules();
 
         void                    load(const string_type& file_name);
+        void                    cleanup();
 };
 
 inline const typename grammar::rules_type& grammar::rules() const
