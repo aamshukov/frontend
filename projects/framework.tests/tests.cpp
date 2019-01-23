@@ -3690,6 +3690,7 @@ void test_sets()
 {
     std::vector<string_type> inputs  =
     {
+        LR"(D:\Projects\fe\grammars\First.Cycle.parr.phd.txt)",
         LR"(D:\Projects\fe\grammars\LR.G.No-First.txt)",
         LR"(D:\Projects\fe\grammars\FirstSet.Sudkamp.G6.txt)",
         LR"(D:\Projects\fe\grammars\Backhouse.G.3.2.3.txt)",
@@ -3723,11 +3724,11 @@ void test_sets()
 
         grammar_algorithm::build_nullability_set(gr);
 
-        //grammar_algorithm::build_first_set(gr, k);
-        //grammar_algorithm::build_first_set(gr, k, true);
-        //grammar_algorithm::build_follow_set(gr, k);
+        grammar_algorithm::build_first_set(gr, k);
+        grammar_algorithm::build_first_set(gr, k, true);
+        grammar_algorithm::build_follow_set(gr, k);
 
-        //gr.cleanup();
+        gr.cleanup();
 
         grammar_algorithm::build_first1_set(gr);
         grammar_algorithm::build_follow1_set(gr);

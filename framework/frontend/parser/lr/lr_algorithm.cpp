@@ -173,7 +173,7 @@ void lr_algorithm::calculate_lr_closure(const grammar& gr, uint8_t k, const type
 
             sets_type first_set;
 
-            if(k == 1) //??
+            if(k == 1)
             {
                 grammar_algorithm::build_first1_set(first_set_symbols, first_set);
             }
@@ -777,7 +777,7 @@ void lr_algorithm::build_lr_items_set_for_viable_prefix(const grammar& gr,
 
                     sets_type first_set;
 
-                    if(k == 1) //??
+                    if(k == 1)
                     {
                         grammar_algorithm::build_first1_set(first_set_symbols, first_set);
                     }
@@ -890,7 +890,7 @@ void lr_algorithm::build_lr_items_set_for_viable_prefix(const grammar& gr,
 
                         sets_type first_set;
 
-                        if(k == 1) //??
+                        if(k == 1)
                         {
                             grammar_algorithm::build_first1_set(first_set_symbols, first_set);
                         }

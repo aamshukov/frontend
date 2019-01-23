@@ -19,7 +19,7 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-// α β ε λ ∅ ∈ Σ ∪ ⊕
+// α β ε λ ∅ ∈ ∉ Σ ∪ ⊕
 
 std::size_t grammar_algorithm::calculate_grammar_size(const grammar& gr)
 {
@@ -1097,7 +1097,7 @@ void grammar_algorithm::build_eff_set(const grammar& gr,
         if((*symbols.front()).terminal())
         {
             // EFFk(α) = FIRSTk(α)
-            if(k == 1) //??
+            if(k == 1)
             {
                 build_first1_set(symbols, result);
             }
@@ -1124,7 +1124,7 @@ void grammar_algorithm::build_eff_set(const grammar& gr,
 
                 std::for_each(symbols.begin() + 1, symbols.end(), [&symbols0](const auto& symb){ symbols0.emplace_back(symb); });
 
-                if(k == 1) //??
+                if(k == 1)
                 {
                     build_first1_set(symbols0, first);
                 }
@@ -1156,7 +1156,7 @@ void grammar_algorithm::build_follow_set(grammar& gr, uint8_t k)
 {
     // Sudkump 2nd ed., p.501 and Ronald C. Backhouse, p.110
     //  1. FL(S) = {λ}
-    //  2. for each A ∈ N-{S} do FL(A) = Ø
+    //  2. for each A ∈ N-{S} do FL(A) = ∅
     //  3. repeat
     //      3.1 for each A ∈ N do FL'(A) = FL(A)
     //      3.2 for each rule A -> w = u1 u2 ... uN with w ∉ T* do  (w ∉ T* means at least one nonterminal must be in RHS, if not - skip)
@@ -1178,10 +1178,11 @@ void grammar_algorithm::build_follow_set(grammar& gr, uint8_t k)
     // (0,1..K) (0,1..K)
     //
     // ATTENTION:
-    //  this algorithm assumes FIRSTk() are not empty, for some infinite grammars algorithm does NOT work correctly, one of them
+    //  this algorithm assumes FIRSTk() are not empty, for some infinite grammars algorithm does NOT work correctly!!!, one of them is
     //      S : E + E
     //      E : E * E
-    // 
+    // in this case, FIRSTk(S) and FIRSTk(E) are empty sets and the statement 3.2.3.1 L = TRUNCk(FIRSTk(ui+1) L) always calculates L as an empty set ∅.
+    // For k = 1 consider to use alternative implementation build_first1_set and build_follow1_set.
     log_info(L"Building follow set for k = %d ..., Sudkamp", k);
 
     // preliminaries
@@ -1205,7 +1206,7 @@ void grammar_algorithm::build_follow_set(grammar& gr, uint8_t k)
     flas.emplace(follow_set_type::value_type(gr.start_symbol(), sets_type { set_type { symbol::epsilon } }));
     //flas.emplace(follow_set_type::value_type(gr.start_symbol(), sets_type { set_type { symbol::eof } }));
 
-    // 2. for each A ∈ N-{S} do FL(A) = Ø
+    // 2. for each A ∈ N-{S} do FL(A) = ∅
     //  follow sets are empty by default
     for(const auto& nonterminal : nonterminals)
     {
@@ -1349,6 +1350,12 @@ void grammar_algorithm::build_follow_set(grammar& gr, uint8_t k)
 
 void grammar_algorithm::build_first1_set(grammar& gr)
 {
+    // The idea is based on this observation, from
+    //  "Reinhard Wilhelm Helmut Seidl Sebastian Hack 'Compiler Design', Syntactic and Semantic Analysis", p.72
+    //               L1                if L2 != ∅ and ε ∉ L1
+    //  L1 (+)1 L2 = 
+    //               (L2\{ε}) ∪ L2    if L2 != ∅ and ε ∈ L1
+    //
     // http://marvin.cs.uidaho.edu/Teaching/CS445/firstfollow.txt
     //  computeFirst({P_1, P_2, ...P_m})
     //      foreach A ∈ TERMS do First[A] = {A}
