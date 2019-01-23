@@ -173,7 +173,14 @@ void lr_algorithm::calculate_lr_closure(const grammar& gr, uint8_t k, const type
 
             sets_type first_set;
 
-            grammar_algorithm::build_first_set(first_set_symbols, k, first_set);
+            if(k == 1) //??
+            {
+                grammar_algorithm::build_first1_set(first_set_symbols, first_set);
+            }
+            else
+            {
+                grammar_algorithm::build_first_set(first_set_symbols, k, first_set);
+            }
 
             // ... add [B -> • γ, x] to set I ...
             auto nonterminal_it(gr.nt_rules().find((*current_symbol).name()));
@@ -770,7 +777,14 @@ void lr_algorithm::build_lr_items_set_for_viable_prefix(const grammar& gr,
 
                     sets_type first_set;
 
-                    grammar_algorithm::build_first_set(first_set_symbols, k, first_set);
+                    if(k == 1) //??
+                    {
+                        grammar_algorithm::build_first1_set(first_set_symbols, first_set);
+                    }
+                    else
+                    {
+                        grammar_algorithm::build_first_set(first_set_symbols, k, first_set);
+                    }
 
                     // ... then for each x in FIRSTk(αu) add [B -> • β, x] to Vk(λ) ...
                     auto nonterminal_it(gr.nt_rules().find((*first_symbol).name()));
@@ -876,7 +890,14 @@ void lr_algorithm::build_lr_items_set_for_viable_prefix(const grammar& gr,
 
                         sets_type first_set;
 
-                        grammar_algorithm::build_first_set(first_set_symbols, k, first_set);
+                        if(k == 1) //??
+                        {
+                            grammar_algorithm::build_first1_set(first_set_symbols, first_set);
+                        }
+                        else
+                        {
+                            grammar_algorithm::build_first_set(first_set_symbols, k, first_set);
+                        }
 
                         // ... then for each x in FIRSTk(βu) add [B -> • δ, x] to Vk(X1...Xi) ...
                         auto nonterminal_it(gr.nt_rules().find((*current_symbol).name()));

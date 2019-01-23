@@ -1097,7 +1097,14 @@ void grammar_algorithm::build_eff_set(const grammar& gr,
         if((*symbols.front()).terminal())
         {
             // EFFk(α) = FIRSTk(α)
-            build_first_set(symbols, k, result);
+            if(k == 1) //??
+            {
+                build_first1_set(symbols, result);
+            }
+            else
+            {
+                build_first_set(symbols, k, result);
+            }
         }
         else
         {
@@ -1117,7 +1124,14 @@ void grammar_algorithm::build_eff_set(const grammar& gr,
 
                 std::for_each(symbols.begin() + 1, symbols.end(), [&symbols0](const auto& symb){ symbols0.emplace_back(symb); });
 
-                build_first_set(symbols0, k, first);
+                if(k == 1) //??
+                {
+                    build_first1_set(symbols0, first);
+                }
+                else
+                {
+                    build_first_set(symbols0, k, first);
+                }
 
                 std::vector<sets_type> infix_op_input;
 

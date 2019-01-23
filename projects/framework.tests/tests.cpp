@@ -3723,12 +3723,14 @@ void test_sets()
 
         grammar_algorithm::build_nullability_set(gr);
 
-        grammar_algorithm::build_first_set(gr, k);
-        grammar_algorithm::build_first_set(gr, k, true);
-        grammar_algorithm::build_follow_set(gr, k);
+        //grammar_algorithm::build_first_set(gr, k);
+        //grammar_algorithm::build_first_set(gr, k, true);
+        //grammar_algorithm::build_follow_set(gr, k);
 
-        //grammar_algorithm::build_first1_set(gr);
-        //grammar_algorithm::build_follow1_set(gr);
+        //gr.cleanup();
+
+        grammar_algorithm::build_first1_set(gr);
+        grammar_algorithm::build_follow1_set(gr);
 
         grammar_algorithm::build_la_set(gr, k);
 
