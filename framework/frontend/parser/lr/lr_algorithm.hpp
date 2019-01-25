@@ -102,12 +102,6 @@ class lr_algorithm : private noncopyable
         using lr_goto_table_type = std::map<std::pair<uint32_t, uint32_t>, uint32_t>;
         using lr_action_table_type = std::map<std::pair<std::vector<uint32_t>, uint32_t>, std::set<uint32_t>>;
 
-
-
-
-        //??
-        using lr_canonical_collection_type = std::vector<lr_items_type>;
-
     private:
         static bool             lr_items_equal(const lr_item_type& lhs, const lr_item_type& rhs);
         static bool             has_lr_item(const lr_items_type& items, const lr_item_type& item);
@@ -137,9 +131,6 @@ class lr_algorithm : private noncopyable
                                                uint8_t k,
                                                lr_goto_table_type& goto_table_result,
                                                lr_action_table_type& action_table_result);
-
-    public:
-        static void             build_lr_canonical_collection(const grammar& gr, uint8_t k, lr_canonical_collection_type& result);
 
     public:
         static void             build_lr_items_set_for_viable_prefix(const grammar& gr,

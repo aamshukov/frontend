@@ -672,47 +672,8 @@ void lr_algorithm::build_lr_table(const grammar& gr,
     build_goto_table(gr, automaton, goto_table);
     build_action_table(gr, k, automaton, goto_table, action_table);
 
-
-
-
-
-    //lr_canonical_collection_type canonical_collection;
-
-    //build_lr_canonical_collection(gr, k, canonical_collection);
-
     log_info(L"Built LR(k) table for k = %d.", k);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 void lr_algorithm::build_lr_items_set_for_viable_prefix(const grammar& gr,
                                                         const typename lr_algorithm::symbols_type& symbols, // viable prefix
@@ -968,28 +929,6 @@ void lr_algorithm::build_lr_items_set_for_viable_prefix(const grammar& gr,
     log_info(L"%s", lr_visualization::decorate_lr_items(result).c_str());
 
     log_info(L"Built LR(k) items set for k = %d.", k);
-}
-
-
-void lr_algorithm::build_lr_canonical_collection(const grammar& gr, uint8_t k, typename lr_algorithm::lr_canonical_collection_type& result)
-{
-gr; //??
-result;
-    // Based on Aho.A.V Lam.M.S Sethi.R Ullman.J.D Compilers Principles Techniques And Tools (2ed), p.261
-    // initialize C to CLOSURE( { [S' -> • S, $ ] } )
-    // repeat
-    //     for(each set of items I in C)
-    //         for(each grammar symbol X)
-    //             if(GOTO(I, X) is not empty and not in C)
-    //                 add GOTO(I, X) to C
-    // until no new sets of items are added to C
-    log_info(L"Building LR(k) canonical collection for k = %d ...", k);
-
-
-    // ... add GOTO(I, X) to C ... also cache in goto_table
-
-
-    log_info(L"Built LR(k) canonical collection for k = %d.", k);
 }
 
 END_NAMESPACE
