@@ -9,6 +9,7 @@
 #include <core\factory.hpp>
 #include <core\text.hpp>
 #include <core\flags.hpp>
+#include <core\tree.hpp>
 
 #include <frontend\grammar\symbol.hpp>
 #include <frontend\grammar\rule.hpp>
@@ -26,22 +27,45 @@ USINGNAMESPACE(core)
 
 // α β ε λ ∅ ∈ Σ ∪
 
-void earley_algorithm::build_core_items_table(const grammar& gr, typename earley_algorithm::core_items_type& result)
+void earley_algorithm::predict(typename earley_algorithm::chart_type& chart, typename earley_algorithm::charts_type& charts)
 {
-gr;//??
-result; //??
-    log_info(L"Building core items table ...");
+chart;charts; //??
+    log_info(L"Running predictor ...");
 
-    log_info(L"Built core items table.");
+    log_info(L"Done running predictor.");
 }
 
-void earley_algorithm::build_prediction_table(const grammar& gr, typename earley_algorithm::core_items_set_type& result)
+void earley_algorithm::complete(typename earley_algorithm::chart_type& chart, typename earley_algorithm::charts_type& charts)
 {
-gr;//??
-result; //??
-    log_info(L"Building prediction table ...");
+chart;charts; //??
+    log_info(L"Running completer ...");
 
-    log_info(L"Built prediction table.");
+    log_info(L"Done running completer.");
+}
+
+void earley_algorithm::scan(typename earley_algorithm::chart_type& chart, typename earley_algorithm::charts_type& charts, typename earley_algorithm::chart_type& result)
+{
+chart;charts; //??
+result;//??
+    log_info(L"Running scanning ...");
+
+    log_info(L"Done running scanning.");
+}
+
+void earley_algorithm::build_charts(typename earley_algorithm::charts_type& result)
+{
+result; //??
+    log_info(L"Building charts ...");
+
+    log_info(L"Built charts.");
+}
+
+void earley_algorithm::build_trees(typename earley_algorithm::charts_type& charts, typename earley_algorithm::trees_type& result)
+{
+result;charts; //??
+    log_info(L"Building tree(s) ...");
+
+    log_info(L"Built tree(s).");
 }
 
 END_NAMESPACE

@@ -67,7 +67,7 @@
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
-struct rd_token_traits : public token_traits
+struct earley_token_traits : public token_traits
 {
     DECLARE_ENUM
     (
@@ -87,7 +87,7 @@ struct rd_token_traits : public token_traits
     )
 };
 
-class rd_lexical_analyzer : public lexical_analyzer<token<rd_token_traits>>
+class rd_lexical_analyzer : public lexical_analyzer<token<earley_token_traits>>
 {
     protected:
         virtual void next_lexeme_impl() override
@@ -101,10 +101,10 @@ class rd_lexical_analyzer : public lexical_analyzer<token<rd_token_traits>>
         }
 };
 
-class rd_parser : recursive_descent_parser<token<rd_token_traits>>
+class rd_parser : recursive_descent_parser<token<earley_token_traits>>
 {
     public:
-        rd_parser(const lexical_analyzer_type& lexical_analyzer) : recursive_descent_parser<token<rd_token_traits>>(lexical_analyzer)
+        rd_parser(const lexical_analyzer_type& lexical_analyzer) : recursive_descent_parser<token<earley_token_traits>>(lexical_analyzer)
         {
         }
 

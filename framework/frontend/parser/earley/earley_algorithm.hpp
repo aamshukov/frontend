@@ -25,64 +25,65 @@ class earley_algorithm : private noncopyable
         using set_type = grammar::set_type;
         using sets_type = grammar::sets_type;
 
-        struct core_item
+        enum class flags : uint32_t
         {
-            uint32_t  id;           // unique id
-            rule_type rule;   // production (rule)
-            uint32_t  dot_position; // dot - position in rhs,
-                                    // if dot_position = rhs.size() it means it points to the end of the rhs
+            init          = 0x00000001, // .
+            scanner       = 0x00000002, //  .
+            predictor     = 0x00000004, //   . which action introduced item
+            completer     = 0x00000008, //  .
+            error_scanner = 0x00000010, // .
+            error_mask    = 0x07000000,
+            marked        = 0x00000080
         };
-
-        using core_item_type = std::shared_ptr<core_item>;
-        using core_items_type = std::vector<core_item_type>;
-
-        struct core_item_key_comparator
-        {
-            bool operator() (const core_item_type& lhs, const core_item_type& rhs) const
-            {
-                return (*lhs).id < (*rhs).id;
-            }
-        };
-
-        using core_items_set_type = std::set<core_item_type, core_item_key_comparator>;
 
         struct chart;
         using chart_type = std::shared_ptr<chart>;
 
         struct item;
         using item_type = std::shared_ptr<item>;
-
-        struct item_key_comparator
-        {
-            bool operator() (const item_type& lhs, const item_type& rhs) const
-            {
-                return (*lhs).id < (*rhs).id;
-            }
-        };
-
-        using items_type = std::set<item_type, item_key_comparator>;
+        using items_type = std::vector<item_type>;
 
         struct item
         {
-           uint32_t       id;           // unique id
-           core_item_type core_item;    // pointer to static core item
-           chart_type     origin_chart; // pointer to the orinal set/chart where recognition started
-           chart_type     master_chart; // chart it belongs to
-           item_type      lptr;         // pointer to left brother
-           items_type     rptrs;        // rightmost child(s), if grammar is ambiguous
+            rule_type   rule;           // production (rule)
+            uint32_t    dot;            // dot - position in rhs, if dot_position = rhs.size() it means it points to the end of the rhs
+
+            chart_type  origin_chart;   // pointer to the orinal set/chart where recognition started
+            chart_type  master_chart;   // chart it belongs to
+
+            item_type   lptr;           // pointer to left brother
+            items_type  rptrs;          // rightmost child(s), if grammar is ambiguous
+
+            flags       flags;          // action (predictor, completer, scanner, errorscanner), error cost
         };
 
         struct chart
         {
-            uint32_t    id;    // unique id
-            items_type  items; // list of items
+            uint32_t    id;              // unique id
+            items_type  items;           // list of items
+
+            items_type  predictor_items; // items in predictor list
+            uint32_t    predicted_k;     // optimization
+
+            items_type  completer_items; // items in completer list
+            uint32_t    completed_k;     // optimization
+
+            items_type  scanner_items;   // items in scanner list
         };
 
         using charts_type = std::vector<chart_type>;
 
+        using tree_type = std::shared_ptr<tree>;
+        using trees_type = std::vector<tree_type>;
+
+    private:
+        static void predict(chart_type& chart, charts_type& charts);
+        static void complete(chart_type& chart, charts_type& charts);
+        static void scan(chart_type& chart, charts_type& charts, chart_type& result);
+
     public:
-        static void build_core_items_table(const grammar& gr, core_items_type& result);
-        static void build_prediction_table(const grammar& gr, core_items_set_type& result);
+        static void build_charts(charts_type& result);
+        static void build_trees(charts_type& charts, trees_type& result);
 };
 
 END_NAMESPACE

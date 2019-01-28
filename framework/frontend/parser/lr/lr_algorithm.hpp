@@ -23,8 +23,6 @@ class lr_algorithm : private noncopyable
         using set_type = grammar::set_type;
         using sets_type = grammar::sets_type;
 
-        using counter_type = counter;
-
         struct lr_item
         {
             rule_type   rule;   // production (rule)
