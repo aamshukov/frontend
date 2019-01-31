@@ -1230,6 +1230,7 @@ void grammar_algorithm::build_follow_set(grammar& gr, uint8_t k)
 
             if(flas_prime_it == flas_prime.end())
             {
+                // this happening at the begining as we do not explicitly initialize F'(A)
                 flas_prime.emplace(follow_set_type::value_type(nonterminal, fla));
             }
             else
@@ -2447,94 +2448,102 @@ void grammar_algorithm::infix_operator(const std::vector<typename grammar_algori
     // (+) = ⊕
     if(!sets.empty())
     {
-        // build index vectors to calculate cartesian product for { a, ba } { aa, bbb } { cc, fd, gh }
-        //                                                          [0,1]      [0,1]       [0,1,2]
-        // import itertools                                           ^          ^            ^
-        // sets = [ [0, 1], [0,1], [0,1,2] ]  -------------------------------------------------
-        // for i, element in enumerate(itertools.product(*sets)):
-        //     print(str(i) + ': ' + str(element))
-        std::vector<std::vector<std::size_t>> indices;
-
-        for(std::size_t i = 0, n = sets.size(); i < n; i++)
-        {
-            indices.emplace_back(std::vector<std::size_t>{});
-
-            std::size_t j = 0;
-
-            std::for_each(sets[i].begin(), sets[i].end(), [&indices, i, &j](const auto&){ indices[i].emplace_back(j++); });
-        }
-
-        // calculate cartesian product
-        //  0: (0, 0, 0)
-        //  1: (0, 0, 1)
-        //  2: (0, 0, 2)
-        //  3: (0, 1, 0)
-        //  4: (0, 1, 1)
-        //  5: (0, 1, 2)
-        //  6: (1, 0, 0)
-        //  7: (1, 0, 1)
-        //  8: (1, 0, 2)
-        //  9: (1, 1, 0)
-        // 10: (1, 1, 1)
-        // 11: (1, 1, 2)
-        std::vector<std::vector<std::size_t>> cartesian_product_result(cartesian_product(indices));
-
-        // combine
         sets_type result_sets;
 
-        for(const auto& cartesian_product : cartesian_product_result)
+        // special case ∅* = λ
+        if(std::all_of(sets.begin(), sets.end(), [](const auto& set){ return set.empty(); }))
         {
-            set_type result_set;
+            result_sets.emplace_back(set_type { symbol::epsilon });
+        }
+        else
+        {
+            // build index vectors to calculate cartesian product for { a, ba } { aa, bbb } { cc, fd, gh }
+            //                                                          [0,1]      [0,1]       [0,1,2]
+            // import itertools                                           ^          ^            ^
+            // sets = [ [0, 1], [0,1], [0,1,2] ]  -------------------------------------------------
+            // for i, element in enumerate(itertools.product(*sets)):
+            //     print(str(i) + ': ' + str(element))
+            std::vector<std::vector<std::size_t>> indices;
 
             for(std::size_t i = 0, n = sets.size(); i < n; i++)
             {
-                const auto& current_set(sets[i][cartesian_product[i]]);
+                indices.emplace_back(std::vector<std::size_t>{});
 
-                if(current_set.empty())
+                std::size_t j = 0;
+
+                std::for_each(sets[i].begin(), sets[i].end(), [&indices, i, &j](const auto&){ indices[i].emplace_back(j++); });
+            }
+
+            // calculate cartesian product
+            //  0: (0, 0, 0)
+            //  1: (0, 0, 1)
+            //  2: (0, 0, 2)
+            //  3: (0, 1, 0)
+            //  4: (0, 1, 1)
+            //  5: (0, 1, 2)
+            //  6: (1, 0, 0)
+            //  7: (1, 0, 1)
+            //  8: (1, 0, 2)
+            //  9: (1, 1, 0)
+            // 10: (1, 1, 1)
+            // 11: (1, 1, 2)
+            std::vector<std::vector<std::size_t>> cartesian_product_result(cartesian_product(indices));
+
+            // combine
+            for(const auto& cartesian_product : cartesian_product_result)
+            {
+                set_type result_set;
+
+                for(std::size_t i = 0, n = sets.size(); i < n; i++)
                 {
-                    result_set.clear();
-                    break;
+                    const auto& current_set(sets[i][cartesian_product[i]]);
+
+                    if(current_set.empty())
+                    {
+                        result_set.clear();
+                        break;
+                    }
+
+                    std::copy(current_set.begin(), current_set.end(), std::back_inserter(result_set));
                 }
 
-                std::copy(current_set.begin(), current_set.end(), std::back_inserter(result_set));
+                if(!result_set.empty())
+                {
+                    result_sets.emplace_back(result_set);
+                }
             }
 
-            if(!result_set.empty())
+            // remove lambdas
+            for(auto& result_set : result_sets)
             {
-                result_sets.emplace_back(result_set);
+                // λ* = λ, keep { λ λ...} as { λ }
+                if(std::all_of(result_set.begin(),
+                               result_set.end(),
+                               [](auto& symb)
+                               {
+                                   return (*symb).id() == (*symbol::epsilon).id();
+                               }))
+                {
+                    result_set.resize(1);
+                }
+                else
+                {
+                    result_set.erase(std::remove_if(result_set.begin(),
+                                                    result_set.end(),
+                                                    [](auto& symb)
+                                                    {
+                                                        return (*symb).id() == (*symbol::epsilon).id();
+                                                    }),
+                                                    result_set.end());
+                }
             }
+
+            // resize up to k
+            std::for_each(result_sets.begin(), result_sets.end(), [&k](auto& set){ if(set.size() > k) set.resize(k); });
+
+            // make unique
+            make_vector_unique(result_sets);
         }
-
-        // remove lambdas
-        for(auto& result_set : result_sets)
-        {
-            // λ* = λ, keep { λ λ...} as { λ }
-            if(std::all_of(result_set.begin(),
-                           result_set.end(),
-                           [](auto& symb)
-                           {
-                               return (*symb).id() == (*symbol::epsilon).id();
-                           }))
-            {
-                result_set.resize(1);
-            }
-            else
-            {
-                result_set.erase(std::remove_if(result_set.begin(),
-                                                result_set.end(),
-                                                [](auto& symb)
-                                                {
-                                                    return (*symb).id() == (*symbol::epsilon).id();
-                                                }),
-                                                result_set.end());
-            }
-        }
-
-        // resize up to k
-        std::for_each(result_sets.begin(), result_sets.end(), [&k](auto& set){ if(set.size() > k) set.resize(k); });
-
-        // make unique
-        make_vector_unique(result_sets);
 
         // copy result
         std::for_each(result_sets.begin(),

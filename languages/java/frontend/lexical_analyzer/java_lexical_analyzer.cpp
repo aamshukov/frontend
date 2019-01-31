@@ -649,13 +649,11 @@ loc_t java_lexical_analyzer::find_line_number(loc_t position)
             }
             else
             {
-                // searched position is at beginning of this line
                 result = my_cached_line = mid + 1;
                 goto done;
             }
         }
 
-        // searched position is on this line
         result = my_cached_line = low;
 done:
         ;

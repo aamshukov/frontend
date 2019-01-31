@@ -3690,8 +3690,8 @@ void test_sets()
 {
     std::vector<string_type> inputs  =
     {
-        LR"(D:\Projects\fe\grammars\First.Cycle.parr.phd.txt)",
         LR"(D:\Projects\fe\grammars\LR.G.No-First.txt)",
+        LR"(D:\Projects\fe\grammars\First.Cycle.parr.phd.txt)",
         LR"(D:\Projects\fe\grammars\FirstSet.Sudkamp.G6.txt)",
         LR"(D:\Projects\fe\grammars\Backhouse.G.3.2.3.txt)",
         LR"(D:\Projects\fe\grammars\FirstSet.Sudkamp.G3.txt)",
