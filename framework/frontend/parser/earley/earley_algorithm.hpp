@@ -55,9 +55,14 @@ class earley_algorithm : private noncopyable
             items_type  rptrs;          // rightmost child(s), if grammar is ambiguous
 
             flags       flags;          // action (predictor, completer, scanner, errorscanner), error cost
+
+            bool operator == (const item& other)
+            {
+                return (*rule).id() == (*other.rule).id() && dot == other.dot && origin_chart == other.origin_chart && lptr == other.lptr;
+            }
         };
 
-        struct chart
+        struct chart // state or chart
         {
             uint32_t    id;              // unique id
             items_type  items;           // list of items
@@ -77,13 +82,30 @@ class earley_algorithm : private noncopyable
         using trees_type = std::vector<tree_type>;
 
     private:
-        static void predict(chart_type& chart, charts_type& charts);
-        static void complete(chart_type& chart, charts_type& charts);
-        static void scan(chart_type& chart, charts_type& charts, chart_type& result);
+        static bool         items_equal(const item_type& lhs, const item_type& rhs);
+        static bool         has_item(const items_type& items, const item_type& item);
+
+        static item_type    add_item(const rule_type& rule,            // production (rule)
+                                     const chart_type& origin_chart,   // original chart recognition started
+                                     const chart_type& master_chart,   // chart to add to
+                                     const item_type& lptr,            // l-ptr
+                                     flags action);                    // action introduced this item
+        static bool         is_final_item(const grammar& gr, const item_type& item);
+        static void         set_rptr(const item_type& rptr_item, item_type& item);
+
+        static chart_type   add_chart(uint32_t id);
+        static bool         is_final_chart(const grammar& gr, const chart_type& chart);
+
+    private:
+        static void         closure(chart_type& chart);
+
+        static void         predict(chart_type& chart, charts_type& charts);
+        static void         complete(chart_type& chart, charts_type& charts);
+        static void         scan(chart_type& chart, charts_type& charts, chart_type& result);
 
     public:
-        static void build_charts(charts_type& result);
-        static void build_trees(charts_type& charts, trees_type& result);
+        static void         build_charts(charts_type& result);
+        static void         build_trees(charts_type& charts, trees_type& result);
 };
 
 END_NAMESPACE

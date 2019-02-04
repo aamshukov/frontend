@@ -29,7 +29,7 @@ USINGNAMESPACE(core)
 
 bool lr_algorithm::lr_items_equal(const typename lr_algorithm::lr_item_type& lhs, const typename lr_algorithm::lr_item_type& rhs)
 {
-    return lhs == rhs;
+    return *lhs == *rhs;
 }
 
 bool lr_algorithm::has_lr_item(const typename lr_algorithm::lr_items_type& items, const typename lr_algorithm::lr_item_type& item)
