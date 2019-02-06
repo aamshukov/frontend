@@ -21,6 +21,7 @@ class earley_visualization : private noncopyable
         using rule_type = grammar::rule_type;
         using rules_type = grammar::rules_type;
 
+        using item_type = earley_algorithm::item_type;
         using chart_type = earley_algorithm::chart_type;
         using charts_type = earley_algorithm::charts_type;
 
@@ -28,7 +29,10 @@ class earley_visualization : private noncopyable
         using trees_type = earley_algorithm::trees_type;
 
     public:
+        static string_type decorate_item(const item_type& item);
+        static string_type decorate_chart(const chart_type& chart);
         static string_type decorate_charts(const charts_type& charts);
+
         static string_type decorate_trees(const trees_type& trees);
 };
 
