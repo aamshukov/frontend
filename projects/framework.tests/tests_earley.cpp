@@ -140,6 +140,14 @@ void test_earley_parser()
         grammar_algorithm::build_follow_set(gr, k);
         grammar_algorithm::build_la_set(gr, k);
 
+        earley_algorithm::items_type items;
+
+        earley_algorithm::item_type item1(factory::create<earley_algorithm::item>());
+        earley_algorithm::item_type item2(factory::create<earley_algorithm::item>());
+
+        items.emplace(item1);
+        items.emplace(item2);
+
         using content_type = lexical_analyzer<token<earley_token_traits>>::content_type;
 
         content_type content;

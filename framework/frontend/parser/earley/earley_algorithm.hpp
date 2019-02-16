@@ -41,7 +41,24 @@ class earley_algorithm : private noncopyable
 
         struct item;
         using item_type = std::shared_ptr<item>;
-        using items_type = std::vector<item_type>;
+
+        struct item_hash
+        {
+            std::size_t operator()(const item_type&) const
+            {
+                return 0; // returning 0 causes item_key_comparator to be called
+            }
+        };
+
+        struct item_key_comparator
+        {
+            bool operator() (const item_type& lhs, const item_type& rhs) const
+            {
+                return *lhs == *rhs;
+            }
+        };
+
+        using items_type = std::unordered_set<item_type, item_hash, item_key_comparator>;
 
         struct item
         {
@@ -58,7 +75,12 @@ class earley_algorithm : private noncopyable
 
             bool operator == (const item& other)
             {
-                return (*rule).id() == (*other.rule).id() && dot == other.dot && origin_chart == other.origin_chart && lptr == other.lptr;
+                return rule != nullptr &&
+                       other.rule != nullptr &&
+                       (*rule).id() == (*other.rule).id() &&
+                       dot == other.dot &&
+                       origin_chart == other.origin_chart &&
+                       lptr == other.lptr;
             }
         };
 
@@ -85,15 +107,15 @@ class earley_algorithm : private noncopyable
         static bool         items_equal(const item_type& lhs, const item_type& rhs);
         static bool         has_item(const items_type& items, const item_type& item);
 
-        static item_type    add_item(const rule_type& rule,            // production (rule)
-                                     const chart_type& origin_chart,   // original chart recognition started
-                                     const chart_type& master_chart,   // chart to add to
-                                     const item_type& lptr,            // l-ptr
-                                     flags action);                    // action introduced this item
+        static item_type    create_item(const rule_type& rule,            // production (rule)
+                                        const chart_type& origin_chart,   // original chart recognition started
+                                        const chart_type& master_chart,   // chart to add to
+                                        const item_type& lptr,            // l-ptr
+                                        flags action);                    // action introduced this item
         static bool         is_final_item(const grammar& gr, const item_type& item);
         static void         set_rptr(const item_type& rptr_item, item_type& item);
 
-        static chart_type   add_chart(uint32_t id);
+        static chart_type   create_chart(uint32_t id);
         static bool         is_final_chart(const grammar& gr, const chart_type& chart);
 
     private:
@@ -101,11 +123,8 @@ class earley_algorithm : private noncopyable
 
         static void         predict(chart_type& chart, charts_type& charts);
         static void         complete(chart_type& chart, charts_type& charts);
-        static void         scan(chart_type& chart, charts_type& charts, chart_type& result);
 
-    public:
-        static void         build_charts(charts_type& result);
-        static void         build_trees(charts_type& charts, trees_type& result);
+        static void         scan(chart_type& chart, charts_type& charts, uint32_t terminal_id, chart_type& result);
 };
 
 END_NAMESPACE

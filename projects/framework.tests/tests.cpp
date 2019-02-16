@@ -245,6 +245,8 @@ void test_lr_table();
 
 void test_sets();
 
+void test_earley_parser();
+
 extern "C" double CombineA(int a, int b, int c, int d, int e, double f);
 extern "C" void _start();
 
@@ -258,7 +260,6 @@ int main()
     auto id = static_cast<uint32_t>(-1);
     std::int32_t id0 = static_cast<int32_t>(id);
     id0;
-
 
     std::array<char, 10> str{"42"};
     int result;
@@ -274,6 +275,8 @@ int main()
     operation_status status;
 
     logger::instance().initialize(LR"(d:\tmp\fe.log)", status);
+
+    test_earley_parser();
 
     test_sets();
 

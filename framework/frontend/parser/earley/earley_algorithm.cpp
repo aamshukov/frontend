@@ -42,11 +42,11 @@ bool earley_algorithm::has_item(const typename earley_algorithm::items_type& ite
                         }) != items.end();
 }
 
-typename earley_algorithm::item_type earley_algorithm::add_item(const typename earley_algorithm::rule_type& rule,
-                                                                const typename earley_algorithm::chart_type& origin_chart,
-                                                                const typename earley_algorithm::chart_type& master_chart,
-                                                                const typename earley_algorithm::item_type& lptr,
-                                                                earley_algorithm::flags action)
+typename earley_algorithm::item_type earley_algorithm::create_item(const typename earley_algorithm::rule_type& rule,
+                                                                   const typename earley_algorithm::chart_type& origin_chart,
+                                                                   const typename earley_algorithm::chart_type& master_chart,
+                                                                   const typename earley_algorithm::item_type& lptr,
+                                                                   earley_algorithm::flags action)
 {
     item_type result(factory::create<item>());
 
@@ -76,13 +76,13 @@ bool earley_algorithm::is_final_item(const grammar& gr, const typename earley_al
 
 void earley_algorithm::set_rptr(const typename earley_algorithm::item_type& rptr_item, typename earley_algorithm::item_type& item)
 {
-    if(!std::any_of((*item).rptrs.begin(), (*item).rptrs.end(), [&rptr_item](const auto& rptr_item0){ return rptr_item0 == rptr_item; }))
+    if(!std::any_of((*item).rptrs.begin(), (*item).rptrs.end(), [&rptr_item](const auto& rptr_item0){ return *rptr_item0 == *rptr_item; }))
     {
-        (*item).rptrs.emplace_back(rptr_item);
+        (*item).rptrs.emplace(rptr_item);
     }
 }
 
-typename earley_algorithm::chart_type earley_algorithm::add_chart(uint32_t id)
+typename earley_algorithm::chart_type earley_algorithm::create_chart(uint32_t id)
 {
     chart_type result(factory::create<chart>());
 
@@ -105,6 +105,9 @@ chart;//??
 void earley_algorithm::predict(typename earley_algorithm::chart_type& chart, typename earley_algorithm::charts_type& charts)
 {
 chart;charts; //??
+
+    // PREDICTOR:
+    //  if [A -> ... • B ..., j] is in S(i), add [B -> • α, i] to S(i) for all rules B -> α
     log_info(L"Running predictor ...");
 
     log_info(L"Done running predictor.");
@@ -118,29 +121,37 @@ chart;charts; //??
     log_info(L"Done running completer.");
 }
 
-void earley_algorithm::scan(typename earley_algorithm::chart_type& chart, typename earley_algorithm::charts_type& charts, typename earley_algorithm::chart_type& result)
+void earley_algorithm::scan(typename earley_algorithm::chart_type& chart,
+                            typename earley_algorithm::charts_type& charts,
+                            uint32_t terminal_id,
+                            typename earley_algorithm::chart_type& result)
 {
-chart;charts; //??
-result;//??
+    // SCANNER:
+    //  if [A -> ... • a ..., j] is in S(i) and a = x(i)+1, add [A -> ... a • ..., j] to S(i+1)
     log_info(L"Running scanning ...");
 
+    chart_type new_chart(create_chart(static_cast<uint32_t>(charts.size())));
+
+    for(const auto& item : (*chart).items)
+    {
+        const auto& rhs((*(*item).rule).rhs());
+        const auto& symbol(rhs[(*item).dot]); // item.CoreItem.Dot is inside rhs.size
+
+        if((*symbol).terminal() && (*symbol).id() == terminal_id)
+        {
+            item_type new_item(create_item((*item).rule, (*item).origin_chart, new_chart, item, flags::scanner));
+
+            (*chart).items.emplace(new_item);
+        }
+    }
+
+    if(!(*new_chart).items.empty())
+    {
+        result.swap(new_chart);
+        charts.emplace_back(result);
+    }
+
     log_info(L"Done running scanning.");
-}
-
-void earley_algorithm::build_charts(typename earley_algorithm::charts_type& result)
-{
-result; //??
-    log_info(L"Building charts ...");
-
-    log_info(L"Built charts.");
-}
-
-void earley_algorithm::build_trees(typename earley_algorithm::charts_type& charts, typename earley_algorithm::trees_type& result)
-{
-result;charts; //??
-    log_info(L"Building tree(s) ...");
-
-    log_info(L"Built tree(s).");
 }
 
 END_NAMESPACE
