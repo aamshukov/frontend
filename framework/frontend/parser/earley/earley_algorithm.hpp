@@ -103,7 +103,7 @@ class earley_algorithm : private noncopyable
         using tree_type = std::shared_ptr<tree>;
         using trees_type = std::vector<tree_type>;
 
-    private:
+    public:
         static bool         items_equal(const item_type& lhs, const item_type& rhs);
         static bool         has_item(const items_type& items, const item_type& item);
 
@@ -118,11 +118,11 @@ class earley_algorithm : private noncopyable
         static chart_type   create_chart(uint32_t id);
         static bool         is_final_chart(const grammar& gr, const chart_type& chart);
 
-    private:
+    public:
         static void         closure(chart_type& chart);
 
-        static void         predict(chart_type& chart, charts_type& charts);
-        static void         complete(chart_type& chart, charts_type& charts);
+        static void         predict(const item_type& item, chart_type& chart);
+        static void         complete(const item_type& item, chart_type& chart);
 
         static void         scan(chart_type& chart, charts_type& charts, uint32_t terminal_id, chart_type& result);
 };

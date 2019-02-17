@@ -22,6 +22,8 @@ class parser : private noncopyable
         lexical_analyzer_type   my_lexical_analyzer;
         trees_type              my_trees;
 
+        operation_status        my_status;
+
     protected:
         virtual void            parse() = 0;
 
@@ -31,7 +33,8 @@ class parser : private noncopyable
 
         const trees_type&       trees() const;
 
-        void                    result() const; //?? result of parsing
+        const operation_status& status() const;
+        operation_status&       status();
 };
 
 template <typename T>
@@ -41,8 +44,15 @@ const typename parser<T>::trees_type& parser<T>::trees() const
 }
 
 template <typename T>
-void parser<T>::result() const //??
+const operation_status& parser<T>::status() const
 {
+    return my_status;
+}
+
+template <typename T>
+operation_status& parser<T>::status()
+{
+    return my_status;
 }
 
 END_NAMESPACE

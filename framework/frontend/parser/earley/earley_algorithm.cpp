@@ -102,9 +102,9 @@ void earley_algorithm::closure(typename earley_algorithm::chart_type& chart)
 chart;//??
 }
 
-void earley_algorithm::predict(typename earley_algorithm::chart_type& chart, typename earley_algorithm::charts_type& charts)
+void earley_algorithm::predict(const typename earley_algorithm::item_type& item, typename earley_algorithm::chart_type& chart)
 {
-chart;charts; //??
+chart;item; //??
 
     // PREDICTOR:
     //  if [A -> ... • B ..., j] is in S(i), add [B -> • α, i] to S(i) for all rules B -> α
@@ -113,9 +113,9 @@ chart;charts; //??
     log_info(L"Done running predictor.");
 }
 
-void earley_algorithm::complete(typename earley_algorithm::chart_type& chart, typename earley_algorithm::charts_type& charts)
+void earley_algorithm::complete(const typename earley_algorithm::item_type& item, typename earley_algorithm::chart_type& chart)
 {
-chart;charts; //??
+chart;item; //??
     log_info(L"Running completer ...");
 
     log_info(L"Done running completer.");

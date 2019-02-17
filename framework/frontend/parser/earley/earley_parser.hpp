@@ -33,8 +33,8 @@ class earley_parser : private parser<T>
         const charts_type&      charts() const;
         const trees_type&       trees() const;
 
-        void                    build_charts(charts_type& result);
-        void                    build_trees(charts_type& charts, trees_type& result);
+        void                    build_charts();
+        void                    build_trees();
 
         void                    parse() override;
 };
