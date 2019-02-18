@@ -16,6 +16,9 @@ class earley_parser : private parser<T>
         using token_type = parser<T>::token_type; //??
         using lexical_analyzer_type = parser<T>::lexical_analyzer_type; //??
 
+        using item_type = earley_algorithm::item_type;
+        using items_type = earley_algorithm::items_type;
+
         using chart_type = earley_algorithm::chart_type;
         using charts_type = earley_algorithm::charts_type;
 
@@ -25,6 +28,14 @@ class earley_parser : private parser<T>
     private:
         charts_type             my_charts;   // list of sets/charts
         trees_type              my_trees;    // tree or list of trees
+
+    protected:
+        virtual tree_type       handle_start(const item_type& item) = 0;
+
+        virtual tree_type       handle_terminal(const token_type& token, const tree_type& node) = 0;
+
+        virtual tree_type       handle_before_terminal(const item_type& item, const tree_type& node) = 0;
+        virtual tree_type       handle_after_terminal(const item_type& item, const tree_type& node) = 0;
 
     public:
                                 earley_parser(const lexical_analyzer_type& lexical_analyzer);

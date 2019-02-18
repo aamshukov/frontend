@@ -100,6 +100,42 @@ class earley_lexical_analyzer : public lexical_analyzer<token<earley_token_trait
         }
 };
 
+class my_earley_parser : public earley_parser<token<earley_token_traits>>
+{
+    public:
+        my_earley_parser(const lexical_analyzer_type& lexical_analyzer) : earley_parser(lexical_analyzer)
+        {
+        }
+
+        tree_type handle_start(const item_type& item) override
+        {
+            item;//??
+            tree_type result;
+            return result;
+        }
+
+        tree_type handle_terminal(const token_type& token, const tree_type& node) override
+        {
+            token, node;//??
+            tree_type result;
+            return result;
+        }
+
+        tree_type handle_before_terminal(const item_type& item, const tree_type& node) override
+        {
+            item, node;//??
+            tree_type result;
+            return result;
+        }
+
+        tree_type handle_after_terminal(const item_type& item, const tree_type& node) override
+        {
+            item, node;//??
+            tree_type result;
+            return result;
+        }
+};
+
 void test_earley_parser()
 {
     std::vector<string_type> inputs  =
@@ -154,7 +190,7 @@ void test_earley_parser()
 
         auto lexical_analyzer(factory::create<earley_lexical_analyzer>(content));
 
-        earley_parser<token<earley_token_traits>> parser(lexical_analyzer);
+        my_earley_parser parser(lexical_analyzer);
 
         parser.parse();
 
