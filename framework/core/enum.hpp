@@ -34,6 +34,22 @@ BEGIN_NAMESPACE(core)
         {                                                   \
             return empty_string();                          \
         }                                                   \
+    }                                                       \
+                                                            \
+    static E value(const string_type& token_name)           \
+    {                                                       \
+        E result((E)0);                                     \
+                                                            \
+        for(const auto& kvp : mapping)                      \
+        {                                                   \
+            if(kvp.second == token_name)                    \
+            {                                               \
+                result = kvp.first;                         \
+                break;                                      \
+            }                                               \
+        }                                                   \
+                                                            \
+        return result;                                      \
     }
 
 template <typename T>

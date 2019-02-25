@@ -169,6 +169,9 @@
     <ClInclude Include="..\..\framework\core\statistics.hpp">
       <Filter>core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\core\string_data_provider.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="backend">
@@ -319,6 +322,9 @@
     </ClCompile>
     <ClCompile Include="..\..\framework\frontend\parser\earley\earley_algorithm.cpp">
       <Filter>frontend\parser\earley</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\core\string_data_provider.cpp">
+      <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -10,6 +10,7 @@
 #include <core\logger.hpp>
 #include <core\data_provider.hpp>
 #include <core\file_data_provider.hpp>
+#include <core\string_data_provider.hpp>
 #include <core\content.hpp>
 #include <core\counter.hpp>
 #include <core\factory.hpp>
@@ -86,24 +87,41 @@ struct earley_token_traits : public token_traits
     )
 };
 
+earley_token_traits::enum_map_type earley_token_traits::mapping;
+
+
 class earley_lexical_analyzer : public lexical_analyzer<token<earley_token_traits>>
 {
+    private:
+        std::size_t k = 0;
+
     protected:
         virtual void next_lexeme_impl() override
         {
-            my_token.type = token_type::traits::type::eos;
+            if(k == (*content()).count())
+            {
+                my_token.type = token_type::traits::type::eos;
+            }
+            else
+            {
+                string_type name(text::codepoint_to_string((*content()).data()[k]));
+                my_token.type = token_type::traits::value(name);
+            }
+
+            k++;
         }
 
     public:
         earley_lexical_analyzer(const content_type& content) : lexical_analyzer(content)
         {
+            earley_token_traits::initialize();
         }
 };
 
 class my_earley_parser : public earley_parser<token<earley_token_traits>>
 {
     public:
-        my_earley_parser(const lexical_analyzer_type& lexical_analyzer) : earley_parser(lexical_analyzer)
+        my_earley_parser(const lexical_analyzer_type& lexical_analyzer, grammar& gr) : earley_parser(lexical_analyzer, gr)
         {
         }
 
@@ -140,24 +158,7 @@ void test_earley_parser()
 {
     std::vector<string_type> inputs  =
     {
-        LR"(D:\Projects\fe\grammars\LR.Aho.G5.29.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.Aho.G.4.55.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.GruneJacobsBook.9.32.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.2.Nigel.G5.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.2.Nigel.G1.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.2.Nigel.G3.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.Sippu.6.7.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.2+.Sippu.6.14.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.1.Sippu.6.24.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.1.Sippu.7.25.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.1.Incremental.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.1.Expr.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.1.Chapter02Compilers6December.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.1.bottom(2).txt)",
-
-        //LR"(D:\Projects\fe\grammars\LR.1.shift.reduce.conflict.G1.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.1.shift.reduce.conflict.G2.txt)",
-        //LR"(D:\Projects\fe\grammars\LR.1.reduce.reduce.conflict.G1.txt)"
+        LR"(D:\Projects\fe\grammars\Earley.G0.txt)",
     };
 
     uint8_t k = 1;
@@ -186,15 +187,24 @@ void test_earley_parser()
 
         using content_type = lexical_analyzer<token<earley_token_traits>>::content_type;
 
-        content_type content;
+        content_type content(factory::create<content>());
 
-        auto lexical_analyzer(factory::create<earley_lexical_analyzer>(content));
+        string_data_provider provider(L"n+n");
 
-        my_earley_parser parser(lexical_analyzer);
+        operation_status status; //??
 
-        parser.parse();
+        bool result = (*content).load(provider, status);
 
-        std::wcout << earley_visualization::decorate_charts(parser.charts()).c_str() << std::endl;
-        std::wcout << earley_visualization::decorate_trees(parser.trees()).c_str() << std::endl;
+        if(result)
+        {
+            auto lexical_analyzer(factory::create<earley_lexical_analyzer>(content));
+
+            my_earley_parser parser(lexical_analyzer, gr);
+
+            parser.parse();
+
+            std::wcout << earley_visualization::decorate_charts(parser.charts()).c_str() << std::endl;
+            std::wcout << earley_visualization::decorate_trees(parser.trees()).c_str() << std::endl;
+        }
     }
 }

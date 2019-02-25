@@ -10,7 +10,7 @@ BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
 template <typename T>
-class earley_parser : private parser<T>
+class earley_parser : public parser<T>
 {
     public:
         using token_type = parser<T>::token_type; //??
@@ -26,8 +26,10 @@ class earley_parser : private parser<T>
         using trees_type = earley_algorithm::trees_type;
 
     private:
-        charts_type             my_charts;   // list of sets/charts
-        trees_type              my_trees;    // tree or list of trees
+        charts_type             my_charts;  // list of sets/charts
+        trees_type              my_trees;   // tree or list of trees
+
+        grammar&                my_grammar; // might be chnaged during parsing
 
     protected:
         virtual tree_type       handle_start(const item_type& item) = 0;
@@ -38,7 +40,7 @@ class earley_parser : private parser<T>
         virtual tree_type       handle_after_terminal(const item_type& item, const tree_type& node) = 0;
 
     public:
-                                earley_parser(const lexical_analyzer_type& lexical_analyzer);
+                                earley_parser(const lexical_analyzer_type& lexical_analyzer, grammar& gr);
                                ~earley_parser();
 
         const charts_type&      charts() const;

@@ -82,7 +82,19 @@ string_type earley_visualization::decorate_item(const typename earley_visualizat
         result += L", ";
     }
 
-    //result += grammar_visualization::decorate_sets((*item).la, false);
+    result += L"( ";
+    if((*item).lptr)
+    {
+        decorate_item((*item).lptr);
+    }
+    result += L"), ";
+
+    result += L"< ";
+    for(const auto& rptr_item : (*item).rptrs)
+    {
+        decorate_item(rptr_item);
+    }
+    result += L">";
 
     result += L"]";
     result += L"\n";

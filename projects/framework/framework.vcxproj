@@ -37,6 +37,7 @@
     <ClInclude Include="..\..\framework\core\statistics.hpp" />
     <ClInclude Include="..\..\framework\core\status.hpp" />
     <ClInclude Include="..\..\framework\core\file_data_provider.hpp" />
+    <ClInclude Include="..\..\framework\core\string_data_provider.hpp" />
     <ClInclude Include="..\..\framework\core\text.hpp" />
     <ClInclude Include="..\..\framework\core\tree.hpp" />
     <ClInclude Include="..\..\framework\core\unicode.hpp" />
@@ -86,6 +87,7 @@
     </ClCompile>
     <ClCompile Include="..\..\framework\core\status.cpp" />
     <ClCompile Include="..\..\framework\core\file_data_provider.cpp" />
+    <ClCompile Include="..\..\framework\core\string_data_provider.cpp" />
     <ClCompile Include="..\..\framework\core\text.cpp" />
     <ClCompile Include="..\..\framework\core\unicode.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
