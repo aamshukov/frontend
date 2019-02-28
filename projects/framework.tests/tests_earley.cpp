@@ -4,6 +4,7 @@
 #include <core\pch.hpp>
 #include <core\noncopyable.hpp>
 #include <core\status.hpp>
+#include <core\enumerate.hpp>
 #include <core\unicode.hpp>
 #include <core\text.hpp>
 #include <core\domain_helper.hpp>
@@ -85,6 +86,9 @@ struct earley_token_traits : public token_traits
         g,
         n,
         p, // +
+        m, // *
+        l, // (
+        r, // )
 
         // the following one (1) entry MUST be the last entry in the enum
         size
@@ -113,6 +117,12 @@ class earley_lexical_analyzer : public lexical_analyzer<token<earley_token_trait
                 auto& symbol((*(my_gr.pool().find(name))).second);
                 if(name == L"+")
                     name = L"p";
+                else if(name == L"*")
+                    name = L"m";
+                else if(name == L"(")
+                    name = L"l";
+                else if(name == L")")
+                    name = L"r";
                 my_token.type = token_type::traits::value(name);
                 (*symbol).id() = static_cast<uint32_t>(my_token.type);
             }
@@ -168,11 +178,24 @@ void test_earley_parser()
     std::vector<string_type> inputs  =
     {
         LR"(D:\Projects\fe\grammars\Earley.G0.txt)",
+        LR"(D:\Projects\fe\grammars\Earley.G1.txt)",
+        LR"(D:\Projects\fe\grammars\Earley.G2.txt)",
+        LR"(D:\Projects\fe\grammars\Earley.G3.AYCOCK.HORSPOOL.txt)",
+        LR"(D:\Projects\fe\grammars\Earley.G4.epsilon.txt)",
+    };
+
+    std::vector<string_type> contents  =
+    {
+        L"n+n",
+        L"n+n",
+        L"a*(a+a)",
+        L"a",
+        L"aa",
     };
 
     uint8_t k = 1;
 
-    for(const auto& input : inputs)
+    for(const auto& [i, input] : enumerate(inputs))
     {
         grammar gr;
 
@@ -186,19 +209,11 @@ void test_earley_parser()
         grammar_algorithm::build_follow_set(gr, k);
         grammar_algorithm::build_la_set(gr, k);
 
-        earley_algorithm::items_type items;
-
-        earley_algorithm::item_type item1(factory::create<earley_algorithm::item>());
-        earley_algorithm::item_type item2(factory::create<earley_algorithm::item>());
-
-        items.emplace(item1);
-        items.emplace(item2);
-
         using content_type = lexical_analyzer<token<earley_token_traits>>::content_type;
 
         content_type content(factory::create<content>());
 
-        string_data_provider provider(L"n+n");
+        string_data_provider provider(contents[i]);
 
         operation_status status; //??
 
@@ -212,8 +227,15 @@ void test_earley_parser()
 
             parser.parse();
 
-            std::wcout << earley_visualization::decorate_charts(parser.charts()).c_str() << std::endl;
-            std::wcout << earley_visualization::decorate_trees(parser.trees()).c_str() << std::endl;
+            if(parser.status().custom_code() == status::custom_code::success)
+            {
+                std::wcout << earley_visualization::decorate_charts(parser.charts()).c_str() << std::endl;
+                std::wcout << earley_visualization::decorate_trees(parser.trees()).c_str() << std::endl;
+            }
+            else
+            {
+                std::wcout << L"Failed to parse '" << input.c_str() << L"'" << std::endl;
+            }
         }
     }
 }

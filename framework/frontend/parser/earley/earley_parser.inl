@@ -52,8 +52,7 @@ void earley_parser<T>::build_charts()
                                                          chart0,                            // chart to add to
                                                          nullptr,                           // l-ptr
                                                          earley_algorithm::flags::init));   // action introduced this item
-        auto ppp = (*chart0).items.emplace(new_item);
-        ppp;
+        (*chart0).items.emplace(new_item);
     }
 
     log_info(earley_visualization::decorate_charts(charts).c_str()); //??

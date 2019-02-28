@@ -86,6 +86,11 @@ bool earley_algorithm::is_final_chart(const grammar& gr, const typename earley_a
 
 void earley_algorithm::closure(const grammar& gr, typename earley_algorithm::chart_type& chart)
 {
+    // 'λ case' - special case for empty rule, always assume the dot is at the end
+    // Grune and Jacobs:
+    //      The easiest way to handle this mare’s nest is to stay calm and keep running
+    //      the Predictor and Completer in turn until neither has anything more to add.
+    // for another method see predict()
     for(;;)
     {
         std::size_t count = (*chart).items.size();
@@ -109,6 +114,10 @@ void earley_algorithm::predict(const grammar& gr,
                                const typename earley_algorithm::item_type& item,
                                typename earley_algorithm::chart_type& chart)
 {
+    // Practical Earley Parsing, JOHN AYCOCK1 AND R. NIGEL HORSPOOL, 2001
+    //      if [A -> ... • B ... , j] is in Si, add [B -> • α, i] to Si for all rules B -> α
+    //      if B is nullable, also add [A -> ... B • ... , j] to Si
+    // looks like in this implementation does not help
     log_info(L"Running predictor ...");
 
     const auto& rhs((*(*item).rule).rhs());
@@ -131,6 +140,16 @@ void earley_algorithm::predict(const grammar& gr,
                                                                  earley_algorithm::flags::predictor)); // action introduced this item
                 (*chart).items.emplace(new_item);
             }
+
+            //if((*symbol).nullable())
+            //{
+            //    item_type new_item(earley_algorithm::create_item((*item).rule,                         // production (rule)
+            //                                                     chart,                                // original chart recognition started
+            //                                                     chart,                                // chart to add to
+            //                                                     nullptr,                              // l-ptr
+            //                                                     earley_algorithm::flags::predictor)); // action introduced this item
+            //    (*chart).items.emplace(new_item);
+            //}
         }
     }
 
@@ -143,7 +162,8 @@ void earley_algorithm::complete(typename earley_algorithm::item_type& item, type
 
     const auto& rhs((*(*item).rule).rhs());
 
-    if((*item).dot == rhs.size()) // is completed
+    if((*item).dot == rhs.size() || // is completed
+      (*(*item).rule).empty())      // 'λ case' - special case for empty rule, always assume the dot is at the end
     {
         const auto& lhs((*(*item).rule).lhs());
         const auto& lhs_symbol(lhs[0]);
@@ -154,14 +174,14 @@ void earley_algorithm::complete(typename earley_algorithm::item_type& item, type
         {
             const auto& rhs_origin((*(*origin_item).rule).rhs());
 
-            if((*origin_item).dot == rhs.size()) // dot must be within rhs.size
+            if((*origin_item).dot == rhs_origin.size()) // dot must be within rhs_origin.size
             {
                 continue;
             }
 
             const auto& rhs_symbol(rhs_origin[(*origin_item).dot]);
 
-            if((*lhs_symbol).id() != (*rhs_symbol).id())
+            if(((*lhs_symbol).id() != (*rhs_symbol).id()))
             {
                 continue;
             }
