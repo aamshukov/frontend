@@ -47,18 +47,19 @@ void earley_parser<T>::build_charts()
 
     for(const auto& nonterminal_rule : nonterminal_rules)
     {
-        item_type new_item(earley_algorithm::create_item(nonterminal_rule, chart0, nullptr, nullptr, earley_algorithm::flags::init));
-        auto result = (*chart0).items.emplace(new_item); //??
+        item_type new_item(earley_algorithm::create_item(nonterminal_rule,                  // production (rule)
+                                                         chart0,                            // original chart recognition started
+                                                         chart0,                            // chart to add to
+                                                         nullptr,                           // l-ptr
+                                                         earley_algorithm::flags::init));   // action introduced this item
+        auto ppp = (*chart0).items.emplace(new_item);
+        ppp;
     }
 
     log_info(earley_visualization::decorate_charts(charts).c_str()); //??
 
     // Для каждой ситуации Эрли в состоянии Эрли V[0] вызываем процедуры Completer и Predictor.
-    for(const auto& item : (*chart0).items)
-    {
-        earley_algorithm::complete(item, chart0);
-        earley_algorithm::predict(item, chart0);
-    }
+    earley_algorithm::closure(gr, chart0);
 
     log_info(earley_visualization::decorate_charts(charts).c_str()); //??
 
@@ -72,17 +73,21 @@ void earley_parser<T>::build_charts()
 
         if((*lexer).is_eos())
         {
+            validate_charts(chart);
             break;
         }
 
         // Вызываем процедуру Scanner для состояния V[i-1].
         chart_type new_chart;
 
-        earley_algorithm::scan(chart, charts, static_cast<uint32_t>((*lexer).token().type), new_chart);
+        uint32_t terminal = static_cast<uint32_t>((*lexer).token().type);
+
+        earley_algorithm::scan(chart, charts, terminal, new_chart);
+
         log_info(earley_visualization::decorate_charts(charts).c_str()); //??
 
         // Если список ситуаций Эрли в состоянии Эрли V[i] пуст, возвращаем False, parsing has failed.
-        if((*new_chart).items.empty())
+        if(new_chart == nullptr || (*new_chart).items.empty())
         {
             status().custom_code() = status::custom_code::error;
             status().system_code() = ::GetLastError();
@@ -91,24 +96,24 @@ void earley_parser<T>::build_charts()
 
             break;
         }
-
-        charts.emplace_back(new_chart);
-
+                                                
         // Для каждой ситуации Эрли в состоянии Эрли V[i] вызываем процедуры Completer и Predictor.
-        for(const auto& item : (*new_chart).items)
-        {
-            earley_algorithm::complete(item, new_chart);
-            earley_algorithm::predict(item, new_chart);
-        }
+        earley_algorithm::closure(gr, new_chart);
 
         log_info(earley_visualization::decorate_charts(charts).c_str()); //??
 
-        chart = new_chart;
+        chart = new_chart; // remember V[i-1] chart
     }
 
-    log_info(earley_visualization::decorate_charts(charts).c_str()); //??
-
-    my_charts.swap(charts);
+    if(status().custom_code() == status::custom_code::success)
+    {
+        my_charts.swap(charts);
+        log_info(L"Succeeded.");
+    }
+    else if(status().custom_code() == status::custom_code::error)
+    {
+        log_info(L"Failed.");
+    }
 
     log_info(L"Built charts.");
 }
@@ -127,9 +132,58 @@ void earley_parser<T>::parse()
     log_info(L"Parsing ...");
 
     build_charts();
-    build_trees();
 
-    log_info(L"Parsed.");
+    if(status().custom_code() == status::custom_code::success)
+    {
+        build_trees();
+
+        if(status().custom_code() == status::custom_code::success)
+        {
+            log_info(L"Parsed.");
+        }
+    }
+    else
+    {
+        log_info(L"Parse failed.");
+    }
+}
+
+template <typename T>
+void earley_parser<T>::validate_charts(const typename earley_parser<T>::chart_type& chart)
+{
+    bool result = false;
+
+    for(const auto& item : (*chart).items)
+    {
+        const auto& lhs((*(*item).rule).lhs());
+        const auto& rhs((*(*item).rule).rhs());
+
+        const auto& lhs_symbol(lhs[0]);
+
+        result = (*lhs_symbol).id() == (*my_grammar.start_symbol()).id() &&
+                 (*item).dot == rhs.size() &&
+                 (*(*item).origin_chart).id == 0;
+
+        if(result)
+        {
+            break;
+        }
+    }
+
+    if(result)
+    {
+        status().custom_code() = status::custom_code::success;
+        status().system_code() = ::GetLastError();
+        status().text().assign(L"Built charts.\n");
+        status().text().append(status().get_system_error_message());
+    }
+    else
+    {
+        status().custom_code() = status::custom_code::error;
+        status().system_code() = ::GetLastError();
+        status().text().assign(L"Build charts failed.\n");
+        status().text().append(status().get_system_error_message());
+    }
 }
 
 END_NAMESPACE

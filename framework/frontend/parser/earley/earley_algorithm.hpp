@@ -62,6 +62,8 @@ class earley_algorithm : private noncopyable
 
         struct item
         {
+            uint32_t    id;              // unique id
+
             rule_type   rule;           // production (rule)
             uint32_t    dot;            // dot - position in rhs, if dot_position = rhs.size() it means it points to the end of the rhs
 
@@ -75,11 +77,9 @@ class earley_algorithm : private noncopyable
 
             bool operator == (const item& other)
             {
-                return rule != nullptr &&
-                       other.rule != nullptr &&
-                       (*rule).id() == (*other.rule).id() &&
+                return rule != nullptr && other.rule != nullptr && (*rule).id() == (*other.rule).id() &&
                        dot == other.dot &&
-                       origin_chart == other.origin_chart &&
+                       origin_chart != nullptr && other.origin_chart != nullptr && (*origin_chart).id == (*other.origin_chart).id &&
                        lptr == other.lptr;
             }
         };
@@ -88,14 +88,6 @@ class earley_algorithm : private noncopyable
         {
             uint32_t    id;              // unique id
             items_type  items;           // list of items
-
-            items_type  predictor_items; // items in predictor list
-            uint32_t    predicted_k;     // optimization
-
-            items_type  completer_items; // items in completer list
-            uint32_t    completed_k;     // optimization
-
-            items_type  scanner_items;   // items in scanner list
         };
 
         using charts_type = std::vector<chart_type>;
@@ -104,27 +96,24 @@ class earley_algorithm : private noncopyable
         using trees_type = std::vector<tree_type>;
 
     public:
-        static bool         items_equal(const item_type& lhs, const item_type& rhs);
-        static bool         has_item(const items_type& items, const item_type& item);
-
         static item_type    create_item(const rule_type& rule,            // production (rule)
                                         const chart_type& origin_chart,   // original chart recognition started
                                         const chart_type& master_chart,   // chart to add to
                                         const item_type& lptr,            // l-ptr
                                         flags action);                    // action introduced this item
         static bool         is_final_item(const grammar& gr, const item_type& item);
-        static void         set_rptr(const item_type& rptr_item, item_type& item);
+        static void         set_rptr(item_type& item, const item_type& new_item);
 
         static chart_type   create_chart(uint32_t id);
         static bool         is_final_chart(const grammar& gr, const chart_type& chart);
 
     public:
-        static void         closure(chart_type& chart);
+        static void         closure(const grammar& gr, chart_type& chart);
 
-        static void         predict(const item_type& item, chart_type& chart);
-        static void         complete(const item_type& item, chart_type& chart);
+        static void         predict(const grammar& gr, const item_type& item, chart_type& chart);
+        static void         complete(item_type& item, chart_type& chart);
 
-        static void         scan(chart_type& chart, charts_type& charts, uint32_t terminal_id, chart_type& result);
+        static void         scan(chart_type& chart, charts_type& charts, uint32_t terminal, chart_type& result);
 };
 
 END_NAMESPACE

@@ -12,9 +12,16 @@ USINGNAMESPACE(core)
 template <typename T>
 class earley_parser : public parser<T>
 {
+    // optimization heuristics might be introduced:
+    //  - optimization lists, which are predictor-list, completer-list and scanner-list
+    //  - if grammar is static it is possible to precalculate 'prediction table',
+    //    this implementation handles generic cases where grammars may change between invokations
+    //  - predictor prediction table, see above item
+    //  - 'execute predictor' flag indicates if predictor should proceed, set when an item is added
+    //  - 'execute completer' flag indicates if completer should proceed, set when an item is added
     public:
-        using token_type = parser<T>::token_type; //??
-        using lexical_analyzer_type = parser<T>::lexical_analyzer_type; //??
+        using token_type = parser<T>::token_type;
+        using lexical_analyzer_type = parser<T>::lexical_analyzer_type;
 
         using item_type = earley_algorithm::item_type;
         using items_type = earley_algorithm::items_type;
@@ -38,6 +45,10 @@ class earley_parser : public parser<T>
 
         virtual tree_type       handle_before_terminal(const item_type& item, const tree_type& node) = 0;
         virtual tree_type       handle_after_terminal(const item_type& item, const tree_type& node) = 0;
+
+    private:
+        void                    closure(chart_type& chart, charts_type& charts);
+        void                    validate_charts(const chart_type& chart);
 
     public:
                                 earley_parser(const lexical_analyzer_type& lexical_analyzer, grammar& gr);

@@ -29,7 +29,7 @@ class earley_visualization : private noncopyable
         using trees_type = earley_algorithm::trees_type;
 
     public:
-        static string_type decorate_item(const item_type& item);
+        static string_type decorate_item(const item_type& item, bool recursive = true);
         static string_type decorate_chart(const chart_type& chart);
         static string_type decorate_charts(const charts_type& charts);
 

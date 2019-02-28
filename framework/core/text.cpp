@@ -276,6 +276,8 @@ string_type text::trim(const string_type& text, const string_type& delimiters)
 
 void text::trim(const string_type& text, const string_type& delimiters, string_type& result_text)
 {
+    result_text = text;
+
     const char_type* data(text.c_str());
 
     // find left offset

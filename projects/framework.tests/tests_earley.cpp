@@ -79,6 +79,10 @@ struct earley_token_traits : public token_traits
         a,
         b,
         c,
+        d,
+        e,
+        f,
+        g,
         n,
         p, // +
 
@@ -94,6 +98,7 @@ class earley_lexical_analyzer : public lexical_analyzer<token<earley_token_trait
 {
     private:
         std::size_t k = 0;
+        const grammar& my_gr;
 
     protected:
         virtual void next_lexeme_impl() override
@@ -105,14 +110,18 @@ class earley_lexical_analyzer : public lexical_analyzer<token<earley_token_trait
             else
             {
                 string_type name(text::codepoint_to_string((*content()).data()[k]));
+                auto& symbol((*(my_gr.pool().find(name))).second);
+                if(name == L"+")
+                    name = L"p";
                 my_token.type = token_type::traits::value(name);
+                (*symbol).id() = static_cast<uint32_t>(my_token.type);
             }
 
             k++;
         }
 
     public:
-        earley_lexical_analyzer(const content_type& content) : lexical_analyzer(content)
+        earley_lexical_analyzer(const grammar& gr, const content_type& content) : my_gr(gr), lexical_analyzer(content)
         {
             earley_token_traits::initialize();
         }
@@ -197,7 +206,7 @@ void test_earley_parser()
 
         if(result)
         {
-            auto lexical_analyzer(factory::create<earley_lexical_analyzer>(content));
+            auto lexical_analyzer(factory::create<earley_lexical_analyzer>(gr, content));
 
             my_earley_parser parser(lexical_analyzer, gr);
 

@@ -88,6 +88,7 @@ class symbol
         symbol&                         operator = (symbol&& other);
 
         uint32_t                        id() const;
+        uint32_t&                       id();
 
         const string_type&              name() const;
 
@@ -132,6 +133,11 @@ class symbol
 };
 
 inline uint32_t symbol::id() const
+{
+    return my_id;
+}
+
+inline uint32_t& symbol::id()
 {
     return my_id;
 }

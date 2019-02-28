@@ -574,6 +574,7 @@ void java_lexical_analyzer::rewind()
     }
 }
 
+// OpenJDK 9+ for more details ...
 void java_lexical_analyzer::build_line_map()
 {
     const datum_type* ptr(my_ptr);
@@ -619,6 +620,7 @@ void java_lexical_analyzer::build_line_map()
     memcpy(my_line_map.get(), line_map.get(), k * sizeof(loc_t));
 }
 
+// OpenJDK 9+ for more details ...
 loc_t java_lexical_analyzer::find_line_number(loc_t position)
 {
     loc_t result = 0;
@@ -662,11 +664,13 @@ done:
     return result;
 }
 
+// OpenJDK 9+ for more details ...
 loc_t java_lexical_analyzer::get_line_number(loc_t position)
 {
     return find_line_number(position);
 }
 
+// OpenJDK 9+ for more details ...
 loc_t java_lexical_analyzer::get_column_number(loc_t position)
 {
     loc_t result = 0;
