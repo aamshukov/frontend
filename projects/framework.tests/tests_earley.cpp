@@ -58,15 +58,16 @@
 #include <frontend\parser\parser.hpp>
 #include <frontend\parser\parser.inl>
 
-#include <frontend\parser\earley\earley_algorithm.hpp>
-#include <frontend\parser\earley\earley_visualization.hpp>
 #include <frontend\parser\earley\earley_parser.hpp>
 #include <frontend\parser\earley\earley_parser.inl>
+
+#include <frontend\parser\earley\earley_visualization.hpp>
+#include <frontend\parser\earley\earley_visualization.inl>
 
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
-struct earley_token_traits : public token_traits
+struct earley_token_traits// : public token_traits
 {
     DECLARE_ENUM
     (
@@ -96,7 +97,6 @@ struct earley_token_traits : public token_traits
 };
 
 earley_token_traits::enum_map_type earley_token_traits::mapping;
-
 
 class earley_lexical_analyzer : public lexical_analyzer<token<earley_token_traits>>
 {
@@ -140,7 +140,10 @@ class earley_lexical_analyzer : public lexical_analyzer<token<earley_token_trait
 class my_earley_parser : public earley_parser<token<earley_token_traits>>
 {
     public:
-        my_earley_parser(const lexical_analyzer_type& lexical_analyzer, grammar& gr) : earley_parser(lexical_analyzer, gr)
+        using eparser_type = earley_parser<token<earley_token_traits>>;
+
+    public:
+        my_earley_parser(const lexical_analyzer_type& lexical_analyzer, grammar& gr, earley_parser::tree_kind kind) : earley_parser(lexical_analyzer, gr, kind)
         {
         }
 
@@ -182,6 +185,7 @@ void test_earley_parser()
         LR"(D:\Projects\fe\grammars\Earley.G2.txt)",
         LR"(D:\Projects\fe\grammars\Earley.G3.AYCOCK.HORSPOOL.txt)",
         LR"(D:\Projects\fe\grammars\Earley.G4.epsilon.txt)",
+        LR"(D:\Projects\fe\grammars\Earley.G5.cycle.txt)",
     };
 
     std::vector<string_type> contents  =
@@ -191,6 +195,7 @@ void test_earley_parser()
         L"a*(a+a)",
         L"a",
         L"aa",
+        L"",
     };
 
     uint8_t k = 1;
@@ -223,14 +228,14 @@ void test_earley_parser()
         {
             auto lexical_analyzer(factory::create<earley_lexical_analyzer>(gr, content));
 
-            my_earley_parser parser(lexical_analyzer, gr);
+            my_earley_parser parser(lexical_analyzer, gr, my_earley_parser::eparser_type::tree_kind::build_trees);
 
             parser.parse();
 
             if(parser.status().custom_code() == status::custom_code::success)
             {
-                std::wcout << earley_visualization::decorate_charts(parser.charts()).c_str() << std::endl;
-                std::wcout << earley_visualization::decorate_trees(parser.trees()).c_str() << std::endl;
+                std::wcout << earley_visualization<my_earley_parser>::decorate_charts(parser.charts()).c_str() << std::endl;
+                std::wcout << earley_visualization<my_earley_parser>::decorate_trees(parser.trees()).c_str() << std::endl;
             }
             else
             {

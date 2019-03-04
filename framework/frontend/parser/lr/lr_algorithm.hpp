@@ -44,7 +44,15 @@ class lr_algorithm : private noncopyable
         using lr_transition_type = std::shared_ptr<lr_transition>;
         using lr_transitions_type = std::map<symbol_type, lr_transition_type, symbol::symbol_key_comparator>;
 
-        using flags_type = flags;
+        enum class flags : uint64_t
+        {
+            clear   = 0x00,
+            nothing = 0x00,
+            marked  = 0x01,
+            final   = 0x02
+        };
+
+        using flags_type = tmpl_flags<flags>;
 
         enum class lr_action : int32_t
         {

@@ -19,10 +19,17 @@ struct token
     using datum_type = text::datum_type;
     using codepoints_type = std::basic_string<datum_type>;
 
+    enum class flags : uint64_t
+    {
+        clear     = 0x00,
+        genuine   = 0x02,
+        synthetic = 0x04  // additional (artificial) tokens which are inserted into the token stream ...
+    };
+
+    using flags_type = tmpl_flags<flags>;
+
     using traits = Traits;
     using token_type = typename traits::type;
-
-    using flags_type = flags;
 
     token_type      type;    // type of lexeme
 
@@ -84,7 +91,8 @@ struct token
             offset = INVALID_VALUE;
             length = INVALID_VALUE;
 
-            flags = flags::clear | flags::genuine;
+            flags = flags::clear;
+            flags |= flags::genuine;
         }
 
         codepoints_type codepoints(const datum_type* content) const

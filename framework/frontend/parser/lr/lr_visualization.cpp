@@ -141,7 +141,7 @@ string_type lr_visualization::decorate_lr_state(const lr_state_type& state)
     string_type result;
 
     char_type buffer[64];
-    snwprintf(buffer, array_size(buffer), TRUNCATE, L"[%4d (%zd) %s] ", (*state).id, (*state).items.size(), (((*state).flags & flags::final) == flags::final) ? L"*" : L"");
+    snwprintf(buffer, array_size(buffer), TRUNCATE, L"[%4d (%zd) %s] ", (*state).id, (*state).items.size(), (((*state).flags & lr_algorithm::flags::final) == lr_algorithm::flags::final) ? L"*" : L"");
 
     result += buffer;
     result += L"\n";

@@ -27,8 +27,6 @@ class symbol
         using set_type = std::vector<symbol_type>;
         using sets_type = std::vector<set_type>;
 
-        using flags_type = flags;
-
         enum class kind
         {
             nonterminal,
@@ -46,6 +44,13 @@ class symbol
             propagate,
             remove
         };
+
+        enum class flags : uint64_t
+        {
+            clear = 0x00
+        };
+
+        using flags_type = tmpl_flags<flags>;
 
         static symbol_type              epsilon;
         static symbol_type              eof;

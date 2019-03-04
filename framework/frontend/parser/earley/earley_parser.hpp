@@ -21,22 +21,134 @@ class earley_parser : public parser<T>
     //  - 'execute completer' flag indicates if completer should proceed, set when an item is added
     public:
         using token_type = parser<T>::token_type;
-        using lexical_analyzer_type = parser<T>::lexical_analyzer_type;
 
-        using item_type = earley_algorithm::item_type;
-        using items_type = earley_algorithm::items_type;
+        using symbol_type = grammar::symbol_type;
+        using symbols_type = grammar::symbols_type;
 
-        using chart_type = earley_algorithm::chart_type;
-        using charts_type = earley_algorithm::charts_type;
+        using pool_type = grammar::pool_type;
 
-        using tree_type = earley_algorithm::tree_type;
-        using trees_type = earley_algorithm::trees_type;
+        using rule_type = grammar::rule_type;
+        using rules_type = grammar::rules_type;
+
+        using set_type = grammar::set_type;
+        using sets_type = grammar::sets_type;
+
+        enum class flags : uint64_t
+        {
+            init          = 0x00000001, // .
+            scanner       = 0x00000002, //  .
+            predictor     = 0x00000004, //   . which action introduced item
+            completer     = 0x00000008, //  .
+            error_scanner = 0x00000010, // .
+            error_mask    = 0x07000000,
+            marked        = 0x00000080
+        };
+
+        using flags_type = tmpl_flags<flags>;
+
+        struct chart;
+        using chart_type = std::shared_ptr<chart>;
+
+        struct item;
+        using item_type = std::shared_ptr<item>;
+
+        struct item_hash
+        {
+            std::size_t operator()(const item_type&) const
+            {
+                return 0; // returning 0 causes item_key_comparator to be called
+            }
+        };
+
+        struct item_key_comparator
+        {
+            bool operator() (const item_type& lhs, const item_type& rhs) const
+            {
+                return *lhs == *rhs;
+            }
+        };
+
+        using items_type = std::unordered_set<item_type, item_hash, item_key_comparator>;
+
+        struct item
+        {
+            uint32_t    id;             // unique id
+
+            rule_type   rule;           // production (rule)
+            uint32_t    dot;            // dot - position in rhs, if dot_position = rhs.size() it means it points to the end of the rhs
+
+            chart_type  origin_chart;   // pointer to the orinal set/chart where recognition started
+            chart_type  master_chart;   // chart it belongs to
+
+            item_type   lptr;           // pointer to left brother
+            items_type  rptrs;          // rightmost child(s), if grammar is ambiguous
+
+            flags_type  flags;          // action (predictor, completer, scanner, errorscanner), error cost
+
+            bool operator == (const item& other)
+            {
+                return rule != nullptr && other.rule != nullptr && (*rule).id() == (*other.rule).id() &&
+                       dot == other.dot &&
+                       origin_chart != nullptr && other.origin_chart != nullptr && (*origin_chart).id == (*other.origin_chart).id &&
+                       lptr == other.lptr;
+            }
+        };
+
+        struct chart // state or chart
+        {
+            uint32_t    id;     // unique id
+            items_type  items;  // list of items
+            token_type  token;
+        };
+
+        using charts_type = std::vector<chart_type>;
+
+        struct earley_tree : public tree
+        {
+            item_type   item;
+            token_type  token; // might be empty for non-terminals
+
+            earley_tree(const item_type& item) : item(item)
+            {
+            }
+        };
+
+        using tree_type = std::shared_ptr<earley_tree>;
+        using trees_type = std::vector<tree_type>;
+
+        // what to build while calling parse, AST or tree(s)
+        enum class tree_kind
+        {
+            build_ast,
+            build_trees
+        };
+
+        // the stack to keep elemens of parse tree's level
+        struct rhs_stack_element
+        {
+            // the element may be item, the list of references or the symbol
+            enum class rhs_stack_type
+            {
+                item = 1, // earley item
+                rptrs,    // rightmost child(s), if grammar is ambiguous
+                symbol    // terminal
+            };
+
+            using data_type = std::variant<item_type, items_type, symbol_type>;
+
+            data_type data;
+            rhs_stack_type type;
+        };
+
+        using rhs_stack_type = std::stack<rhs_stack_element>;
 
     private:
-        charts_type             my_charts;  // list of sets/charts
-        trees_type              my_trees;   // tree or list of trees
+        charts_type             my_charts;      // list of sets/charts
+        trees_type              my_trees;       // tree or list of trees
 
-        grammar&                my_grammar; // might be chnaged during parsing
+        grammar&                my_grammar;     // might be chnaged during parsing
+
+        tree_kind               my_tree_kind;   // what to build, trees or AST
 
     protected:
         virtual tree_type       handle_start(const item_type& item) = 0;
@@ -47,18 +159,47 @@ class earley_parser : public parser<T>
         virtual tree_type       handle_after_terminal(const item_type& item, const tree_type& node) = 0;
 
     private:
-        void                    closure(chart_type& chart, charts_type& charts);
+        static item_type        create_item(const rule_type& rule,            // production (rule)
+                                            const chart_type& origin_chart,   // original chart recognition started
+                                            const chart_type& master_chart,   // chart to add to
+                                            const item_type& lptr,            // l-ptr
+                                            flags action);                    // action introduced this item
+        static void             set_rptr(item_type& item, const item_type& new_item);
+
+        static bool             is_item_marked(const item_type& item);
+
+        static void             mark_item(item_type& item);
+        static void             unmark_item(item_type& item);
+
+        static chart_type       create_chart(uint32_t id);
+
+        static void             closure(const grammar& gr, chart_type& chart);
+
+        static void             predict(const grammar& gr, const item_type& item, chart_type& chart);
+        static void             complete(item_type& item, chart_type& chart);
+
+        static void             scan(chart_type& chart, charts_type& charts, const token_type& token, chart_type& result);
+
+        static void             populate_rhs_stack(const item_type& item, rhs_stack_type& stack);
+        static void             clone_tree(const tree_type& src_tree, tree_type& result);
+
+    private:
+
         void                    validate_charts(const chart_type& chart);
 
+        void                    build_charts();
+
+        void                    build_parse_trees();
+        void                    build_parse_trees(item_type& item, tree_type& papa, tree_type& tree);
+
+        void                    build_ast();
+
     public:
-                                earley_parser(const lexical_analyzer_type& lexical_analyzer, grammar& gr);
+                                earley_parser(const lexical_analyzer_type& lexical_analyzer, grammar& gr, tree_kind kind);
                                ~earley_parser();
 
         const charts_type&      charts() const;
         const trees_type&       trees() const;
-
-        void                    build_charts();
-        void                    build_trees();
 
         void                    parse() override;
 };

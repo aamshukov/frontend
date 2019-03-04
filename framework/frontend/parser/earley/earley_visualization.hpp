@@ -9,6 +9,7 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
+template <typename T>
 class earley_visualization : private noncopyable
 {
     public:
@@ -21,12 +22,14 @@ class earley_visualization : private noncopyable
         using rule_type = grammar::rule_type;
         using rules_type = grammar::rules_type;
 
-        using item_type = earley_algorithm::item_type;
-        using chart_type = earley_algorithm::chart_type;
-        using charts_type = earley_algorithm::charts_type;
+        using earley_parser_type = T;
 
-        using tree_type = earley_algorithm::tree_type;
-        using trees_type = earley_algorithm::trees_type;
+        using item_type = typename earley_parser_type::item_type;
+        using chart_type = typename earley_parser_type::chart_type;
+        using charts_type = typename earley_parser_type::charts_type;
+
+        using tree_type = typename earley_parser_type::tree_type;
+        using trees_type = typename earley_parser_type::trees_type;
 
     public:
         static string_type decorate_item(const item_type& item, bool recursive = true);

@@ -15,7 +15,12 @@ class rule
         using symbol_type = symbol::symbol_type;
         using symbols_type = symbol::symbols_type;
 
-        using flags_type = flags;
+        enum class flags : uint64_t
+        {
+            clear = 0x00
+        };
+
+        using flags_type = tmpl_flags<flags>;
 
     private:
         uint32_t            my_id; // enumerable type, will be cast to specific enum values

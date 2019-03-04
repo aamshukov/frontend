@@ -58,7 +58,6 @@
     <ClInclude Include="..\..\framework\frontend\grammar\token.hpp" />
     <ClInclude Include="..\..\framework\frontend\lexical_analyzer\lexical_analyzer.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\backtracking\recursive_descent_parser.hpp" />
-    <ClInclude Include="..\..\framework\frontend\parser\earley\earley_algorithm.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\earley\earley_parser.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\earley\earley_visualization.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\ll\ll_algorithm.hpp" />
@@ -108,8 +107,6 @@
     <ClCompile Include="..\..\framework\frontend\grammar\grammar_visualization.cpp" />
     <ClCompile Include="..\..\framework\frontend\grammar\rule.cpp" />
     <ClCompile Include="..\..\framework\frontend\grammar\symbol.cpp" />
-    <ClCompile Include="..\..\framework\frontend\parser\earley\earley_algorithm.cpp" />
-    <ClCompile Include="..\..\framework\frontend\parser\earley\earley_visualization.cpp" />
     <ClCompile Include="..\..\framework\frontend\parser\ll\ll_algorithm.cpp" />
     <ClCompile Include="..\..\framework\frontend\parser\ll\ll_visualization.cpp" />
     <ClCompile Include="..\..\framework\frontend\parser\lr\lr_algorithm.cpp" />
@@ -128,6 +125,7 @@
     <None Include="..\..\framework\frontend\lexical_analyzer\lexical_analyzer.inl" />
     <None Include="..\..\framework\frontend\parser\backtracking\recursive_descent_parser.inl" />
     <None Include="..\..\framework\frontend\parser\earley\earley_parser.inl" />
+    <None Include="..\..\framework\frontend\parser\earley\earley_visualization.inl" />
     <None Include="..\..\framework\frontend\parser\ll\ll_parser.inl" />
     <None Include="..\..\framework\frontend\parser\lr\lr_parser.inl" />
     <None Include="..\..\framework\frontend\parser\operator_precedence\precedence_parser.inl" />

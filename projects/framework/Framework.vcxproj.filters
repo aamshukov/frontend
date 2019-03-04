@@ -151,9 +151,6 @@
     <ClInclude Include="..\..\framework\frontend\parser\earley\earley_visualization.hpp">
       <Filter>frontend\parser\earley</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\frontend\parser\earley\earley_algorithm.hpp">
-      <Filter>frontend\parser\earley</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\frontend\parser\earley\earley_parser.hpp">
       <Filter>frontend\parser\earley</Filter>
     </ClInclude>
@@ -317,12 +314,6 @@
     <ClCompile Include="..\..\framework\frontend\parser\operator_precedence\precedence_visualization.cpp">
       <Filter>frontend\parser\precedence</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\framework\frontend\parser\earley\earley_visualization.cpp">
-      <Filter>frontend\parser\earley</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\framework\frontend\parser\earley\earley_algorithm.cpp">
-      <Filter>frontend\parser\earley</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\framework\core\string_data_provider.cpp">
       <Filter>core</Filter>
     </ClCompile>
@@ -360,6 +351,9 @@
     </None>
     <None Include="..\..\framework\frontend\semantics\symbol_table.inl">
       <Filter>frontend\semantics</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\parser\earley\earley_visualization.inl">
+      <Filter>frontend\parser\earley</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

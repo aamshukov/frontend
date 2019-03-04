@@ -68,7 +68,7 @@ void grammar::load(const string_type& file_name)
 
     stream_type stream;
 
-    stream.open(file_name, std::ios::in|std::ios::binary);
+    stream.open(file_name, std::ios::in | std::ios::binary);
 
     if(!stream.is_open() || stream.bad() || stream.fail())
     {

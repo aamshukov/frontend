@@ -358,7 +358,7 @@ void lr_algorithm::build_lr_automaton(const grammar& gr, uint8_t k, typename lr_
                 continue;
             }
 
-            (*state).flags = modify_flags<flags>((*state).flags, flags::marked, flags::nothing);
+            (*state).flags.modify_flags(flags::marked, flags::nothing);
 
             for(const auto& symb_kvp : gr.pool())
             {

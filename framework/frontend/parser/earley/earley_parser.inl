@@ -12,8 +12,234 @@ USINGNAMESPACE(core)
 // α β ε λ ∅ ∈ Σ ∪
 
 template <typename T>
-earley_parser<T>::earley_parser(const typename earley_parser<T>::lexical_analyzer_type& lexical_analyzer, grammar& gr)
-                : parser<T>(lexical_analyzer), my_grammar(gr)
+typename earley_parser<T>::item_type earley_parser<T>::create_item(const typename earley_parser<T>::rule_type& rule,
+                                                                   const typename earley_parser<T>::chart_type& origin_chart,
+                                                                   const typename earley_parser<T>::chart_type& master_chart,
+                                                                   const typename earley_parser<T>::item_type& lptr,
+                                                                   flags action)
+{
+    item_type result(factory::create<item>());
+
+    (*result).id = static_cast<uint32_t>((*master_chart).items.size());
+
+    (*result).rule = rule;
+    (*result).dot = 0;
+
+    (*result).origin_chart = origin_chart;
+    (*result).master_chart = master_chart;
+
+    (*result).lptr = lptr;
+
+    (*result).flags = action;
+
+    return result;
+}
+
+template <typename T>
+void earley_parser<T>::set_rptr(typename earley_parser<T>::item_type& item, const typename earley_parser<T>::item_type& new_item)
+{
+    if(!std::any_of((*item).rptrs.begin(), (*item).rptrs.end(), [&new_item](const auto& item0){ return *item0 == *new_item; }))
+    {
+        (*item).rptrs.emplace(new_item);
+    }
+}
+
+template <typename T>
+bool earley_parser<T>::is_item_marked(typename const earley_parser<T>::item_type& item)
+{
+    return ((*item).flags & flags::marked) == flags::marked;
+}
+
+template <typename T>
+void earley_parser<T>::mark_item(typename earley_parser<T>::item_type& item)
+{
+    (*item).flags |= flags::marked;
+}
+
+template <typename T>
+void earley_parser<T>::unmark_item(typename earley_parser<T>::item_type& item)
+{
+    // crappy C++ syntax, need this hack for templates
+    (*item).flags = ~static_cast<std::underlying_type_t<earley_parser<T>::flags>>(flags::marked);
+}
+
+template <typename T>
+typename earley_parser<T>::chart_type earley_parser<T>::create_chart(uint32_t id)
+{
+    chart_type result(factory::create<chart>());
+
+    (*result).id = id;
+
+    return result;
+}
+
+template <typename T>
+void earley_parser<T>::closure(const grammar& gr, typename earley_parser<T>::chart_type& chart)
+{
+    // 'λ case' - special case for empty rule, always assume the dot is at the end
+    // Grune and Jacobs:
+    //      The easiest way to handle this mare’s nest is to stay calm and keep running
+    //      the Predictor and Completer in turn until neither has anything more to add.
+    // for another method see predict()
+    for(;;)
+    {
+        std::size_t count = (*chart).items.size();
+
+        items_type items((*chart).items);
+
+        for(auto item : items) // not const auto&
+        {
+            complete(item, chart);
+            predict(gr, item, chart);
+        }
+
+        if((*chart).items.size() == count)
+        {
+            break;
+        }
+    }
+}
+
+template <typename T>
+void earley_parser<T>::predict(const grammar& gr,
+                               const typename earley_parser<T>::item_type& item,
+                               typename earley_parser<T>::chart_type& chart)
+{
+    // Practical Earley Parsing, JOHN AYCOCK1 AND R. NIGEL HORSPOOL, 2001
+    //      if [A -> ... • B ... , j] is in Si, add [B -> • α, i] to Si for all rules B -> α
+    //      if B is nullable, also add [A -> ... B • ... , j] to Si
+    const auto& rhs((*(*item).rule).rhs());
+
+    if((*item).dot < rhs.size()) // dot is within rhs.size, not completed
+    {
+        const auto& symbol(rhs[(*item).dot]); // dot is within rhs.size
+
+        if((*symbol).nonterminal())
+        {
+            auto nonterminal_it(gr.nt_rules().find((*symbol).name()));
+            const auto& nonterminal_rules((*nonterminal_it).second);
+
+            for(const auto& nonterminal_rule : nonterminal_rules)
+            {
+                item_type new_item(create_item(nonterminal_rule,   // production (rule)
+                                               chart,              // original chart recognition started
+                                               chart,              // chart to add to
+                                               nullptr,            // l-ptr
+                                               flags::predictor)); // action introduced this item
+                (*chart).items.emplace(new_item);
+            }
+
+            // looks like in this implementation does not help
+            //if((*symbol).nullable())
+            //{
+            //    item_type new_item(create_item((*item).rule,  // production (rule)
+            //                       chart,                     // original chart recognition started
+            //                       chart,                     // chart to add to
+            //                       nullptr,                   // l-ptr
+            //                       flags::predictor));        // action introduced this item
+            //    (*chart).items.emplace(new_item);
+            //}
+        }
+    }
+}
+
+template <typename T>
+void earley_parser<T>::complete(typename earley_parser<T>::item_type& item, typename earley_parser<T>::chart_type& chart)
+{
+    const auto& rhs((*(*item).rule).rhs());
+
+    if((*item).dot == rhs.size() || // is completed
+      (*(*item).rule).empty())      // 'λ case' - special case for empty rule, always assume the dot is at the end
+    {
+        const auto& lhs((*(*item).rule).lhs());
+        const auto& lhs_symbol(lhs[0]);
+
+        const auto& origin_chart((*item).origin_chart); // j
+
+        for(const auto& origin_item : (*origin_chart).items)
+        {
+            const auto& rhs_origin((*(*origin_item).rule).rhs());
+
+            if((*origin_item).dot == rhs_origin.size()) // dot must be within rhs_origin.size
+            {
+                continue;
+            }
+
+            const auto& rhs_symbol(rhs_origin[(*origin_item).dot]);
+
+            if(((*lhs_symbol).id() != (*rhs_symbol).id()))
+            {
+                continue;
+            }
+
+            item_type new_item(create_item((*origin_item).rule,           // production (rule)
+                                           (*origin_item).origin_chart,   // original chart recognition started
+                                           chart,                         // chart to add to
+                                           origin_item,                   // l-ptr
+                                           flags::completer));            // action introduced this item
+            (*new_item).dot = (*origin_item).dot + 1; // move • over ... • B ... ==> ... B • ...
+
+            auto result = (*chart).items.emplace(new_item);
+
+            if(!result.second)
+            {
+                // exists, update <p>
+                // <p>' = <p>' + [B -> γ •, j, l, <p>]
+                set_rptr(const_cast<item_type&>(*result.first), item);
+            }
+            else
+            {
+                // does not exist, update new item
+                // V[i] = V[i] + [new item, <[B -> γ •, j, l, <p>]>]
+                set_rptr(new_item, item);
+            }
+        }
+    }
+}
+
+template <typename T>
+void earley_parser<T>::scan(typename earley_parser<T>::chart_type& chart,
+                            typename earley_parser<T>::charts_type& charts,
+                            typename const earley_parser<T>::token_type& token,
+                            typename earley_parser<T>::chart_type& result)
+{
+    chart_type new_chart(create_chart(static_cast<uint32_t>(charts.size())));
+
+    for(const auto& item : (*chart).items)
+    {
+        const auto& rhs((*(*item).rule).rhs());
+
+        if((*item).dot < rhs.size()) // dot is within rhs.size
+        {
+            const auto& symbol(rhs[(*item).dot]);
+
+            if((*symbol).terminal() && (*symbol).id() == static_cast<uint32_t>(token.type))
+            {
+                item_type new_item(create_item((*item).rule,         // production (rule)
+                                               (*item).origin_chart, // original chart recognition started
+                                               new_chart,            // chart to add to
+                                               item,                 // l-ptr
+                                               flags::scanner));     // action introduced this item
+
+                (*new_item).dot = (*item).dot + 1; // move • over ... • a ... ==> ... a • ...
+
+                (*new_chart).items.emplace(new_item);
+            }
+        }
+    }
+
+    if(!(*new_chart).items.empty())
+    {
+        (*new_chart).token = token;
+
+        result.swap(new_chart);
+        charts.emplace_back(result);
+    }
+}
+
+template <typename T>
+earley_parser<T>::earley_parser(const typename earley_parser<T>::lexical_analyzer_type& lexical_analyzer, grammar& gr, tree_kind kind)
+                : parser<T>(lexical_analyzer), my_grammar(gr), my_tree_kind(kind)
 {
 }
 
@@ -36,7 +262,7 @@ void earley_parser<T>::build_charts()
     charts_type charts;
 
     // add V[0]
-    chart_type chart0(earley_algorithm::create_chart(static_cast<uint32_t>(charts.size()))); // V[0]
+    chart_type chart0(create_chart(static_cast<uint32_t>(charts.size()))); // V[0]
 
     charts.emplace_back(chart0);
 
@@ -47,20 +273,16 @@ void earley_parser<T>::build_charts()
 
     for(const auto& nonterminal_rule : nonterminal_rules)
     {
-        item_type new_item(earley_algorithm::create_item(nonterminal_rule,                  // production (rule)
-                                                         chart0,                            // original chart recognition started
-                                                         chart0,                            // chart to add to
-                                                         nullptr,                           // l-ptr
-                                                         earley_algorithm::flags::init));   // action introduced this item
+        item_type new_item(create_item(nonterminal_rule, // production (rule)
+                                       chart0,           // original chart recognition started
+                                       chart0,           // chart to add to
+                                       nullptr,          // l-ptr
+                                       flags::init));    // action introduced this item
         (*chart0).items.emplace(new_item);
     }
 
-    log_info(earley_visualization::decorate_charts(charts).c_str()); //??
-
     // Для каждой ситуации Эрли в состоянии Эрли V[0] вызываем процедуры Completer и Predictor.
-    earley_algorithm::closure(gr, chart0);
-
-    log_info(earley_visualization::decorate_charts(charts).c_str()); //??
+    closure(gr, chart0);
 
     chart_type chart(chart0); // V[i-1] chart
 
@@ -79,11 +301,7 @@ void earley_parser<T>::build_charts()
         // Вызываем процедуру Scanner для состояния V[i-1].
         chart_type new_chart;
 
-        uint32_t terminal = static_cast<uint32_t>((*lexer).token().type);
-
-        earley_algorithm::scan(chart, charts, terminal, new_chart);
-
-        log_info(earley_visualization::decorate_charts(charts).c_str()); //??
+        scan(chart, charts, (*lexer).token(), new_chart);
 
         // Если список ситуаций Эрли в состоянии Эрли V[i] пуст, возвращаем False, parsing has failed.
         if(new_chart == nullptr || (*new_chart).items.empty())
@@ -97,9 +315,7 @@ void earley_parser<T>::build_charts()
         }
                                                 
         // Для каждой ситуации Эрли в состоянии Эрли V[i] вызываем процедуры Completer и Predictor.
-        earley_algorithm::closure(gr, new_chart);
-
-        log_info(earley_visualization::decorate_charts(charts).c_str()); //??
+        closure(gr, new_chart);
 
         chart = new_chart; // remember V[i-1] chart
     }
@@ -118,11 +334,82 @@ void earley_parser<T>::build_charts()
 }
 
 template <typename T>
-void earley_parser<T>::build_trees()
+void earley_parser<T>::build_parse_trees()
 {
-    log_info(L"Building tree(s) ...");
+    log_info(L"Building parse tree(s) ...");
 
-    log_info(L"Built tree(s).");
+    trees_type trees;
+
+    // the last built chart should have completed items
+    const chart_type& chart(charts().back());
+
+    // collect all completed items kind of [S -> α •, 0, ...] ...
+    for(auto item : (*chart).items)
+    {
+        const auto& lhs((*(*item).rule).lhs());
+        const auto& rhs((*(*item).rule).rhs());
+
+        const auto& lhs_symbol(lhs[0]);
+
+        // ... [S -> α •, 0, ...] and build tree(s)
+        if((*lhs_symbol).id() == (*my_grammar.start_symbol()).id() && (*item).dot == rhs.size() && (*(*item).origin_chart).id == 0)
+        {
+            tree_type root(factory::create<earley_tree>(item));
+
+            trees.emplace_back(root);
+
+            mark_item(item);
+            build_parse_trees(item, root, root);
+            unmark_item(item);
+        }
+    }
+
+    my_trees.swap(trees);
+
+    log_info(L"Built parse tree(s).");
+}
+
+template <typename T>
+void earley_parser<T>::populate_rhs_stack(const typename earley_parser<T>::item_type& item,
+                                          typename earley_parser<T>::rhs_stack_type& stack)
+{
+    item;stack;
+}
+
+template <typename T>
+void earley_parser<T>::clone_tree(const typename earley_parser<T>::tree_type& src_tree, typename earley_parser<T>::tree_type& result)
+{
+src_tree; //??
+    tree_type tree;
+
+    result.swap(tree);
+}
+
+template <typename T>
+void earley_parser<T>::build_parse_trees(typename earley_parser<T>::item_type& item,
+                                         typename earley_parser<T>::tree_type& papa,
+                                         typename earley_parser<T>::tree_type& tree)
+{
+item;tree;papa; //??
+
+    // populate rhs stack
+    rhs_stack_type rhs_stack;
+
+    populate_rhs_stack(item, rhs_stack);
+
+	// go through the rhs stack
+	for(; !rhs_stack.empty(); rhs_stack.pop())
+	{
+        rhs_stack_element cur_stack_element(rhs_stack.top());
+        cur_stack_element; //??
+    }
+}
+
+template <typename T>
+void earley_parser<T>::build_ast()
+{
+    log_info(L"Building AST tree(s) ...");
+    log_info(L"Built AST tree(s).");
 }
 
 template <typename T>
@@ -134,7 +421,14 @@ void earley_parser<T>::parse()
 
     if(status().custom_code() == status::custom_code::success)
     {
-        build_trees();
+        if(my_tree_kind == tree_kind::build_trees)
+        {
+            build_parse_trees();
+        }
+        else if(my_tree_kind == tree_kind::build_ast)
+        {
+            build_ast();
+        }
 
         if(status().custom_code() == status::custom_code::success)
         {
@@ -159,9 +453,7 @@ void earley_parser<T>::validate_charts(const typename earley_parser<T>::chart_ty
 
         const auto& lhs_symbol(lhs[0]);
 
-        result = (*lhs_symbol).id() == (*my_grammar.start_symbol()).id() &&
-                 (*item).dot == rhs.size() &&
-                 (*(*item).origin_chart).id == 0;
+        result = (*lhs_symbol).id() == (*my_grammar.start_symbol()).id() && (*item).dot == rhs.size() && (*(*item).origin_chart).id == 0;
 
         if(result)
         {
@@ -188,3 +480,6 @@ void earley_parser<T>::validate_charts(const typename earley_parser<T>::chart_ty
 END_NAMESPACE
 
 #endif // __EARLEY_PARSER_INL__
+
+
+//log_info(earley_visualization<earley_parser<T>>::decorate_charts(charts).c_str()); //??
