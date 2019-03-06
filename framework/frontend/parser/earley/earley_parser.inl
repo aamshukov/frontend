@@ -354,7 +354,9 @@ void earley_parser<T>::build_parse_trees()
         // ... [S -> α •, 0, ...] and build tree(s)
         if((*lhs_symbol).id() == (*my_grammar.start_symbol()).id() && (*item).dot == rhs.size() && (*(*item).origin_chart).id == 0)
         {
-            tree_type root(factory::create<earley_tree>(item));
+            tree_type root(factory::create<earley_tree>());
+
+            (*root).item = item;
 
             trees.emplace_back(root);
 
@@ -373,16 +375,75 @@ template <typename T>
 void earley_parser<T>::populate_rhs_stack(const typename earley_parser<T>::item_type& item,
                                           typename earley_parser<T>::rhs_stack_type& stack)
 {
-    item;stack;
+    for(auto cur_item = item; (*cur_item).dot > 0 && (*cur_item).dot < (*(*cur_item).rule).rhs().size(); cur_item = (*cur_item).lptr)
+    {
+        rhs_stack_element element;
+
+        const auto& rhs((*(*cur_item).rule).rhs());
+        const auto& symbol(rhs[(*cur_item).dot]);
+
+        if((*symbol).nonterminal())
+        {
+            if((*cur_item).rptrs.size() > 0)
+            {
+                element.data = (*cur_item).rptrs;
+                element.type = rhs_stack_element::element_type::rptrs;
+            }
+            else
+            {
+                element.data = *(*cur_item).rptrs.begin();
+                element.type = rhs_stack_element::element_type::item;
+            }
+        }
+        else
+        {
+            element.data = symbol;
+            element.type = rhs_stack_element::element_type::symbol;
+        }
+
+        stack.push(element);
+    }
 }
 
 template <typename T>
-void earley_parser<T>::clone_tree(const typename earley_parser<T>::tree_type& src_tree, typename earley_parser<T>::tree_type& result)
+void earley_parser<T>::clone_tree(const typename earley_parser<T>::tree_type& tree, typename earley_parser<T>::tree_type& result)
 {
-src_tree; //??
-    tree_type tree;
+    struct queue_entry
+    {
+        tree_type org_node;
+        tree_type new_papa;
+    };
 
-    result.swap(tree);
+    tree_type new_tree(factory::create<earley_tree>());
+
+    (*new_tree).papa = nullptr;
+    (*new_tree).item = (*tree).item;
+    (*new_tree).token = (*tree).token;
+
+    std::queue<queue_entry> queue;
+
+    queue.emplace(queue_entry { tree, nullptr });
+
+    while(!queue.empty())
+    {
+        auto entry(queue.front());
+
+        queue.pop();
+
+        auto new_node(factory::create<earley_tree>());
+
+        (*new_node).papa = entry.new_papa;
+        (*entry.new_papa).kids.emplace_back(new_node);
+        (*new_node).item = (*entry.org_node).item;
+        (*new_node).token = (*entry.org_node).token;
+
+        for(auto kid : (*entry.org_node).kids)
+        {
+            queue.emplace(queue_entry { std::dynamic_pointer_cast<earley_tree>(kid), new_node });
+        }
+    }
+
+    result.swap(new_tree);
 }
 
 template <typename T>
@@ -395,13 +456,30 @@ item;tree;papa; //??
     // populate rhs stack
     rhs_stack_type rhs_stack;
 
+    tree_type src_tree;
+    tree_type result;
+
     populate_rhs_stack(item, rhs_stack);
 
-	// go through the rhs stack
-	for(; !rhs_stack.empty(); rhs_stack.pop())
-	{
+	// init parse tree elements
+    parse_tree_elements_type parse_roots;
+
+	parse_roots.push_back(parse_tree_element{ tree, papa });
+
+    // go through the rhs stack
+    for(; !rhs_stack.empty(); rhs_stack.pop())
+    {
         rhs_stack_element cur_stack_element(rhs_stack.top());
-        cur_stack_element; //??
+
+        switch(cur_stack_element.type)
+        {
+            case rhs_stack_element::element_type::symbol:
+                break;
+            case rhs_stack_element::element_type::item:
+                break;
+            case rhs_stack_element::element_type::rptrs:
+                break;
+        }
     }
 }
 

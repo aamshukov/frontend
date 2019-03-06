@@ -105,12 +105,8 @@ class earley_parser : public parser<T>
 
         struct earley_tree : public tree
         {
-            item_type   item;
-            token_type  token; // might be empty for non-terminals
-
-            earley_tree(const item_type& item) : item(item)
-            {
-            }
+            item_type  item;
+            token_type token; // might be empty for non-terminals
         };
 
         using tree_type = std::shared_ptr<earley_tree>;
@@ -127,7 +123,7 @@ class earley_parser : public parser<T>
         struct rhs_stack_element
         {
             // the element may be item, the list of references or the symbol
-            enum class rhs_stack_type
+            enum class element_type
             {
                 item = 1, // earley item
                 rptrs,    // rightmost child(s), if grammar is ambiguous
@@ -137,10 +133,18 @@ class earley_parser : public parser<T>
             using data_type = std::variant<item_type, items_type, symbol_type>;
 
             data_type data;
-            rhs_stack_type type;
+            element_type type;
         };
 
         using rhs_stack_type = std::stack<rhs_stack_element>;
+
+        struct parse_tree_element // (Tr = parsing tree, P = papa)
+        {
+            tree_type tree;
+	        tree_type node;
+        };
+
+        using parse_tree_elements_type = std::list<parse_tree_element>;
 
     private:
         charts_type             my_charts;      // list of sets/charts
@@ -181,7 +185,7 @@ class earley_parser : public parser<T>
         static void             scan(chart_type& chart, charts_type& charts, const token_type& token, chart_type& result);
 
         static void             populate_rhs_stack(const item_type& item, rhs_stack_type& stack);
-        static void             clone_tree(const tree_type& src_tree, tree_type& result);
+        static void             clone_tree(const tree_type& tree, tree_type& result);
 
     private:
 

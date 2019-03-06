@@ -15,6 +15,10 @@ struct tree
 
     node_type papa;
     nodes_type kids;
+
+    virtual ~tree()
+    {
+    }
 };
 
 END_NAMESPACE
