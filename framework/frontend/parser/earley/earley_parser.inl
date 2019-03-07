@@ -294,7 +294,20 @@ void earley_parser<T>::build_charts()
 
         if((*lexer).is_eos())
         {
-            validate_charts(chart);
+            if(validate_charts(chart))
+            {
+                status().custom_code() = status::custom_code::success;
+                status().text().assign(L"Built charts successfully.\n");
+            }
+            else
+            {
+                status().custom_code() = status::custom_code::error;
+                status().text().assign(L"Build charts failed.\n");
+            }
+
+            status().system_code() = ::GetLastError();
+            status().text().append(status().get_system_error_message());
+
             break;
         }
 
@@ -344,25 +357,26 @@ void earley_parser<T>::build_parse_trees()
     const chart_type& chart(charts().back());
 
     // collect all completed items kind of [S -> α •, 0, ...] ...
-    for(auto item : (*chart).items)
+    for(auto current_item : (*chart).items)
     {
-        const auto& lhs((*(*item).rule).lhs());
-        const auto& rhs((*(*item).rule).rhs());
+        const auto& lhs((*(*current_item).rule).lhs());
+        const auto& rhs((*(*current_item).rule).rhs());
 
         const auto& lhs_symbol(lhs[0]);
 
         // ... [S -> α •, 0, ...] and build tree(s)
-        if((*lhs_symbol).id() == (*my_grammar.start_symbol()).id() && (*item).dot == rhs.size() && (*(*item).origin_chart).id == 0)
+        if((*lhs_symbol).id() == (*my_grammar.start_symbol()).id() && (*current_item).dot == rhs.size() && (*(*current_item).origin_chart).id == 0)
         {
             tree_type root(factory::create<earley_tree>());
 
-            (*root).item = item;
+            (*root).item = current_item;
+            (*root).token = (*(*current_item).master_chart).token;
 
             trees.emplace_back(root);
 
-            mark_item(item);
-            build_parse_trees(item, root, root);
-            unmark_item(item);
+            mark_item(current_item);
+            build_parse_trees(current_item, root, root, trees);
+            unmark_item(current_item);
         }
     }
 
@@ -375,23 +389,26 @@ template <typename T>
 void earley_parser<T>::populate_rhs_stack(const typename earley_parser<T>::item_type& item,
                                           typename earley_parser<T>::rhs_stack_type& stack)
 {
-    for(auto cur_item = item; (*cur_item).dot > 0 && (*cur_item).dot < (*(*cur_item).rule).rhs().size(); cur_item = (*cur_item).lptr)
+    // Заполнение магазина ссылками на ситуации текущего уровня.
+    for(auto current_item = item; (*current_item).dot > 0; current_item = (*current_item).lptr)
     {
+log_info(earley_visualization<earley_parser<T>>::decorate_item(current_item).c_str()); //??
+
         rhs_stack_element element;
 
-        const auto& rhs((*(*cur_item).rule).rhs());
-        const auto& symbol(rhs[(*cur_item).dot]);
+        const auto& rhs((*(*current_item).rule).rhs());
+        const auto& symbol(rhs[(*current_item).dot - 1]);
 
         if((*symbol).nonterminal())
         {
-            if((*cur_item).rptrs.size() > 0)
+            if((*current_item).rptrs.size() > 1)
             {
-                element.data = (*cur_item).rptrs;
+                element.data = (*current_item).rptrs;
                 element.type = rhs_stack_element::element_type::rptrs;
             }
             else
             {
-                element.data = *(*cur_item).rptrs.begin();
+                element.data = *(*current_item).rptrs.begin();
                 element.type = rhs_stack_element::element_type::item;
             }
         }
@@ -446,14 +463,14 @@ void earley_parser<T>::clone_tree(const typename earley_parser<T>::tree_type& tr
     result.swap(new_tree);
 }
 
+// BuildTreeLevel([A -> X1...Xm •, i, l, <s>], P, Tr)
 template <typename T>
 void earley_parser<T>::build_parse_trees(typename earley_parser<T>::item_type& item,
                                          typename earley_parser<T>::tree_type& papa,
-                                         typename earley_parser<T>::tree_type& tree)
+                                         typename earley_parser<T>::tree_type& tree,
+                                         typename earley_parser<T>::trees_type& trees)
 {
-item;tree;papa; //??
-
-    // populate rhs stack
+    // Заполнение магазина ссылками на ситуации текущего уровня.
     rhs_stack_type rhs_stack;
 
     tree_type src_tree;
@@ -461,24 +478,119 @@ item;tree;papa; //??
 
     populate_rhs_stack(item, rhs_stack);
 
-	// init parse tree elements
-    parse_tree_elements_type parse_roots;
+    // Положить в список pr пару (Tr, P) ...
+    parse_tree_elements_type parse_roots; // список pr (parse roots), в котором содержатся деревья, созданные во время исполнения данного вызова процедуры
 
-	parse_roots.push_back(parse_tree_element{ tree, papa });
+    parse_roots.push_back(parse_tree_element{ tree, papa });
 
-    // go through the rhs stack
+    // ... и для каждого элемента магазина rhs выполнить шаг
     for(; !rhs_stack.empty(); rhs_stack.pop())
     {
-        rhs_stack_element cur_stack_element(rhs_stack.top());
+        rhs_stack_element current_rhs_stack_element(rhs_stack.top());
 
-        switch(cur_stack_element.type)
+        switch(current_rhs_stack_element.type)
         {
+            // Если Xk - это терминальный символ ...
             case rhs_stack_element::element_type::symbol:
+            {
+                auto current_item(std::get<item_type>(current_rhs_stack_element.data));
+                auto token((*(*current_item).master_chart).token);
+
+                for(const auto& parse_root : parse_roots) // parse_tree_element = (Tr, P)
+                {
+                    auto new_node(factory::create<earley_tree>());
+
+                    (*new_node).papa = parse_root.node;
+                    (*parse_root.node).kids.emplace_back(new_node);
+                    (*new_node).item = current_item;
+                    (*new_node).token = token;
+                }
+
                 break;
+            }
+            // Если Xk - это нетерминальный символ и список <s> имеет единственный элемент ...
             case rhs_stack_element::element_type::item:
+            {
+                auto current_item(std::get<item_type>(current_rhs_stack_element.data));
+
+                for(const auto& parse_root : parse_roots) // parse_tree_element = (Tr, P)
+                {
+                    auto new_node(factory::create<earley_tree>());
+
+                    (*new_node).papa = parse_root.node;
+                    (*parse_root.node).kids.emplace_back(new_node);
+                    (*new_node).item = current_item;
+
+                    mark_item(current_item);
+                    build_parse_trees(current_item, new_node, tree, trees);
+                    unmark_item(current_item);
+                }
+
                 break;
+            }
+            // Если Xk - это нетерминальный символ и список <s> имеет более одного элемента ...
             case rhs_stack_element::element_type::rptrs:
+            {
+                volatile bool handle_first_rptr = true; // если первый элемент списка <s> ...
+
+                parse_tree_elements_type new_parse_roots; // список nn новых узлов, созданных на этапе обработки списка s данной ситуации
+
+                const auto& rptr_items(std::get<items_type>(current_rhs_stack_element.data));
+
+                for(const auto& rptr_item : rptr_items)
+                {
+                    if(!is_item_marked(rptr_item))
+                    {
+                        parse_tree_elements_type current_parse_roots; // список cn (current nodes) текущих нетерминальных узлов, подлежащих обработке с помощью процедуры build_parse_trees()
+
+                        if(handle_first_rptr)
+                        {
+                            for(const auto& parse_root : parse_roots) // parse_tree_element = (Tr, P)
+                            {
+                                current_parse_roots.emplace_back(parse_root);
+                            }
+
+                            handle_first_rptr = false;
+                        }
+                        else
+                        {
+                            for(const auto& parse_root : parse_roots) // parse_tree_element = (Tr, P)
+                            {
+								parse_tree_element new_parse_root;
+
+                                clone_tree(parse_root.tree, new_parse_root.tree);
+
+								trees.emplace_back(new_parse_root.tree);
+
+								current_parse_roots.push_back(new_parse_root);
+								new_parse_roots.push_back(new_parse_root);
+                            }
+                        }
+
+                        auto current_item(std::get<item_type>(current_rhs_stack_element.data));
+
+                        for(const auto& parse_root : current_parse_roots) // parse_tree_element = (Tr, P)
+                        {
+                            auto new_node(factory::create<earley_tree>());
+
+                            (*new_node).papa = parse_root.node;
+                            (*parse_root.node).kids.emplace_back(new_node);
+                            (*new_node).item = current_item;
+
+                            mark_item(current_item);
+                            build_parse_trees(current_item, new_node, tree, trees);
+                            unmark_item(current_item);
+                        }
+                    }
+                }
+
+                for(const auto& parse_root : new_parse_roots)
+                {
+                    parse_roots.emplace_back(parse_root);
+                }
+
                 break;
+            }
         }
     }
 }
@@ -520,7 +632,7 @@ void earley_parser<T>::parse()
 }
 
 template <typename T>
-void earley_parser<T>::validate_charts(const typename earley_parser<T>::chart_type& chart)
+bool earley_parser<T>::validate_charts(const typename earley_parser<T>::chart_type& chart)
 {
     bool result = false;
 
@@ -539,20 +651,7 @@ void earley_parser<T>::validate_charts(const typename earley_parser<T>::chart_ty
         }
     }
 
-    if(result)
-    {
-        status().custom_code() = status::custom_code::success;
-        status().system_code() = ::GetLastError();
-        status().text().assign(L"Built charts.\n");
-        status().text().append(status().get_system_error_message());
-    }
-    else
-    {
-        status().custom_code() = status::custom_code::error;
-        status().system_code() = ::GetLastError();
-        status().text().assign(L"Build charts failed.\n");
-        status().text().append(status().get_system_error_message());
-    }
+    return result;
 }
 
 END_NAMESPACE
@@ -561,3 +660,4 @@ END_NAMESPACE
 
 
 //log_info(earley_visualization<earley_parser<T>>::decorate_charts(charts).c_str()); //??
+//earley_visualization<earley_parser<T>>::print_tree(trees, std::wcout); //??

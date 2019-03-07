@@ -29,7 +29,7 @@ void fsa_visualization::generate_graphviz_file(const fsa_type& fsa, const string
 
         if(!stream.is_open() || stream.bad() || stream.fail())
         {
-            log_error(L"Failed to generate graphviz file: stream is either open or in a bad condition.")
+            log_error(L"Failed to generate graphviz file: stream is either open or in a bad condition.");
         }
 
         const char_type* indent(get_indent(4));
@@ -102,7 +102,7 @@ void fsa_visualization::generate_graphviz_file(const fsa_type& fsa, const string
     }
     catch(const std::exception& ex)
     {
-        log_exception(ex, L"Failed to generate graphviz file: error occurred.")
+        log_exception(ex, L"Failed to generate graphviz file: error occurred.");
     }
 
     log_info(L"Generated graphviz file.");

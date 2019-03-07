@@ -235,7 +235,8 @@ void test_earley_parser()
             if(parser.status().custom_code() == status::custom_code::success)
             {
                 std::wcout << earley_visualization<my_earley_parser>::decorate_charts(parser.charts()).c_str() << std::endl;
-                std::wcout << earley_visualization<my_earley_parser>::decorate_trees(parser.trees()).c_str() << std::endl;
+
+                earley_visualization<my_earley_parser>::decorate_trees(parser.trees(), L"earley.trees");
             }
             else
             {

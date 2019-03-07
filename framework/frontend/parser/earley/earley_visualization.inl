@@ -184,13 +184,71 @@ string_type earley_visualization<T>::decorate_charts(const typename earley_visua
 }
 
 template <typename T>
-string_type earley_visualization<T>::decorate_trees(const typename earley_visualization<T>::trees_type& trees)
+void earley_visualization<T>::print_tree(const typename earley_visualization<T>::tree_type& tree, std::size_t level, std::wostream& stream)
+{
+    for(std::size_t i = 0; i < level; i++)
+    {
+        stream << "   ";
+    }
+
+    stream << (*(*(*(*tree).item).rule).lhs()[0]).name() << std::endl;
+
+    for(const auto& kid : (*tree).kids)
+    {
+        print_tree(std::dynamic_pointer_cast<earley_parser_type::earley_tree>(kid), level + 1, stream);
+    }
+}
+
+template <typename T>
+void earley_visualization<T>::print_tree(const typename earley_visualization<T>::trees_type& trees, std::wostream& stream)
+{
+    stream << std::endl;
+
+    for(const auto& tree : trees)
+    {
+        print_tree(tree, 0, stream);
+    }
+
+    stream << std::endl;
+}
+
+template <typename T>
+void earley_visualization<T>::decorate_trees(const typename earley_visualization<T>::trees_type& trees, const string_type& dot_file_name)
 {
     // generate Graphviz dot file ...
-trees;//??
-    string_type result;
+    // D:\Soft\graphviz\2.38\release\bin\dot -Tpng d:\tmp\fsa.dot -o d:\tmp\fsa.png
+    for(auto [k, tree] : enumerate(trees))
+    {
+        string_type file_name(dot_file_name + std::to_wstring(k) + L".dot");
 
-    return result;
+        std::wofstream stream;
+
+        try
+        {
+            stream.open(file_name.c_str(), std::ios::out | std::ios::binary);
+
+            if(!stream.is_open() || stream.bad() || stream.fail())
+            {
+                log_error(L"Failed to generate graphviz file %s: stream is either open or in a bad condition.", file_name.c_str());
+            }
+
+            const char_type* indent(get_indent(4));
+indent;//??
+            stream << L"digraph Earley Tree" << std::endl;
+            stream << L"{" << std::endl;
+
+
+            stream << L"}" << std::endl;
+
+            stream.flush();
+            stream.clear();
+            stream.close();
+        }
+        catch(const std::exception& ex)
+        {
+            log_exception(ex, L"Failed to generate graphviz file %s: error occurred.", file_name.c_str());
+        }
+    }
 }
 
 END_NAMESPACE

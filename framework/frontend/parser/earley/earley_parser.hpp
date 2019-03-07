@@ -122,7 +122,6 @@ class earley_parser : public parser<T>
         // the stack to keep elemens of parse tree's level
         struct rhs_stack_element
         {
-            // the element may be item, the list of references or the symbol
             enum class element_type
             {
                 item = 1, // earley item
@@ -130,8 +129,9 @@ class earley_parser : public parser<T>
                 symbol    // terminal
             };
 
-            using data_type = std::variant<item_type, items_type, symbol_type>;
-
+            using data_type = std::variant<item_type,
+                                           items_type,
+                                           symbol_type>;
             data_type data;
             element_type type;
         };
@@ -140,8 +140,8 @@ class earley_parser : public parser<T>
 
         struct parse_tree_element // (Tr = parsing tree, P = papa)
         {
-            tree_type tree;
-	        tree_type node;
+            tree_type tree; // Tr
+	        tree_type node; // P
         };
 
         using parse_tree_elements_type = std::list<parse_tree_element>;
@@ -189,12 +189,12 @@ class earley_parser : public parser<T>
 
     private:
 
-        void                    validate_charts(const chart_type& chart);
+        bool                    validate_charts(const chart_type& chart);
 
         void                    build_charts();
 
         void                    build_parse_trees();
-        void                    build_parse_trees(item_type& item, tree_type& papa, tree_type& tree);
+        void                    build_parse_trees(item_type& item, tree_type& papa, tree_type& tree, trees_type& trees);
 
         void                    build_ast();
 

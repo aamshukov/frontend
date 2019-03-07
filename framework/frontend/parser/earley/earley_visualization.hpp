@@ -36,7 +36,10 @@ class earley_visualization : private noncopyable
         static string_type decorate_chart(const chart_type& chart);
         static string_type decorate_charts(const charts_type& charts);
 
-        static string_type decorate_trees(const trees_type& trees);
+        static void print_tree(const tree_type& tree, std::size_t level, std::wostream& stream);
+        static void print_tree(const trees_type& trees, std::wostream& stream);
+
+        static void decorate_trees(const trees_type& trees, const string_type& dot_file_name);
 };
 
 END_NAMESPACE
