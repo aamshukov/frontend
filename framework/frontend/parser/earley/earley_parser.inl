@@ -347,52 +347,13 @@ void earley_parser<T>::build_charts()
 }
 
 template <typename T>
-void earley_parser<T>::build_parse_trees()
-{
-    log_info(L"Building parse tree(s) ...");
-
-    trees_type trees;
-
-    // the last built chart should have completed items
-    const chart_type& chart(charts().back());
-
-    // collect all completed items kind of [S -> α •, 0, ...] ...
-    for(auto current_item : (*chart).items)
-    {
-        const auto& lhs((*(*current_item).rule).lhs());
-        const auto& rhs((*(*current_item).rule).rhs());
-
-        const auto& lhs_symbol(lhs[0]);
-
-        // ... [S -> α •, 0, ...] and build tree(s)
-        if((*lhs_symbol).id() == (*my_grammar.start_symbol()).id() && (*current_item).dot == rhs.size() && (*(*current_item).origin_chart).id == 0)
-        {
-            tree_type root(factory::create<earley_tree>());
-
-            (*root).item = current_item;
-            (*root).token = (*(*current_item).master_chart).token;
-
-            trees.emplace_back(root);
-
-            mark_item(current_item);
-            build_parse_trees(current_item, root, root, trees);
-            unmark_item(current_item);
-        }
-    }
-
-    my_trees.swap(trees);
-
-    log_info(L"Built parse tree(s).");
-}
-
-template <typename T>
 void earley_parser<T>::populate_rhs_stack(const typename earley_parser<T>::item_type& item,
                                           typename earley_parser<T>::rhs_stack_type& stack)
 {
     // Заполнение магазина ссылками на ситуации текущего уровня.
     for(auto current_item = item; (*current_item).dot > 0; current_item = (*current_item).lptr)
     {
-log_info(earley_visualization<earley_parser<T>>::decorate_item(current_item).c_str()); //??
+        log_info(earley_visualization<earley_parser<T>>::decorate_item(current_item).c_str()); //??
 
         rhs_stack_element element;
 
@@ -423,7 +384,7 @@ log_info(earley_visualization<earley_parser<T>>::decorate_item(current_item).c_s
 }
 
 template <typename T>
-void earley_parser<T>::clone_tree(const typename earley_parser<T>::tree_type& tree, typename earley_parser<T>::tree_type& result)
+void earley_parser<T>::clone_tree(const typename earley_parser<T>::parse_tree_element& original, typename earley_parser<T>::parse_tree_element& result)
 {
     struct queue_entry
     {
@@ -432,14 +393,11 @@ void earley_parser<T>::clone_tree(const typename earley_parser<T>::tree_type& tr
     };
 
     tree_type new_tree(factory::create<earley_tree>());
-
-    (*new_tree).papa = nullptr;
-    (*new_tree).item = (*tree).item;
-    (*new_tree).token = (*tree).token;
+    tree_type new_papa;
 
     std::queue<queue_entry> queue;
 
-    queue.emplace(queue_entry { tree, nullptr });
+    queue.emplace(queue_entry { original.tree, nullptr });
 
     while(!queue.empty())
     {
@@ -447,12 +405,31 @@ void earley_parser<T>::clone_tree(const typename earley_parser<T>::tree_type& tr
 
         queue.pop();
 
-        auto new_node(factory::create<earley_tree>());
+        tree_type new_node;
 
-        (*new_node).papa = entry.new_papa;
-        (*entry.new_papa).kids.emplace_back(new_node);
-        (*new_node).item = (*entry.org_node).item;
-        (*new_node).token = (*entry.org_node).token;
+        if(entry.new_papa == nullptr)
+        {
+            new_node = new_tree;
+
+            (*new_tree).symbol = (*original.tree).symbol;
+            (*new_tree).token = (*original.tree).token;
+            (*new_tree).papa = nullptr;
+        }
+        else
+        {
+            new_node = factory::create<earley_tree>();
+
+            (*new_node).symbol = (*entry.org_node).symbol;
+            (*new_node).token = (*entry.org_node).token;
+            (*new_node).papa = entry.new_papa;
+
+            (*entry.new_papa).kids.emplace_back(new_node);
+        }
+
+        if(entry.org_node == original.papa)
+        {
+            new_papa = new_node;
+        }
 
         for(auto kid : (*entry.org_node).kids)
         {
@@ -460,7 +437,8 @@ void earley_parser<T>::clone_tree(const typename earley_parser<T>::tree_type& tr
         }
     }
 
-    result.swap(new_tree);
+    result.tree.swap(new_tree);
+    result.papa = new_papa;
 }
 
 // BuildTreeLevel([A -> X1...Xm •, i, l, <s>], P, Tr)
@@ -493,17 +471,18 @@ void earley_parser<T>::build_parse_trees(typename earley_parser<T>::item_type& i
             // Если Xk - это терминальный символ ...
             case rhs_stack_element::element_type::symbol:
             {
-                auto current_item(std::get<item_type>(current_rhs_stack_element.data));
-                auto token((*(*current_item).master_chart).token);
+                auto symbol(std::get<symbol_type>(current_rhs_stack_element.data));
+                //auto token((*(*current_item).master_chart).token);
 
                 for(const auto& parse_root : parse_roots) // parse_tree_element = (Tr, P)
                 {
                     auto new_node(factory::create<earley_tree>());
 
-                    (*new_node).papa = parse_root.node;
-                    (*parse_root.node).kids.emplace_back(new_node);
-                    (*new_node).item = current_item;
-                    (*new_node).token = token;
+                    (*new_node).symbol = symbol;
+                    //(*new_node).token = token;
+                    (*new_node).papa = parse_root.papa;
+
+                    (*parse_root.papa).kids.emplace_back(new_node);
                 }
 
                 break;
@@ -512,17 +491,22 @@ void earley_parser<T>::build_parse_trees(typename earley_parser<T>::item_type& i
             case rhs_stack_element::element_type::item:
             {
                 auto current_item(std::get<item_type>(current_rhs_stack_element.data));
+                auto symbol((*(*current_item).rule).lhs()[0]);
 
                 for(const auto& parse_root : parse_roots) // parse_tree_element = (Tr, P)
                 {
                     auto new_node(factory::create<earley_tree>());
 
-                    (*new_node).papa = parse_root.node;
-                    (*parse_root.node).kids.emplace_back(new_node);
-                    (*new_node).item = current_item;
+                    (*new_node).symbol = symbol;
+                    //(*new_node).token = token;
+                    (*new_node).papa = parse_root.papa;
+
+                    (*parse_root.papa).kids.emplace_back(new_node);
 
                     mark_item(current_item);
+
                     build_parse_trees(current_item, new_node, tree, trees);
+
                     unmark_item(current_item);
                 }
 
@@ -537,7 +521,7 @@ void earley_parser<T>::build_parse_trees(typename earley_parser<T>::item_type& i
 
                 const auto& rptr_items(std::get<items_type>(current_rhs_stack_element.data));
 
-                for(const auto& rptr_item : rptr_items)
+                for(auto rptr_item : rptr_items)
                 {
                     if(!is_item_marked(rptr_item))
                     {
@@ -545,11 +529,7 @@ void earley_parser<T>::build_parse_trees(typename earley_parser<T>::item_type& i
 
                         if(handle_first_rptr)
                         {
-                            for(const auto& parse_root : parse_roots) // parse_tree_element = (Tr, P)
-                            {
-                                current_parse_roots.emplace_back(parse_root);
-                            }
-
+                            current_parse_roots = parse_roots;
                             handle_first_rptr = false;
                         }
                         else
@@ -558,28 +538,35 @@ void earley_parser<T>::build_parse_trees(typename earley_parser<T>::item_type& i
                             {
 								parse_tree_element new_parse_root;
 
-                                clone_tree(parse_root.tree, new_parse_root.tree);
+                                clone_tree(parse_root, new_parse_root);
+                                earley_visualization<my_earley_parser>::print_tree(trees_type{ parse_root.tree }, std::wcout); //??
+                                earley_visualization<my_earley_parser>::print_tree(trees_type{ new_parse_root.tree }, std::wcout); //??
 
 								trees.emplace_back(new_parse_root.tree);
+                                earley_visualization<my_earley_parser>::print_tree(trees, std::wcout); //??
 
 								current_parse_roots.push_back(new_parse_root);
 								new_parse_roots.push_back(new_parse_root);
                             }
                         }
 
-                        auto current_item(std::get<item_type>(current_rhs_stack_element.data));
+                        auto symbol((*(*rptr_item).rule).lhs()[0]);
 
                         for(const auto& parse_root : current_parse_roots) // parse_tree_element = (Tr, P)
                         {
                             auto new_node(factory::create<earley_tree>());
 
-                            (*new_node).papa = parse_root.node;
-                            (*parse_root.node).kids.emplace_back(new_node);
-                            (*new_node).item = current_item;
+                            (*new_node).symbol = symbol;
+                            //(*new_node).token = token;
+                            (*new_node).papa = parse_root.papa;
 
-                            mark_item(current_item);
-                            build_parse_trees(current_item, new_node, tree, trees);
-                            unmark_item(current_item);
+                            (*parse_root.papa).kids.emplace_back(new_node);
+
+                            mark_item(rptr_item);
+
+                            build_parse_trees(rptr_item, new_node, tree, trees);
+
+                            unmark_item(rptr_item);
                         }
                     }
                 }
@@ -593,6 +580,54 @@ void earley_parser<T>::build_parse_trees(typename earley_parser<T>::item_type& i
             }
         }
     }
+}
+
+template <typename T>
+void earley_parser<T>::build_parse_trees()
+{
+    log_info(L"Building parse tree(s) ...");
+
+    trees_type trees;
+
+    // the last built chart should have completed items
+    const chart_type& chart(charts().back());
+
+    // collect all completed items kind of [S -> α •, 0, ...] ...
+    for(auto current_item : (*chart).items)
+    {
+        const auto& lhs((*(*current_item).rule).lhs());
+        const auto& rhs((*(*current_item).rule).rhs());
+
+        const auto& lhs_symbol(lhs[0]);
+
+        // ... [S -> α •, 0, l, <s>] and build tree(s)
+        if((*lhs_symbol).id() == (*my_grammar.start_symbol()).id() && (*current_item).dot == rhs.size() && (*(*current_item).origin_chart).id == 0)
+        {
+            // ... для каждой такой ситуации [S -> α •, 0, l, <s>], принадлежащей списку Sn,
+            // создать дерево вывода Tr ...
+            tree_type root(factory::create<earley_tree>());
+
+            // ... добавить в него узел S как корень ...
+            (*root).symbol = my_grammar.start_symbol();
+            (*root).token = (*(*current_item).master_chart).token;
+
+            // ... добавить Tr в список trees
+            trees.emplace_back(root);
+
+            // пометить ситуацию [S -> α •, 0, l, <s>] как обработанную и ...
+            mark_item(current_item);
+            
+            // ... выполнить рекурсивную процедуру ...
+            build_parse_trees(current_item, root, root, trees);
+
+            // ... после чего пометить ситуацию [S -> α •, 0, l, <s>] как необработанную
+            unmark_item(current_item);
+        }
+    }
+
+    my_trees.swap(trees);
+
+    log_info(L"Built parse tree(s).");
 }
 
 template <typename T>
@@ -661,3 +696,4 @@ END_NAMESPACE
 
 //log_info(earley_visualization<earley_parser<T>>::decorate_charts(charts).c_str()); //??
 //earley_visualization<earley_parser<T>>::print_tree(trees, std::wcout); //??
+//earley_visualization<my_earley_parser>::print_tree(trees_type{ tree }, std::wcout); //??

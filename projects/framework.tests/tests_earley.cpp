@@ -236,7 +236,8 @@ void test_earley_parser()
             {
                 std::wcout << earley_visualization<my_earley_parser>::decorate_charts(parser.charts()).c_str() << std::endl;
 
-                earley_visualization<my_earley_parser>::decorate_trees(parser.trees(), L"earley.trees");
+                earley_visualization<my_earley_parser>::print_tree(parser.trees(), std::wcout);
+                earley_visualization<my_earley_parser>::decorate_trees(parser.trees(), LR"(d:\tmp\earley.tree)");
             }
             else
             {
