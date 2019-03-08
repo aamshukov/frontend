@@ -35,6 +35,7 @@ class earley_parser : public parser<T>
 
         enum class flags : uint64_t
         {
+            unknown       = 0x00000000,
             init          = 0x00000001, // .
             scanner       = 0x00000002, //  .
             predictor     = 0x00000004, //   . which action introduced item
@@ -133,6 +134,7 @@ class earley_parser : public parser<T>
                                            items_type,
                                            symbol_type>;
             data_type data;
+            token_type token;
             element_type type;
         };
 
@@ -185,7 +187,7 @@ class earley_parser : public parser<T>
         static void             scan(chart_type& chart, charts_type& charts, const token_type& token, chart_type& result);
 
         static void             populate_rhs_stack(const item_type& item, rhs_stack_type& stack);
-        static void             clone_tree(const parse_tree_element& original, parse_tree_element& result);
+        static void             clone_tree(const parse_tree_element& source, parse_tree_element& result);
 
     private:
 

@@ -178,33 +178,30 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>>
 
 void test_earley_parser()
 {
-    std::vector<string_type> inputs  =
+    struct input_element
     {
-        LR"(D:\Projects\fe\grammars\Earley.G0.txt)",
-        LR"(D:\Projects\fe\grammars\Earley.G1.txt)",
-        LR"(D:\Projects\fe\grammars\Earley.G2.txt)",
-        LR"(D:\Projects\fe\grammars\Earley.G3.AYCOCK.HORSPOOL.txt)",
-        LR"(D:\Projects\fe\grammars\Earley.G4.epsilon.txt)",
-        LR"(D:\Projects\fe\grammars\Earley.G5.cycle.txt)",
+        char_type* file_name;
+        char_type* content;
+        char_type* dot_file_name;
     };
 
-    std::vector<string_type> contents  =
+    std::vector<input_element> inputs =
     {
-        L"n+n",
-        L"n+n",
-        L"a*(a+a)",
-        L"a",
-        L"aa",
-        L"",
+        { LR"(D:\Projects\fe\grammars\Earley.G0.txt)", L"n+n", LR"(d:\tmp\Earley.G0)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G1.txt)", L"n+n", LR"(d:\tmp\Earley.G1)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G2.txt)", L"a*(a+a)", LR"(d:\tmp\Earley.G2)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G3.AYCOCK.HORSPOOL.txt)", L"a", LR"(d:\tmp\G3.AYCOCK.HORSPOOL)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G4.epsilon.txt)", L"aa", LR"(d:\tmp\G4.epsilon)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G5.cycle.txt)", L"", LR"(d:\tmp\Earley.G5.cycle)" }
     };
 
     uint8_t k = 1;
 
-    for(const auto& [i, input] : enumerate(inputs))
+    for(const auto& input : inputs)
     {
         grammar gr;
 
-        gr.load(input);
+        gr.load(input.file_name);
 
         std::wcout << grammar_visualization::decorate_grammar(gr) << std::endl;
 
@@ -218,7 +215,7 @@ void test_earley_parser()
 
         content_type content(factory::create<content>());
 
-        string_data_provider provider(contents[i]);
+        string_data_provider provider(input.content);
 
         operation_status status; //??
 
@@ -237,11 +234,11 @@ void test_earley_parser()
                 std::wcout << earley_visualization<my_earley_parser>::decorate_charts(parser.charts()).c_str() << std::endl;
 
                 earley_visualization<my_earley_parser>::print_tree(parser.trees(), std::wcout);
-                earley_visualization<my_earley_parser>::decorate_trees(parser.trees(), LR"(d:\tmp\earley.tree)");
+                earley_visualization<my_earley_parser>::decorate_trees(parser.trees(), input.dot_file_name);
             }
             else
             {
-                std::wcout << L"Failed to parse '" << input.c_str() << L"'" << std::endl;
+                std::wcout << L"Failed to parse '" << input.file_name << L"'" << std::endl;
             }
         }
     }

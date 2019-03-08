@@ -191,7 +191,10 @@ void earley_visualization<T>::print_tree(const typename earley_visualization<T>:
         stream << "    ";
     }
 
-    stream << (*(*tree).symbol).name() << std::endl;
+    if(static_cast<uint32_t>((*tree).token.type) != 0)
+        stream << (*(*tree).symbol).name() << L":" << static_cast<uint32_t>((*tree).token.type) << std::endl;
+    else
+        stream << (*(*tree).symbol).name() << std::endl;
 
     for(const auto& kid : (*tree).kids)
     {
@@ -216,42 +219,68 @@ void earley_visualization<T>::print_tree(const typename earley_visualization<T>:
 }
 
 template <typename T>
-void earley_visualization<T>::collect_dot_labels(const typename earley_visualization<T>::tree_type& tree, std::size_t k, std::wostream& stream)
+void earley_visualization<T>::collect_dot_labels(const typename earley_visualization<T>::tree_type& tree, std::wostream& stream)
 {
-    stream << L"    " << k << L"[label=\"" << (*(*tree).symbol).name() << L"];" << std::endl;
+    std::size_t k = 1;
 
-    for(const auto& kid : (*tree).kids)
+    std::queue<tree_type> queue;
+
+    queue.emplace(tree);
+
+    while(!queue.empty())
     {
-        collect_dot_labels(std::dynamic_pointer_cast<earley_parser_type::earley_tree>(kid), k + 1, stream);
+        auto entry(queue.front());
+
+        queue.pop();
+
+        stream << L"    " << k++ << L" [label=\"" << (*(*entry).symbol).name() << L"\"];" << std::endl;
+
+        for(auto kid : (*entry).kids)
+        {
+            queue.emplace(std::dynamic_pointer_cast<earley_tree>(kid));
+        }
     }
+
+    stream << std::endl;
 }
 
 template <typename T>
-void earley_visualization<T>::decorate_tree(const typename earley_visualization<T>::tree_type& tree, std::wostream& stream)
+void earley_visualization<T>::build_dot_graph(const typename earley_visualization<T>::tree_type& tree, std::wostream& stream)
 {
-    stream << (*(*tree).symbol).name();
-
-    if(!(*tree).kids.empty())
+    struct queue_entry
     {
-        stream << L" -> ";
-    }
+        tree_type node;
+        std::size_t papa;
+    };
 
-    for(const auto& kid : (*tree).kids)
+    std::size_t k = 1;
+
+    std::queue<queue_entry> queue;
+
+    queue.emplace(queue_entry{ tree, k });
+
+    while(!queue.empty())
     {
-        decorate_tree(std::dynamic_pointer_cast<earley_parser_type::earley_tree>(kid), stream);
-    }
+        auto entry(queue.front());
 
-    stream << L";" << std::endl;
+        queue.pop();
+
+        for(auto kid : (*entry.node).kids)
+        {
+            stream << L"    " << entry.papa << L" -> " << ++k << L";" << std::endl;
+            queue.emplace(queue_entry{ std::dynamic_pointer_cast<earley_tree>(kid), k });
+        }
+    }
 }
 
 template <typename T>
 void earley_visualization<T>::decorate_trees(const typename earley_visualization<T>::trees_type& trees, const string_type& dot_file_name)
 {
     // generate Graphviz dot file ...
-    // for %i in (d:\tmp\earley.tree*.dot) do D:\Soft\graphviz\2.38\release\bin\dot -Tpng %i -o %i.png
+    // for %i in (d:\tmp\*etree.dot) do D:\Soft\graphviz\2.38\release\bin\dot -Tpng %i -o %i.png
     for(auto [k, tree] : enumerate(trees))
     {
-        string_type file_name(dot_file_name + std::to_wstring(k) + L".dot");
+        string_type file_name(dot_file_name + std::to_wstring(k) + L".etree.dot");
 
         std::wofstream stream;
 
@@ -267,8 +296,8 @@ void earley_visualization<T>::decorate_trees(const typename earley_visualization
             stream << L"digraph EarleyTree" << std::endl;
             stream << L"{" << std::endl;
 
-            collect_dot_labels(tree, 1, stream);
-            decorate_tree(tree, stream);
+            collect_dot_labels(tree, stream);
+            build_dot_graph(tree, stream);
 
             stream << L"}" << std::endl;
 

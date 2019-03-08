@@ -28,11 +28,13 @@ class earley_visualization : private noncopyable
         using chart_type = typename earley_parser_type::chart_type;
         using charts_type = typename earley_parser_type::charts_type;
 
+        using earley_tree = typename earley_parser_type::earley_tree;
         using tree_type = typename earley_parser_type::tree_type;
         using trees_type = typename earley_parser_type::trees_type;
 
     private:
-        static void collect_dot_labels(const tree_type& tree, std::size_t k, std::wostream& stream);
+        static void collect_dot_labels(const tree_type& tree, std::wostream& stream);
+        static void build_dot_graph(const tree_type& tree, std::wostream& stream);
 
     public:
         static string_type decorate_item(const item_type& item, bool recursive = true);
@@ -42,7 +44,6 @@ class earley_visualization : private noncopyable
         static void print_tree(const tree_type& tree, std::size_t level, std::wostream& stream);
         static void print_tree(const trees_type& trees, std::wostream& stream);
 
-        static void decorate_tree(const tree_type& tree, std::wostream& stream);
         static void decorate_trees(const trees_type& trees, const string_type& dot_file_name);
 };
 
