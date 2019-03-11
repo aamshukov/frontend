@@ -149,29 +149,34 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>>
 
         tree_type handle_start(const item_type& item) override
         {
-            item;//??
-            tree_type result;
+            auto result(factory::create<earley_tree>());
+            (*result).symbol = ((*(*item).rule).lhs()[0]);
             return result;
         }
 
-        tree_type handle_terminal(const token_type& token, const tree_type& node) override
+        tree_type handle_terminal(const symbol_type& symbol, const token_type& token, const tree_type& node) override
         {
-            token, node;//??
-            tree_type result;
+            auto result(factory::create<earley_tree>());
+            (*result).symbol = symbol;
+            (*result).token = token;
+            (*result).papa = node;
+            (*node).kids.emplace_back(result);
             return result;
         }
 
-        tree_type handle_before_terminal(const item_type& item, const tree_type& node) override
+        tree_type handle_before_nonterminal(const item_type& item, const tree_type& node, bool) override
         {
-            item, node;//??
-            tree_type result;
+            auto result(factory::create<earley_tree>());
+            (*result).symbol = ((*(*item).rule).lhs()[0]);
+            (*result).papa = node;
+            (*node).kids.emplace_back(result);
             return result;
         }
 
-        tree_type handle_after_terminal(const item_type& item, const tree_type& node) override
+        tree_type handle_after_nonterminal(const item_type& item, const tree_type& node, bool) override
         {
-            item, node;//??
-            tree_type result;
+            item;
+            tree_type result(node);
             return result;
         }
 };
@@ -226,6 +231,7 @@ void test_earley_parser()
             auto lexical_analyzer(factory::create<earley_lexical_analyzer>(gr, content));
 
             my_earley_parser parser(lexical_analyzer, gr, my_earley_parser::eparser_type::tree_kind::build_trees);
+            //my_earley_parser parser(lexical_analyzer, gr, my_earley_parser::eparser_type::tree_kind::build_ast);
 
             parser.parse();
 

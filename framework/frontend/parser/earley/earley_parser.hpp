@@ -159,10 +159,10 @@ class earley_parser : public parser<T>
     protected:
         virtual tree_type       handle_start(const item_type& item) = 0;
 
-        virtual tree_type       handle_terminal(const token_type& token, const tree_type& node) = 0;
+        virtual tree_type       handle_terminal(const symbol_type& symbol, const token_type& token, const tree_type& node) = 0;
 
-        virtual tree_type       handle_before_terminal(const item_type& item, const tree_type& node) = 0;
-        virtual tree_type       handle_after_terminal(const item_type& item, const tree_type& node) = 0;
+        virtual tree_type       handle_before_nonterminal(const item_type& item, const tree_type& node, bool ambiguous) = 0;
+        virtual tree_type       handle_after_nonterminal(const item_type& item, const tree_type& node, bool ambiguous) = 0;
 
     private:
         static item_type        create_item(const rule_type& rule,            // production (rule)
@@ -199,6 +199,7 @@ class earley_parser : public parser<T>
         void                    build_parse_trees(item_type& item, tree_type& papa, tree_type& tree, trees_type& trees);
 
         void                    build_ast();
+        void                    build_ast_tree(item_type& item, tree_type& papa, tree_type& tree, trees_type& trees);
 
     public:
                                 earley_parser(const lexical_analyzer_type& lexical_analyzer, grammar& gr, tree_kind kind);
