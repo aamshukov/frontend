@@ -4,6 +4,7 @@
 #include <core\pch.hpp>
 #include <core\noncopyable.hpp>
 #include <core\status.hpp>
+#include <core\enumerate.hpp>
 #include <core\unicode.hpp>
 #include <core\text.hpp>
 #include <core\domain_helper.hpp>
@@ -12,6 +13,7 @@
 #include <core\data_provider.hpp>
 #include <core\factory.hpp>
 #include <core\content.hpp>
+#include <core\tree.hpp>
 
 #include <frontend\fsa\fsa_transition.hpp>
 #include <frontend\fsa\fsa_state.hpp>
@@ -85,7 +87,7 @@ bool fsa_re::re_to_fsa(const std::shared_ptr<typename fsa_re::datum_type[]>& re,
                         break;
                 }
 
-                *p_src++;
+                p_src++;
             }
 
             if(result)
@@ -121,6 +123,68 @@ bool fsa_re::re_to_fsa(const std::shared_ptr<typename fsa_re::datum_type[]>& re,
     }
 
     log_info(L"Generated FSA from RE.");
+
+    return result;
+}
+
+bool fsa_re::re_to_dfa(const string_type& re,
+                       typename fsa_re::token_type token,
+                       typename fsa_re::token_type escape_token,
+                       const string_type& escape_predicate,
+                       typename fsa_re::fsa_type& result_fsa,
+                       operation_status& status)
+{
+token, escape_token, escape_predicate, result_fsa; //??
+
+    log_info(L"Generating DFA from RE, direct method ...");
+
+    std::shared_ptr<fsa_re::datum_type[]> re_data;
+
+    size_type count = 0;
+
+    bool result = text::string_to_codepoints(re + L"#", re_data, count, status);
+
+    if(result)
+    {
+        try
+        {
+            std::shared_ptr<datum_type[]> processed_re;
+
+            size_type new_count = preprocess(re_data, count, processed_re);
+
+            std::shared_ptr<datum_type[]> postfix_re;
+
+            if(infix_to_postfix(processed_re, new_count, postfix_re, status))
+            {
+                std::size_t terminals;
+
+                tree_type tree(postfix_to_tree(postfix_re, terminals));
+
+                print_fsa_tree(tree, std::wcout); //??
+
+                calculate_nullable(tree);
+                print_fsa_tree(tree, std::wcout); //??
+
+                calculate_first_position(tree);
+                print_fsa_tree(tree, std::wcout); //??
+                calculate_last_position(tree);
+                print_fsa_tree(tree, std::wcout); //??
+
+                followpos_type followpos(terminals);
+
+                calculate_follow_position(tree, followpos); //??
+
+                print_fsa_followpos(followpos, std::wcout);
+
+            }
+        }
+        catch(const std::exception& ex)
+        {
+            OPERATION_FAILED_EX(ex, status::custom_code::error, L"Generating FSA from RE: error occurred.")
+        }
+    }
+
+    log_info(L"Generated DFA from RE, direct method.");
 
     return result;
 }
@@ -362,6 +426,97 @@ bool fsa_re::infix_to_postfix(const std::shared_ptr<typename fsa_re::datum_type[
 error: ;
 
     log_info(L"Converted infix RE to postfix notation.");
+
+    return result;
+}
+
+typename fsa_re::tree_type fsa_re::postfix_to_tree(const std::shared_ptr<typename fsa_re::datum_type[]>& postfix_re, std::size_t& terminals)
+{
+    terminals = 0;
+
+    tree_type result;
+
+    std::stack<tree_type> nodes;
+
+    const datum_type* p_src(postfix_re.get());
+
+    std::size_t index = 0;
+
+    while(*p_src)
+    {
+        switch(*p_src)
+        {
+            case ALTERNATE_OP:
+            case CONCATENATE_OP:
+            case ZERO_OR_MORE_OP:   // always one kid
+            case ONE_OR_MORE_OP:    // always one kid
+            case ZERO_OR_ONE_OP:    // always one kid
+            {
+                tree_type right_operand;
+                tree_type left_operand;
+
+                if(!nodes.empty())
+                {
+                    right_operand = nodes.top();
+                    nodes.pop();
+                }
+
+                if(!nodes.empty())
+                {
+                    left_operand = nodes.top();
+                    nodes.pop();
+                }
+
+                auto node(factory::create<fsa_tree>());
+
+                (*node).symbol = *p_src;
+                (*node).index = 0;
+                (*node).nullable = false;
+
+                if(left_operand != nullptr)
+                {
+                    (*node).kids.emplace_back(left_operand);
+                    (*left_operand).papa = node;
+                }
+
+                if(right_operand != nullptr)
+                {
+                    (*node).kids.emplace_back(right_operand);
+                    (*right_operand).papa = node;
+                }
+
+                nodes.push(node);
+
+                break;
+            }
+            default:
+            {
+                auto node(factory::create<fsa_tree>());
+
+                (*node).symbol = *p_src;
+                (*node).nullable = false;
+
+                if(*p_src != text::epsilon_codepoint())
+                    (*node).index = ++index;
+
+                nodes.push(node);
+
+                terminals++;
+
+                break;
+            }
+        }
+
+        p_src++;
+    }
+
+    if(!nodes.empty())
+    {
+        auto root(nodes.top());
+        result.swap(root);
+    }
+
+    terminals++; // etra increment to keep numbering from 1
 
     return result;
 }
@@ -809,6 +964,364 @@ void fsa_re::add_escape_state(typename fsa_re::fsa_type& fsa0,
 
         (*fsa0).add_transition(escape_state, escape_state, escape_predicate, status);
         (*fsa0).add_final_state(escape_state, status);
+    }
+}
+
+void fsa_re::calculate_nullable(typename fsa_re::tree_type& tree)
+{
+    for(const auto& kid : (*tree).kids)
+    {
+        auto kid_tree(std::dynamic_pointer_cast<fsa_tree>(kid));
+        calculate_nullable(kid_tree);
+    }
+
+    switch((*tree).symbol)
+    {
+        case ALTERNATE_OP:
+        case CONCATENATE_OP:
+        {
+            tree_type left_operand;
+            tree_type right_operand;
+
+            bool left_operand_nullable = false;
+            bool right_operand_nullable = false;
+
+            if((*tree).kids.size() > 0)
+            {
+                left_operand = std::dynamic_pointer_cast<fsa_tree>((*tree).kids[0]);
+                left_operand_nullable = (*left_operand).nullable;
+            }
+
+            if((*tree).kids.size() > 1)
+            {
+                right_operand = std::dynamic_pointer_cast<fsa_tree>((*tree).kids[1]);
+                right_operand_nullable = (*right_operand).nullable;
+            }
+
+            if((*tree).symbol == ALTERNATE_OP)
+            {
+                (*tree).nullable = left_operand_nullable || right_operand_nullable;
+            }
+            else // CONCATENATE_OP
+            {
+                (*tree).nullable = left_operand_nullable && right_operand_nullable;
+            }
+
+            break;
+        }
+        case ONE_OR_MORE_OP:
+            (*tree).nullable = false;
+            break;
+        case ZERO_OR_MORE_OP:
+        case ZERO_OR_ONE_OP:
+            (*tree).nullable = true;
+            break;
+        default:
+            if((*tree).symbol == text::epsilon_codepoint())
+            {
+                (*tree).nullable = true;
+            }
+            else
+            {
+                (*tree).nullable = false;
+            }
+
+            break;
+    }
+}
+
+void fsa_re::calculate_first_position(typename fsa_re::tree_type& tree)
+{
+    for(const auto& kid : (*tree).kids)
+    {
+        auto kid_tree(std::dynamic_pointer_cast<fsa_tree>(kid));
+        calculate_first_position(kid_tree);
+    }
+
+    switch((*tree).symbol)
+    {
+        case ALTERNATE_OP:
+            if((*tree).kids.size() > 0)
+            {
+                const auto& firstpos((*std::dynamic_pointer_cast<fsa_tree>((*tree).kids[0])).firstpos);
+                std::for_each(firstpos.begin(), firstpos.end(), [&tree](std::size_t index){ (*tree).firstpos.emplace_back(index); });
+            }
+
+            if((*tree).kids.size() > 1)
+            {
+                const auto& firstpos((*std::dynamic_pointer_cast<fsa_tree>((*tree).kids[1])).firstpos);
+                std::for_each(firstpos.begin(), firstpos.end(), [&tree](std::size_t index){ (*tree).firstpos.emplace_back(index); });
+            }
+
+            make_vector_unique((*tree).firstpos);
+
+            break;
+        case CONCATENATE_OP:
+        {
+            tree_type left_operand;
+
+            if((*tree).kids.size() > 0)
+            {
+                left_operand = std::dynamic_pointer_cast<fsa_tree>((*tree).kids[0]);
+
+                const auto& firstpos((*left_operand).firstpos);
+
+                std::for_each(firstpos.begin(), firstpos.end(), [&tree](std::size_t index){ (*tree).firstpos.emplace_back(index); });
+            }
+
+            if(left_operand != nullptr && (*left_operand).nullable)
+            {
+                if((*tree).kids.size() > 1)
+                {
+                    const auto& firstpos((*std::dynamic_pointer_cast<fsa_tree>((*tree).kids[1])).firstpos);
+                    std::for_each(firstpos.begin(), firstpos.end(), [&tree](std::size_t index){ (*tree).firstpos.emplace_back(index); });
+                }
+            }
+
+            make_vector_unique((*tree).firstpos);
+
+            break;
+        }
+        case ONE_OR_MORE_OP:
+        case ZERO_OR_MORE_OP:
+        case ZERO_OR_ONE_OP:
+            if((*tree).kids.size() > 0)
+            {
+                (*tree).firstpos = (*std::dynamic_pointer_cast<fsa_tree>((*tree).kids[0])).firstpos;
+            }
+
+            make_vector_unique((*tree).firstpos);
+
+            break;
+        default:
+            if((*tree).symbol != text::epsilon_codepoint())
+            {
+                (*tree).firstpos.emplace_back((*tree).index);
+            }
+
+            break;
+    }
+}
+
+void fsa_re::calculate_last_position(typename fsa_re::tree_type& tree)
+{
+    for(const auto& kid : (*tree).kids)
+    {
+        auto kid_tree(std::dynamic_pointer_cast<fsa_tree>(kid));
+        calculate_last_position(kid_tree);
+    }
+
+    switch((*tree).symbol)
+    {
+        case ALTERNATE_OP:
+            if((*tree).kids.size() > 0)
+            {
+                const auto& lastpos((*std::dynamic_pointer_cast<fsa_tree>((*tree).kids[0])).lastpos);
+                std::for_each(lastpos.begin(), lastpos.end(), [&tree](std::size_t index){ (*tree).lastpos.emplace_back(index); });
+            }
+
+            if((*tree).kids.size() > 1)
+            {
+                const auto& lastpos((*std::dynamic_pointer_cast<fsa_tree>((*tree).kids[1])).lastpos);
+                std::for_each(lastpos.begin(), lastpos.end(), [&tree](std::size_t index){ (*tree).lastpos.emplace_back(index); });
+            }
+
+            make_vector_unique((*tree).lastpos);
+
+            break;
+        case CONCATENATE_OP:
+        {
+            tree_type right_operand;
+
+            if((*tree).kids.size() > 1)
+            {
+                right_operand = std::dynamic_pointer_cast<fsa_tree>((*tree).kids[1]);
+
+                const auto& lastpos((*right_operand).lastpos);
+
+                std::for_each(lastpos.begin(), lastpos.end(), [&tree](std::size_t index){ (*tree).lastpos.emplace_back(index); });
+            }
+
+            if(right_operand != nullptr && (*right_operand).nullable)
+            {
+                const auto& lastpos((*std::dynamic_pointer_cast<fsa_tree>((*tree).kids[0])).lastpos);
+                std::for_each(lastpos.begin(), lastpos.end(), [&tree](std::size_t index){ (*tree).lastpos.emplace_back(index); });
+            }
+
+            make_vector_unique((*tree).lastpos);
+
+            break;
+        }
+        case ONE_OR_MORE_OP:
+        case ZERO_OR_MORE_OP:
+        case ZERO_OR_ONE_OP:
+            if((*tree).kids.size() > 0)
+            {
+                (*tree).lastpos = (*std::dynamic_pointer_cast<fsa_tree>((*tree).kids[0])).lastpos;
+            }
+
+            make_vector_unique((*tree).lastpos);
+
+            break;
+        default:
+            if((*tree).symbol != text::epsilon_codepoint())
+            {
+                (*tree).lastpos.emplace_back((*tree).index);
+            }
+
+            break;
+    }
+}
+
+void fsa_re::calculate_follow_position(const typename fsa_re::tree_type& node, typename fsa_re::followpos_type& followpos)
+{
+    switch((*node).symbol)
+    {
+        case CONCATENATE_OP:
+        {
+            tree_type left_operand;
+            tree_type right_operand;
+
+            if((*node).kids.size() > 0)
+            {
+                left_operand = std::dynamic_pointer_cast<fsa_tree>((*node).kids[0]);
+            }
+
+            if((*node).kids.size() > 1)
+            {
+                right_operand = std::dynamic_pointer_cast<fsa_tree>((*node).kids[1]);
+            }
+
+            if(left_operand != nullptr && right_operand != nullptr)
+            {
+                for(auto i : (*left_operand).lastpos)
+                {
+                    const auto& firstpos((*right_operand).firstpos);
+
+                    std::for_each(firstpos.begin(), firstpos.end(), [&followpos, i](std::size_t index){ followpos[i].emplace_back(index); });
+
+                    make_vector_unique(followpos[i]);
+                }
+            }
+
+            for(const auto& kid : (*node).kids)
+            {
+                auto kid_tree(std::dynamic_pointer_cast<fsa_tree>(kid));
+                calculate_follow_position(kid_tree, followpos);
+            }
+
+            break;
+        }
+        case ONE_OR_MORE_OP:
+        case ZERO_OR_MORE_OP:
+        case ZERO_OR_ONE_OP:
+        {
+            tree_type left_operand;
+
+            if((*node).kids.size() > 0)
+            {
+                left_operand = std::dynamic_pointer_cast<fsa_tree>((*node).kids[0]);
+
+                for(auto i : (*left_operand).lastpos)
+                {
+                    const auto& firstpos((*left_operand).firstpos);
+
+                    std::for_each(firstpos.begin(), firstpos.end(), [&followpos, i](std::size_t index){ followpos[i].emplace_back(index); });
+
+                    make_vector_unique(followpos[i]);
+                }
+            }
+
+            for(const auto& kid : (*node).kids)
+            {
+                auto kid_tree(std::dynamic_pointer_cast<fsa_tree>(kid));
+                calculate_follow_position(kid_tree, followpos);
+            }
+
+            break;
+        }
+    }
+}
+
+void fsa_re::make_vector_unique(std::vector<std::size_t>& sequence)
+{
+    std::sort(sequence.begin(), sequence.end(), std::less<std::size_t>());
+    sequence.erase(std::unique(sequence.begin(), sequence.end() ), sequence.end());
+}
+
+void fsa_re::print_fsa_tree(const typename fsa_re::tree_type& tree, std::size_t level, std::wostream& stream)
+{
+    for(std::size_t i = 0; i < level; i++)
+    {
+        stream << "    ";
+    }
+
+    string_type symb;
+
+    switch((*tree).symbol)
+    {
+        case OPEN_PAREN_OP:
+            symb = L'(';
+            break;
+        case CLOSE_PAREN_OP:
+            symb = L')';
+            break;
+        case CONCATENATE_OP:
+            symb = L'.';
+            break;
+        case ALTERNATE_OP:
+            symb = L'|';
+            break;
+        case ZERO_OR_MORE_OP:
+            symb = L'*';
+            break;
+        case ONE_OR_MORE_OP:
+            symb = L'+';
+            break;
+        case ZERO_OR_ONE_OP:
+            symb = L'?';
+            break;
+        default:
+            symb = text::codepoint_to_string((*tree).symbol) + L':' + std::to_wstring((*tree).index);
+    }
+
+    string_type firstpos;
+    string_type lastpos;
+
+    std::for_each((*tree).firstpos.begin(), (*tree).firstpos.end(), [&firstpos](std::size_t pos){ firstpos += std::to_wstring(pos) + L' '; });
+    std::for_each((*tree).lastpos.begin(), (*tree).lastpos.end(), [&lastpos](std::size_t pos){ lastpos += std::to_wstring(pos) + L' '; });
+
+    stream << L"{ " << firstpos.c_str() << L"} " << symb.c_str() << L" { " << lastpos.c_str() << L"}";
+
+    if((*tree).nullable)
+        stream << L" nullable";
+
+    stream << std::endl;
+
+    for(const auto& kid : (*tree).kids)
+    {
+        print_fsa_tree(std::dynamic_pointer_cast<fsa_tree>(kid), level + 1, stream);
+    }
+}
+
+void fsa_re::print_fsa_tree(const typename fsa_re::tree_type& tree, std::wostream& stream)
+{
+    print_fsa_tree(tree, 0, stream);
+    stream << std::endl;
+}
+
+void fsa_re::print_fsa_followpos(const typename fsa_re::followpos_type& followpos, std::wostream& stream)
+{
+    for(auto [k, fp] : enumerate(followpos))
+    {
+        if(k == 0)
+            continue; // starting from 1
+
+        string_type fps;
+
+        std::for_each(fp.begin(), fp.end(), [&fps](std::size_t pos){ fps += std::to_wstring(pos) + L' '; });
+
+        stream << k << L": { " << fps << L"} " << std::endl;
     }
 }
 

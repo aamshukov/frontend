@@ -8,6 +8,8 @@
 #include <core\domain_helper.hpp>
 #include <core\logger.hpp>
 #include <core\counter.hpp>
+#include <core\enumerate.hpp>
+#include <core\tree.hpp>
 
 #include <frontend\fsa\fsa_transition.hpp>
 #include <frontend\fsa\fsa_state.hpp>

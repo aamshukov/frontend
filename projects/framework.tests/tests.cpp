@@ -247,6 +247,8 @@ void test_sets();
 
 void test_earley_parser();
 
+void test_re_dfa();
+
 extern "C" double CombineA(int a, int b, int c, int d, int e, double f);
 extern "C" void _start();
 
@@ -275,6 +277,8 @@ int main()
     operation_status status;
 
     logger::instance().initialize(LR"(d:\tmp\fe.log)", status);
+
+    test_re_dfa();
 
     test_earley_parser();
 
@@ -450,6 +454,8 @@ int main()
         //OPERATION_FAILED_EX(ex, status::custom_code::error, L"Adding final FSA state: error occurred.")
 
         //string_type fmt(format(L"Test %d %s.dot", 5, L"kuku"));
+
+        test_re_dfa();
 
         test_java_literals();
         test_java_identifiers_and_keywords();
@@ -3742,6 +3748,59 @@ void test_sets()
         lr_algorithm::lr_action_table_type action_table;
 
         lr_algorithm::build_lr_table(gr, k, goto_table, action_table);
+    }
+}
+
+void test_re_dfa()
+{
+    USINGNAMESPACE(core)
+    USINGNAMESPACE(frontend)
+
+    string_type res[] =
+    {
+        L"(a|b)*abb",
+
+        L"a+",
+
+        L"(a|b)*a(a|b)(a|b)", // aho, ullman
+        L"(a|b)*abb", // aho, ullman
+
+        L"(a|b)*(abb|a+b)",
+        L"(0|10*1)*",
+        L"a\\.",
+        L"a\\.(b\\.b)+\\.a",
+        L"a\\.b|c",
+        L"a\\.b+\\.c",
+        //L"\t\r\n\f\\(\\)\\?\\*\\|\\.\\+a(bb)+a",
+        L"a((bb))*a",
+        L"a*",
+        L"(a|b)*abb",
+        L"(a|b)*ba",
+        L"ab|a*",
+        L"a*(a|b)ba*|a*",
+        L"((ab)|c)*",
+        //L"జ్ఞ‌ా*",
+        L"a+(\\.a+)*@a+(\\.a+)+",
+        L"(ab+(b+aa)(ba)*(a+bb))*",
+        L"\\ban?\\b",
+        L"\\b|(a(T|n)?)|\\b",
+        L"\\b|(a(T|n)?)|\\b",
+        L"((c|a)b*)*",
+        L"(a(b|c))*a",
+    };
+
+    uint16_t k = 0;
+
+    operation_status status;
+
+    for(const auto& re : res)
+    {
+        fsa::fsa_type dfa;
+
+        if(fsa_re::re_to_dfa(re, 0, 0, empty_string(), dfa, status))
+        {
+            fsa_visualization::generate_graphviz_file(dfa, format(LR"(d:\tmp\FSA\dfa_%d.dot)", ++k));
+        }
     }
 }
 

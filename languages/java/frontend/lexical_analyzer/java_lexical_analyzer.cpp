@@ -16,6 +16,7 @@
 #include <core\counter.hpp>
 #include <core\enum.hpp>
 #include <core\flags.hpp>
+#include <core\tree.hpp>
 
 #include <frontend\grammar\token.hpp>
 

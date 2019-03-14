@@ -12,15 +12,30 @@ USINGNAMESPACE(core)
 #define IDENTIFIER_START (L"S") // should not be a part of any set of chars - keywords or any special symbols in language
 #define IDENTIFIER_PART  (L"Q") // should not be a part of any set of chars - keywords or any special symbols in language
 
-
 class fsa_re : private noncopyable
 {
     public:
-        using datum_type = content::datum_type;
-
+        using datum_type = text::datum_type;
         using token_type = fsa::token_type;
-        
+
         using fsa_type = fsa::fsa_type;
+
+    public:
+        struct fsa_tree : public tree
+        {
+            datum_type symbol;
+
+            std::size_t index;
+
+            std::vector<std::size_t> firstpos;
+            std::vector<std::size_t> lastpos;
+
+            bool nullable;
+        };
+
+        using tree_type = std::shared_ptr<fsa_tree>;
+
+        using followpos_type = std::vector<std::vector<std::size_t>>;
 
     private:
         static datum_type   get_codepoint(const datum_type*& p_src);
@@ -28,8 +43,15 @@ class fsa_re : private noncopyable
 
         static bool         is_literal(datum_type ch);
 
-        static size_type    preprocess(const std::shared_ptr<datum_type[]>& infix_re, size_type count, std::shared_ptr<datum_type[]>& processed_re);
-        static bool         infix_to_postfix(const std::shared_ptr<datum_type[]>& infix_re, size_type count, std::shared_ptr<datum_type[]>& postfix_refsa, operation_status& status);
+        static size_type    preprocess(const std::shared_ptr<datum_type[]>& infix_re,
+                                       size_type count,
+                                       std::shared_ptr<datum_type[]>& processed_re);
+
+        static bool         infix_to_postfix(const std::shared_ptr<datum_type[]>& infix_re,
+                                             size_type count,
+                                             std::shared_ptr<datum_type[]>& postfix_refsa,
+                                             operation_status& status);
+        static tree_type    postfix_to_tree(const std::shared_ptr<datum_type[]>& postfix_re, std::size_t& terminals);
 
         static bool         process_combine(std::stack<fsa::fsa_type>& fragments, operation_status& status);
         static bool         process_concatenate(std::stack<fsa::fsa_type>& fragments, operation_status& status);
@@ -38,12 +60,33 @@ class fsa_re : private noncopyable
         static bool         process_zero_or_one(std::stack<fsa::fsa_type>& fragments, operation_status& status);
         static bool         process_literal(const datum_type*& p_src, std::stack<fsa::fsa_type>& fragments, operation_status& status);
 
-        static void         adjust_predicates(typename fsa_re::fsa_type& fsa0);
-        static void         add_escape_state(typename fsa_re::fsa_type& fsa0, token_type escape_token, const string_type& escape_predicate);
+        static void         adjust_predicates(fsa_type& fsa0);
+        static void         add_escape_state(fsa_type& fsa0, token_type escape_token, const string_type& escape_predicate);
+
+        static void         calculate_nullable(tree_type& tree);
+
+        static void         calculate_first_position(tree_type& tree);
+        static void         calculate_last_position(tree_type& tree);
+
+        static void         calculate_follow_position(const tree_type& node, followpos_type& result);
+
+        static void         make_vector_unique(std::vector<std::size_t>& sequence);
+
+
+        static void         print_fsa_tree(const tree_type& tree, std::size_t level, std::wostream& stream);
+        static void         print_fsa_tree(const tree_type& tree, std::wostream& stream);
+
+        static void         print_fsa_followpos(const followpos_type& followpos, std::wostream& stream);
 
     public:
         static bool         re_to_fsa(const std::shared_ptr<datum_type[]>& re,
                                       size_type count,
+                                      token_type token,
+                                      token_type escape_token,
+                                      const string_type& escape_predicate,
+                                      fsa_type& result_fsa,
+                                      operation_status& status);
+        static bool         re_to_dfa(const string_type& re,
                                       token_type token,
                                       token_type escape_token,
                                       const string_type& escape_predicate,
