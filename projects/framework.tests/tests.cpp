@@ -259,6 +259,9 @@ int main()
 
     std::cout << "CombineA: " << CombineA(1,2,3,4, 5, 6.1) << std::endl;
 
+    std::string qstr("Quick+brown+fox");
+    std::replace(qstr.begin(), qstr.end(), '+', ' ');
+
     auto id = static_cast<uint32_t>(-1);
     std::int32_t id0 = static_cast<int32_t>(id);
     id0;
@@ -278,19 +281,20 @@ int main()
 
     logger::instance().initialize(LR"(d:\tmp\fe.log)", status);
 
+    //test_re_to_nfa_to_dfa();
     test_re_dfa();
 
-    test_earley_parser();
+    //test_earley_parser();
 
-    test_sets();
+    //test_sets();
 
-    test_lr_table();
-    test_eff();
-    test_recursive_descent_0();
+    //test_lr_table();
+    //test_eff();
+    //test_recursive_descent_0();
 
-    test_operator_precedence();
+    //test_operator_precedence();
 
-    test_algo_directory();
+    //test_algo_directory();
 
     //test_make_unique();
     //test_cartesian_product();
@@ -327,8 +331,14 @@ int main()
     mm.emplace(std::multimap<int, string_type>::value_type(2, L"dva"));
     mm.emplace(std::multimap<int, string_type>::value_type(2, L"DVA"));
 
+    auto key_range = mm.equal_range(1);
+    for(auto kr_it = key_range.first; kr_it != key_range.second; ++kr_it)
+    {
+        auto s = (*kr_it);
+    }
+
     auto it_mm(mm.find(1));
-    it_mm;
+    it_mm++;
 
     wchar_t* end;
     auto n = std::wcstol(L"101", &end, 2);
@@ -639,7 +649,7 @@ void test_re_to_nfa_to_dfa()
 
     string_type res[] =
     {
-        L"a+",
+        //L"a+",
 
         L"(a|b)*a(a|b)(a|b)", // aho, ullman
         L"(a|b)*abb", // aho, ullman
@@ -3758,8 +3768,16 @@ void test_re_dfa()
 
     string_type res[] =
     {
+        L"(a|ε)bc*",
+
+        L"aa*",
+        L"ab+c*",
+
+        L"(a|bb)c",
+        L"a*",
         L"(a|b)*abb",
 
+        L"b|a",
         L"a+",
 
         L"(a|b)*a(a|b)(a|b)", // aho, ullman
@@ -3805,6 +3823,6 @@ void test_re_dfa()
 }
 
 
-// for %i in (d:\tmp\FSA\*.dot) do D:\Soft\graphviz\2.38\release\bin\dot -Tpng %i -o %i.png
+// for %i in (d:\tmp\fsa\*.dot) do D:\Soft\graphviz\2.38\release\bin\dot -Tpng %i -o %i.png
 // D:\Soft\graphviz\2.38\release\bin\dot -Tpng d:\tmp\FSA\nfa.dot -o d:\tmp\FSA\nfa.dot.png
 // for /r "D:\Tmp\Books\Parsing & Syntactic Theory" %f in (*) do @copy /Y "%f" .

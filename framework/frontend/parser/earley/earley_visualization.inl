@@ -277,7 +277,7 @@ template <typename T>
 void earley_visualization<T>::decorate_trees(const typename earley_visualization<T>::trees_type& trees, const string_type& dot_file_name)
 {
     // generate Graphviz dot file ...
-    // for %i in (d:\tmp\*etree.dot) do D:\Soft\graphviz\2.38\release\bin\dot -Tpng %i -o %i.png
+    // for %i in (d:\tmp\fsa\*.dot) do D:\Soft\graphviz\2.38\release\bin\dot -Tpng %i -o %i.png
     for(auto [k, tree] : enumerate(trees))
     {
         string_type file_name(dot_file_name + std::to_wstring(k) + L".etree.dot");

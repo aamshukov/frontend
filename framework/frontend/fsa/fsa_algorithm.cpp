@@ -291,7 +291,7 @@ bool fsa_algorithm::nfa_to_dfa(const typename fsa_algorithm::fsa_type& fsa0, typ
         {
             auto t_state(get_unmarked_dstate(dstates));
 
-            if(!t_state)
+            if(t_state == nullptr)
             {
                 break;
             }
