@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\framework\backend\ir\ir_visitor.hpp" />
+    <ClInclude Include="..\..\framework\backend\ir\quadruple.hpp" />
     <ClInclude Include="..\..\framework\core\command_line.hpp" />
     <ClInclude Include="..\..\framework\core\configurator.hpp" />
     <ClInclude Include="..\..\framework\core\content.hpp" />

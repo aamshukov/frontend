@@ -169,6 +169,12 @@
     <ClInclude Include="..\..\framework\core\string_data_provider.hpp">
       <Filter>core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\backend\ir\quadruple.hpp">
+      <Filter>backend\ir</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\backend\ir\ir_visitor.hpp">
+      <Filter>backend\ir</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="backend">

@@ -3768,6 +3768,8 @@ void test_re_dfa()
 
     string_type res[] =
     {
+        L"(abc)*",
+
         L"(a|ε)bc*",
 
         L"aa*",
