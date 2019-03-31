@@ -47,7 +47,7 @@ class symbol
 
         enum class flags : uint64_t
         {
-            clear = 0x00
+            clear = 0x0000,
         };
 
         using flags_type = tmpl_flags<flags>;

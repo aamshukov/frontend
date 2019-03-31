@@ -19,6 +19,7 @@
 #include <core\command_line.hpp>
 #include <core\configurator.hpp>
 #include <core\tree.hpp>
+#include <core\dag.hpp>
 #include <core\enumerate.hpp>
 
 #include <frontend\grammar\token.hpp>
@@ -46,9 +47,6 @@
 #include <core\statistics.hpp>
 
 #include <frontend\lexical_analyzer\lexical_analyzer.hpp>
-
-#include <frontend\tree\ast.hpp>
-#include <frontend\tree\cst.hpp>
 
 #include <frontend\parser\parser_algorithm.hpp>
 
@@ -282,9 +280,9 @@ int main()
     logger::instance().initialize(LR"(d:\tmp\fe.log)", status);
 
     //test_re_to_nfa_to_dfa();
-    test_re_dfa();
+//    test_re_dfa();
 
-    //test_earley_parser();
+    test_earley_parser();
 
     //test_sets();
 

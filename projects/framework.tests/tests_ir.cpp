@@ -20,6 +20,8 @@
 #include <core\configurator.hpp>
 
 #include <core\tree.hpp>
+#include <core\dag.hpp>
+
 #include <core\visitor.hpp>
 
 #include <frontend\grammar\token.hpp>
@@ -48,9 +50,6 @@
 
 #include <frontend\lexical_analyzer\lexical_analyzer.hpp>
 
-#include <frontend\tree\ast.hpp>
-#include <frontend\tree\cst.hpp>
-
 #include <frontend\parser\parser_algorithm.hpp>
 
 #include <frontend\parser\parser.hpp>
@@ -62,6 +61,7 @@
 #include <frontend\parser\lr\lr_parser.inl>
 
 #include <backend\ir\quadruple.hpp>
+#include <backend\ir\ssa.hpp>
 #include <backend\ir\ir_visitor.hpp>
 
 USINGNAMESPACE(core)

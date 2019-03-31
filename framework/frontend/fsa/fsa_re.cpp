@@ -13,6 +13,7 @@
 #include <core\data_provider.hpp>
 #include <core\factory.hpp>
 #include <core\content.hpp>
+#include <core\flags.hpp>
 #include <core\tree.hpp>
 
 #include <frontend\fsa\fsa_transition.hpp>

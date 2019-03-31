@@ -106,12 +106,6 @@
     <ClInclude Include="..\..\framework\core\tree.hpp">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\frontend\tree\cst.hpp">
-      <Filter>frontend\tree</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\frontend\tree\ast.hpp">
-      <Filter>frontend\tree</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\core\visitor.hpp">
       <Filter>core</Filter>
     </ClInclude>
@@ -175,6 +169,12 @@
     <ClInclude Include="..\..\framework\backend\ir\ir_visitor.hpp">
       <Filter>backend\ir</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\backend\ir\ssa.hpp">
+      <Filter>backend\ir</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\dag.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="backend">
@@ -215,9 +215,6 @@
     </Filter>
     <Filter Include="frontend\fsa">
       <UniqueIdentifier>{2a1c4217-44e3-497c-af00-e1b6506d793f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="frontend\tree">
-      <UniqueIdentifier>{2d2f0f1f-b4a1-451c-8257-b5d1dfbe900f}</UniqueIdentifier>
     </Filter>
     <Filter Include="frontend\parser\ll">
       <UniqueIdentifier>{80060640-0a73-4257-8355-aa049da1117b}</UniqueIdentifier>
@@ -330,12 +327,6 @@
     </None>
     <None Include="..\..\framework\frontend\parser\parser.inl">
       <Filter>frontend\parser</Filter>
-    </None>
-    <None Include="..\..\framework\frontend\tree\ast.inl">
-      <Filter>frontend\tree</Filter>
-    </None>
-    <None Include="..\..\framework\frontend\tree\cst.inl">
-      <Filter>frontend\tree</Filter>
     </None>
     <None Include="..\..\framework\frontend\parser\backtracking\recursive_descent_parser.inl">
       <Filter>frontend\parser\recursive_descent</Filter>

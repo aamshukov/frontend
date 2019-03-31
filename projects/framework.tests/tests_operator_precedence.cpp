@@ -20,6 +20,8 @@
 #include <core\configurator.hpp>
 
 #include <core\tree.hpp>
+#include <core\dag.hpp>
+
 #include <core\visitor.hpp>
 
 #include <frontend\grammar\token.hpp>
@@ -47,9 +49,6 @@
 #include <core\statistics.hpp>
 
 #include <frontend\lexical_analyzer\lexical_analyzer.hpp>
-
-#include <frontend\tree\ast.hpp>
-#include <frontend\tree\cst.hpp>
 
 #include <frontend\parser\parser_algorithm.hpp>
 

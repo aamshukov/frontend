@@ -9,6 +9,7 @@
 #include <core\logger.hpp>
 #include <core\counter.hpp>
 #include <core\enumerate.hpp>
+#include <core\flags.hpp>
 #include <core\tree.hpp>
 
 #include <frontend\fsa\fsa_transition.hpp>

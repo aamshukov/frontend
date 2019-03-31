@@ -21,10 +21,12 @@
   <ItemGroup>
     <ClInclude Include="..\..\framework\backend\ir\ir_visitor.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\quadruple.hpp" />
+    <ClInclude Include="..\..\framework\backend\ir\ssa.hpp" />
     <ClInclude Include="..\..\framework\core\command_line.hpp" />
     <ClInclude Include="..\..\framework\core\configurator.hpp" />
     <ClInclude Include="..\..\framework\core\content.hpp" />
     <ClInclude Include="..\..\framework\core\counter.hpp" />
+    <ClInclude Include="..\..\framework\core\dag.hpp" />
     <ClInclude Include="..\..\framework\core\data_provider.hpp" />
     <ClInclude Include="..\..\framework\core\diagnostics.hpp" />
     <ClInclude Include="..\..\framework\core\domain_helper.hpp" />
@@ -75,8 +77,6 @@
     <ClInclude Include="..\..\framework\frontend\parser\parser_algorithm.hpp" />
     <ClInclude Include="..\..\framework\frontend\semantics\symbol_attribute.hpp" />
     <ClInclude Include="..\..\framework\frontend\semantics\symbol_table.hpp" />
-    <ClInclude Include="..\..\framework\frontend\tree\ast.hpp" />
-    <ClInclude Include="..\..\framework\frontend\tree\cst.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\core\content.cpp" />
@@ -134,8 +134,6 @@
     <None Include="..\..\framework\frontend\parser\parser.inl" />
     <None Include="..\..\framework\frontend\semantics\symbol_attribute.inl" />
     <None Include="..\..\framework\frontend\semantics\symbol_table.inl" />
-    <None Include="..\..\framework\frontend\tree\ast.inl" />
-    <None Include="..\..\framework\frontend\tree\cst.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C0F31E66-9BE9-4349-B2F9-5E7B688F9BA2}</ProjectGuid>

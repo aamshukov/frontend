@@ -36,6 +36,8 @@ class parser : private noncopyable
 
         const operation_status& status() const;
         operation_status&       status();
+
+        static void             cst_to_ast(const tree_type& cst, tree_type& ast);
 };
 
 template <typename T>
@@ -54,6 +56,12 @@ template <typename T>
 operation_status& parser<T>::status()
 {
     return my_status;
+}
+
+template <typename T>
+void parser<T>::cst_to_ast(const tree_type& cst, tree_type& ast)
+{
+    cst, ast; //??
 }
 
 END_NAMESPACE
