@@ -82,7 +82,7 @@ void grammar::load(const string_type& file_name)
         char_type buffer[MAX_LINE_SIZE];
 
         string_type lhs_symbol_name;
-        //symbol::flags_type lhs_flag = symbol::flags::clear;
+        symbol::flags_type lhs_flag = symbol::flags::clear;
 
         while(!stream.eof())
         {
@@ -145,20 +145,20 @@ void grammar::load(const string_type& file_name)
                     continue;
                 }
 
-                //if(buffer[lhs_count - 1] == L'^')
-                //{
-                //    lhs_count--;
-                //    lhs_flag = symbol::flags::root_in_ast;
-                //}
-                //else if(buffer[lhs_count - 1] == L'!')
-                //{
-                //    lhs_count--;
-                //    lhs_flag = symbol::flags::not_in_ast;
-                //}
-                //else
-                //{
-                //    lhs_flag = symbol::flags::clear;
-                //}
+                if(buffer[lhs_count - 1] == L'^')
+                {
+                    lhs_count--;
+                    lhs_flag = symbol::flags::root_in_ast;
+                }
+                else if(buffer[lhs_count - 1] == L'!')
+                {
+                    lhs_count--;
+                    lhs_flag = symbol::flags::not_in_ast;
+                }
+                else
+                {
+                    lhs_flag = symbol::flags::clear;
+                }
 
                 lhs_symbol_name.assign(buffer, lhs_start, std::max(static_cast<uint32_t>(0), lhs_count));
             }
@@ -173,7 +173,7 @@ void grammar::load(const string_type& file_name)
                 {
                     lhs_symbol_name.clear();
 
-                    //lhs_flag = symbol::flags::clear;
+                    lhs_flag = symbol::flags::clear;
 
                     continue;
                 }
@@ -198,7 +198,7 @@ void grammar::load(const string_type& file_name)
                 my_indexed_pool.insert(pool_index_type::value_type((*lhs_symbol).id(), lhs_symbol));
             }
 
-            //(*lhs_symbol).flags() = lhs_flag;
+            (*lhs_symbol).flags() = lhs_flag;
 
             rule_type rule0(factory::create<rule>(rule_number++, lhs_symbol_name)); // rule name is the LHS's symbol name
 
@@ -267,22 +267,22 @@ void grammar::load(const string_type& file_name)
 
                         symbol_type rhs_symbol;
 
-                        //symbol::flags_type rhs_flag = symbol::flags::clear;
+                        symbol::flags_type rhs_flag = symbol::flags::clear;
 
-                        //if(rhs_symbol_name[rhs_symbol_name.size() - 1] == L'^')
-                        //{
-                        //    rhs_flag = symbol::flags::root_in_ast;
-                        //    rhs_symbol_name = rhs_symbol_name.substr(0, rhs_symbol_name.size() - 1);
-                        //}
-                        //else if(rhs_symbol_name[rhs_symbol_name.size() - 1] == L'!')
-                        //{
-                        //    rhs_flag = symbol::flags::not_in_ast;
-                        //    rhs_symbol_name = rhs_symbol_name.substr(0, rhs_symbol_name.size() - 1);
-                        //}
-                        //else
-                        //{
-                        //    rhs_flag = symbol::flags::clear;
-                        //}
+                        if(rhs_symbol_name[rhs_symbol_name.size() - 1] == L'^')
+                        {
+                            rhs_flag = symbol::flags::root_in_ast;
+                            rhs_symbol_name = rhs_symbol_name.substr(0, rhs_symbol_name.size() - 1);
+                        }
+                        else if(rhs_symbol_name[rhs_symbol_name.size() - 1] == L'!')
+                        {
+                            rhs_flag = symbol::flags::not_in_ast;
+                            rhs_symbol_name = rhs_symbol_name.substr(0, rhs_symbol_name.size() - 1);
+                        }
+                        else
+                        {
+                            rhs_flag = symbol::flags::clear;
+                        }
 
                         if(rhs_symbol_name[0] == L'\'' && rhs_symbol_name.size() > 1)
                         {
@@ -304,7 +304,7 @@ void grammar::load(const string_type& file_name)
                             my_indexed_pool.insert(pool_index_type::value_type((*rhs_symbol).id(), rhs_symbol));
                         }
 
-                        //(*rhs_symbol).flags() = rhs_flag;
+                        (*rhs_symbol).flags() = rhs_flag;
 
                         (*rule0).add_rhs_symbol(rhs_symbol);
                     }

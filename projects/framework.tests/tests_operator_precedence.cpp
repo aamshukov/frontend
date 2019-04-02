@@ -52,6 +52,9 @@
 
 #include <frontend\parser\parser_algorithm.hpp>
 
+#include <frontend\parser\parser_tree.hpp>
+#include <frontend\parser\parser_dag.hpp>
+
 #include <frontend\parser\parser.hpp>
 #include <frontend\parser\parser.inl>
 

@@ -50,6 +50,9 @@
 
 #include <frontend\parser\parser_algorithm.hpp>
 
+#include <frontend\parser\parser_tree.hpp>
+#include <frontend\parser\parser_dag.hpp>
+
 #include <frontend\parser\parser.hpp>
 #include <frontend\parser\parser.inl>
 
@@ -3822,7 +3825,7 @@ void test_re_dfa()
     }
 }
 
-
 // for %i in (d:\tmp\fsa\*.dot) do D:\Soft\graphviz\2.38\release\bin\dot -Tpng %i -o %i.png
 // D:\Soft\graphviz\2.38\release\bin\dot -Tpng d:\tmp\FSA\nfa.dot -o d:\tmp\FSA\nfa.dot.png
 // for /r "D:\Tmp\Books\Parsing & Syntactic Theory" %f in (*) do @copy /Y "%f" .
+// D:\Soft\graphviz\2.38\release\bin\dot -Tpng d:\tmp\fsa.dot -o d:\tmp\fsa.png

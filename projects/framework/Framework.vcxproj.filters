@@ -103,9 +103,6 @@
     <ClInclude Include="..\..\framework\frontend\parser\parser.hpp">
       <Filter>frontend\parser</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\core\tree.hpp">
-      <Filter>core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\core\visitor.hpp">
       <Filter>core</Filter>
     </ClInclude>
@@ -174,6 +171,15 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\core\dag.hpp">
       <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\tree.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\parser_tree.hpp">
+      <Filter>frontend\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\parser_dag.hpp">
+      <Filter>frontend\parser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

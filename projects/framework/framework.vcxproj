@@ -75,6 +75,8 @@
     <ClInclude Include="..\..\framework\frontend\parser\operator_precedence\precedence_visualization.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\parser.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\parser_algorithm.hpp" />
+    <ClInclude Include="..\..\framework\frontend\parser\parser_dag.hpp" />
+    <ClInclude Include="..\..\framework\frontend\parser\parser_tree.hpp" />
     <ClInclude Include="..\..\framework\frontend\semantics\symbol_attribute.hpp" />
     <ClInclude Include="..\..\framework\frontend\semantics\symbol_table.hpp" />
   </ItemGroup>

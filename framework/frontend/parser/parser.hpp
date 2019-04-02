@@ -16,7 +16,7 @@ class parser : private noncopyable
         using token_type = T;
         using lexical_analyzer_type = std::shared_ptr<lexical_analyzer<token_type>>;
 
-        using tree_type = std::shared_ptr<tree>;
+        using tree_type = std::shared_ptr<parser_tree<token_type>>;
         using trees_type = std::vector<tree_type>;
 
     protected:
@@ -37,7 +37,7 @@ class parser : private noncopyable
         const operation_status& status() const;
         operation_status&       status();
 
-        static void             cst_to_ast(const tree_type& cst, tree_type& ast);
+        static void             cst_to_ast(tree_type& tree); // convert cst to ast
 };
 
 template <typename T>
@@ -56,12 +56,6 @@ template <typename T>
 operation_status& parser<T>::status()
 {
     return my_status;
-}
-
-template <typename T>
-void parser<T>::cst_to_ast(const tree_type& cst, tree_type& ast)
-{
-    cst, ast; //??
 }
 
 END_NAMESPACE

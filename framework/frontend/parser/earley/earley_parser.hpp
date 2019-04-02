@@ -104,15 +104,6 @@ class earley_parser : public parser<T>
 
         using charts_type = std::vector<chart_type>;
 
-        struct earley_tree : public tree
-        {
-            symbol_type symbol;
-            token_type  token; // might be empty for non-terminals
-        };
-
-        using tree_type = std::shared_ptr<earley_tree>;
-        using trees_type = std::vector<tree_type>;
-
         // what to build while calling parse, AST or tree(s)
         enum class tree_kind
         {
@@ -139,6 +130,8 @@ class earley_parser : public parser<T>
         };
 
         using rhs_stack_type = std::stack<rhs_stack_element>;
+
+        using earley_tree = parser_tree<token_type>;
 
         struct parse_tree_element // (Tr = parsing tree, P = papa)
         {

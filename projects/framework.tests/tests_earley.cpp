@@ -54,6 +54,9 @@
 
 #include <frontend\parser\parser_algorithm.hpp>
 
+#include <frontend\parser\parser_tree.hpp>
+#include <frontend\parser\parser_dag.hpp>
+
 #include <frontend\parser\parser.hpp>
 #include <frontend\parser\parser.inl>
 
@@ -148,14 +151,14 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>>
 
         tree_type handle_start(const item_type& item) override
         {
-            auto result(factory::create<earley_tree>());
+            auto result(factory::create<parser_tree<token_type>>());
             (*result).symbol = ((*(*item).rule).lhs()[0]);
             return result;
         }
 
         tree_type handle_terminal(const symbol_type& symbol, const token_type& token, const tree_type& node) override
         {
-            auto result(factory::create<earley_tree>());
+            auto result(factory::create<parser_tree<token_type>>());
             (*result).symbol = symbol;
             (*result).token = token;
             (*result).papa = node;
@@ -165,7 +168,7 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>>
 
         tree_type handle_before_nonterminal(const item_type& item, const tree_type& node, bool) override
         {
-            auto result(factory::create<earley_tree>());
+            auto result(factory::create<parser_tree<token_type>>());
             (*result).symbol = ((*(*item).rule).lhs()[0]);
             (*result).papa = node;
             (*node).kids.emplace_back(result);
@@ -191,12 +194,13 @@ void test_earley_parser()
 
     std::vector<input_element> inputs =
     {
-        { LR"(D:\Projects\fe\grammars\Earley.G0.txt)", L"n+n", LR"(d:\tmp\Earley.G0)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G1.txt)", L"n+n", LR"(d:\tmp\Earley.G1)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G2.txt)", L"a*(a+a)", LR"(d:\tmp\Earley.G2)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G3.AYCOCK.HORSPOOL.txt)", L"a", LR"(d:\tmp\G3.AYCOCK.HORSPOOL)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G4.epsilon.txt)", L"aa", LR"(d:\tmp\G4.epsilon)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G5.cycle.txt)", L"", LR"(d:\tmp\Earley.G5.cycle)" }
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+(a*b-(b-a)+b/a)+(a+b)", LR"(d:\tmp\fsa\Expr.G0)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G0.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G0)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G1.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G1)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G2.txt)", L"a*(a+a)", LR"(d:\tmp\fsa\Earley.G2)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G3.AYCOCK.HORSPOOL.txt)", L"a", LR"(d:\tmp\fsa\G3.AYCOCK.HORSPOOL)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G4.epsilon.txt)", L"aa", LR"(d:\tmp\fsa\G4.epsilon)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G5.cycle.txt)", L"", LR"(d:\tmp\fsa\Earley.G5.cycle)" }
     };
 
     uint8_t k = 1;
@@ -229,13 +233,17 @@ void test_earley_parser()
         {
             auto lexical_analyzer(factory::create<earley_lexical_analyzer>(gr, content));
 
-            my_earley_parser parser(lexical_analyzer, gr, my_earley_parser::eparser_type::tree_kind::build_trees);
-            //my_earley_parser parser(lexical_analyzer, gr, my_earley_parser::eparser_type::tree_kind::build_ast);
+            //my_earley_parser parser(lexical_analyzer, gr, my_earley_parser::eparser_type::tree_kind::build_trees);
+            my_earley_parser parser(lexical_analyzer, gr, my_earley_parser::eparser_type::tree_kind::build_ast);
 
             parser.parse();
 
             if(parser.status().custom_code() == status::custom_code::success)
             {
+                auto cst(std::dynamic_pointer_cast<my_earley_parser::earley_tree>(parser.trees()[0]));
+
+                my_earley_parser::cst_to_ast(cst);
+
                 std::wcout << earley_visualization<my_earley_parser>::decorate_charts(parser.charts()).c_str() << std::endl;
 
                 earley_visualization<my_earley_parser>::print_tree(parser.trees(), std::wcout);
