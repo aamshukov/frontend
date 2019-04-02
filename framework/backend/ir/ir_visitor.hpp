@@ -6,8 +6,10 @@
 
 #pragma once
 
-BEGIN_NAMESPACE(frontend)
+BEGIN_NAMESPACE(backend)
+
 USINGNAMESPACE(core)
+USINGNAMESPACE(frontend)
 
 template <typename T>
 struct ir_visitor : public visitor<T>

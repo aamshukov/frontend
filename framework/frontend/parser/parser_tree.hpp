@@ -16,7 +16,8 @@ struct parser_tree : public tree
 
     enum class flags : uint64_t
     {
-        clear = 0x0000
+        clear = 0x0000,
+        deleted = 0x0001
     };
 
     using symbol_type = grammar::symbol_type;

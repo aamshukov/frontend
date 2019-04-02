@@ -67,8 +67,12 @@
 #include <backend\ir\ssa.hpp>
 #include <backend\ir\ir_visitor.hpp>
 
+#include <backend\ir\ir.hpp>
+#include <backend\ir\ir.inl>
+
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
+USINGNAMESPACE(backend)
 
 void test_ir()
 {

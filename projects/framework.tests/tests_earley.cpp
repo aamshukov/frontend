@@ -66,8 +66,12 @@
 #include <frontend\parser\earley\earley_visualization.hpp>
 #include <frontend\parser\earley\earley_visualization.inl>
 
+#include <backend\ir\ir.hpp>
+#include <backend\ir\ir.inl>
+
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
+USINGNAMESPACE(backend)
 
 struct earley_token_traits// : public token_traits
 {
@@ -242,7 +246,9 @@ void test_earley_parser()
             {
                 auto cst(std::dynamic_pointer_cast<my_earley_parser::earley_tree>(parser.trees()[0]));
 
-                my_earley_parser::cst_to_ast(cst);
+                ir<token<earley_token_traits>>::tree_type ast;
+
+                ir<token<earley_token_traits>>::cst_to_ast(cst, ast);
 
                 std::wcout << earley_visualization<my_earley_parser>::decorate_charts(parser.charts()).c_str() << std::endl;
 

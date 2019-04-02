@@ -36,8 +36,6 @@ class parser : private noncopyable
 
         const operation_status& status() const;
         operation_status&       status();
-
-        static void             cst_to_ast(tree_type& tree); // convert cst to ast
 };
 
 template <typename T>

@@ -6,8 +6,10 @@
 
 #pragma once
 
-BEGIN_NAMESPACE(frontend)
+BEGIN_NAMESPACE(backend)
+
 USINGNAMESPACE(core)
+USINGNAMESPACE(frontend)
 
 template <typename O, typename A, typename R>
 struct quadruple
