@@ -1,9 +1,9 @@
 # fe
 **Front End** parsing framework in modern C++.
 
-Implementation of **parsing classical FE (Front End)** algorithms with some exposure to IR.
+Implementation of **parsing classical FE (Front End)** algorithms with some exposure to **IR**.
 
-The framework has implementation of various algorithms, methods and techniques, including:
+Covers:
 - FA (NFA/DFA) related algorithms and construction
 - RE related algorithms and construction
 - Fully functional lexical analyzer with Unicode support
