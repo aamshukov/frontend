@@ -17,7 +17,7 @@ Covers:
 - **CST** (Concret Syntax Tree) construction
 - **AST** (Abstract Syntax Tree) ability to construct and convert from **CST**
 - **ASD** (Abstract Syntax Dag) conversion from **CST**/**AST**
-- **IR** related algorithms, **TAC**, **QUADRUPLES** and **SSA** (comming soon ...)
+- **IR** related algorithms, **TAC**, **QUADRUPLES** and **SSA**
 - **Compiler/Interpretator** controller implementation
 
 and much more ... stay tuned.
