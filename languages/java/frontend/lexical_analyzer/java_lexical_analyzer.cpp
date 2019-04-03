@@ -7744,37 +7744,3 @@ _exit_num:
 }
 
 END_NAMESPACE
-
-
-
-
-
-/*??
-            switch(my_token.type)
-            {
-                case token_type::traits::type::binary_integer_lit:
-                    my_token.value = text::parse<uint64_t>(my_start_content + my_token.offset + 2, my_token.length, 2); // +2 skip '0b' prefix
-                    break;
-                case token_type::traits::type::octal_integer_lit:
-                    my_token.value = text::parse<uint64_t>(my_start_content + my_token.offset, my_token.length, 8);
-                    break;
-                case token_type::traits::type::decimal_integer_lit:
-                    my_token.value = text::parse<uint64_t>(my_start_content + my_token.offset, my_token.length, 10);
-                    break;
-                case token_type::traits::type::hexadecimal_integer_lit:
-                    my_token.value = text::parse<uint64_t>(my_start_content + my_token.offset, my_token.length, 16);
-                    break;
-                case token_type::traits::type::decimal_floating_lit:
-                    my_token.value = text::parse<double>(my_start_content + my_token.offset, my_token.length, 10);
-                    break;
-                case token_type::traits::type::hexadecimal_floating_lit:
-                    my_token.value = text::parse<double>(my_start_content + my_token.offset, my_token.length, 16);
-                    break;
-                default:
-                    log_error(L"Invalid numerical literal at '%ld, %ld'. Only ASCII allowed in constants and floating literals use ASCII only.", CURRENT_LOCATION);
-                    break;
-            }
-
-
-*/
-
