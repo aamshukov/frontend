@@ -12,7 +12,7 @@ Covers:
 - **Recursive descent** parser
 - **LL(k)** table construction **strong-LL(k)** and **full-LL(k)** methods
 - **LR(k)** table construction 
-- **Earley parser** implementation to handle all ambiguous tree(s), supports **AST** construction
+- **Earley parser** implementation to handle any **CFG**, tree(s) and **AST** extraction
 - **Backtracking** techniques
 - **CST** (Concret Syntax Tree) construction
 - **AST** (Abstract Syntax Tree) ability to construct and convert from **CST**
