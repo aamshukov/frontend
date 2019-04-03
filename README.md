@@ -1,4 +1,3 @@
 # fe
-Front end (parsing) framework
-
-Implementation of parsing classic FE algorithms with some exposure to IR.
+Front end (parsing) framework.
+Implementation of parsing classical FE algorithms with some exposure to IR.
