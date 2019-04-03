@@ -10,7 +10,7 @@ Covers:
 - Fully functional **lexical analyzer** with Unicode support
 - Calculation of **FIRST(k) and FOLLOW(k), EFF(k), LA(k) sets**
 - **Recursive descent** parser
-- **LL(k)** table construction for **strong-LL(k)** and **full-LL(k)** methods
+- **LL(k)** table construction **strong-LL(k)** and **full-LL(k)** methods
 - **LR(k)** table construction 
 - **Earley parser** implementation to handle all ambiguous tree(s), supports **AST** construction
 - **Backtracking** techniques
