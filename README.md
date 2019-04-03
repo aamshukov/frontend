@@ -4,7 +4,7 @@
 Implementation of **parsing classical** algorithms with some exposure to **IR**.
 
 Covers:
-- **Grammar** grammar representation
+- **Grammar** representation
 - **FA** (NFA/DFA) related algorithms and construction
 - **RE** related algorithms and construction
 - Fully functional **lexical analyzer** with Unicode support
