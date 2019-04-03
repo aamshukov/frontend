@@ -21,3 +21,5 @@ Covers:
 - **Compiler/Interpretator** controller implementation
 
 and much more ... stay tuned.
+
+**MIT License**
