@@ -1,5 +1,5 @@
 # fe
-**Front End** parsing framework in modern C++.
+**Front End** parsing framework in **modern C++**.
 
 Implementation of **parsing classical FE (Front End)** algorithms with some exposure to **IR**.
 
