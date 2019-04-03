@@ -21,7 +21,7 @@ class ir : private noncopyable
         using trees_type = typename parser<token_type>::trees_type;
 
     public:
-        static void cst_to_ast(const tree_type& cst, tree_type& ast_result);
+        static void cst_to_ast(tree_type& cst);
 };
 
 END_NAMESPACE

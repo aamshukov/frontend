@@ -121,9 +121,8 @@ class earley_parser : public parser<T>
                 symbol    // terminal
             };
 
-            using data_type = std::variant<item_type,
-                                           items_type,
-                                           symbol_type>;
+            using data_type = std::variant<item_type, items_type, symbol_type>;
+
             data_type data;
             token_type token;
             element_type type;
