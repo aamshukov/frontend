@@ -709,6 +709,8 @@ void earley_parser<T>::build_ast_tree(typename earley_parser<T>::item_type& item
 
     parse_roots.push_back(parse_tree_element{ tree, papa });
 
+    uint32_t rhs_index = 0; // for ast operators map
+
     // ... и для каждого элемента магазина rhs выполнить шаг
     for(; !rhs_stack.empty(); rhs_stack.pop())
     {
@@ -723,7 +725,7 @@ void earley_parser<T>::build_ast_tree(typename earley_parser<T>::item_type& item
             {
                 auto symbol(std::get<symbol_type>(current_rhs_stack_element.data));
 
-                auto new_node(handle_terminal(symbol, token, papa));
+                auto new_node(handle_terminal(symbol, rhs_index++, (*item).rule, token, papa));
 
                 if(new_node != nullptr)
                 {
@@ -737,15 +739,19 @@ void earley_parser<T>::build_ast_tree(typename earley_parser<T>::item_type& item
             {
                 auto current_item(std::get<item_type>(current_rhs_stack_element.data));
 
-                auto new_node(handle_before_nonterminal(current_item, papa, false));
+                auto new_node(handle_before_nonterminal(current_item, rhs_index, (*item).rule, papa, false));
 
                 if(new_node != nullptr)
                 {
                     mark_item(current_item);
+
                     build_ast_tree(current_item, new_node, tree, trees);
+
                     unmark_item(current_item);
 
-                    handle_after_nonterminal(current_item, papa, false);
+                    handle_after_nonterminal(current_item, rhs_index, (*item).rule, papa, false);
+
+                    rhs_index++;
 
                     break;
                 }
@@ -761,15 +767,19 @@ void earley_parser<T>::build_ast_tree(typename earley_parser<T>::item_type& item
                 {
                     if(!is_item_marked(rptr_item))
                     {
-                        auto new_node(handle_before_nonterminal(rptr_item, papa, true));
+                        auto new_node(handle_before_nonterminal(rptr_item, rhs_index, (*item).rule, papa, true));
 
                         if(new_node != nullptr)
                         {
                             mark_item(rptr_item);
+
                             build_ast_tree(rptr_item, new_node, tree, trees);
+
                             unmark_item(rptr_item);
 
-                            handle_after_nonterminal(rptr_item, papa, true);
+                            handle_after_nonterminal(rptr_item, rhs_index, (*item).rule, papa, true);
+
+                            rhs_index++;
 
                             break;
                         }

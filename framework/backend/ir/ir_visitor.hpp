@@ -11,11 +11,11 @@ BEGIN_NAMESPACE(backend)
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
-template <typename T>
-struct ir_visitor : public visitor<T>
+struct ir_visitor : public visitor
 {
-    public:
-        using concrete_acceptor_type = visitor<T>::concrete_acceptor_type;
+    void visit(const tree::tree_type& /*acceptor*/) override
+    {
+    }
 };
 
 END_NAMESPACE

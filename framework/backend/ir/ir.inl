@@ -14,23 +14,62 @@ USINGNAMESPACE(frontend)
 template <typename T>
 void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
 {
+    // will be split later ...
     std::stack<tree_type> stack;
-    std::queue<tree_type> queue;
 
-    // collapse single parents
+    std::queue<tree_type> queue;
+    std::queue<tree_type> empty_queue;
+
+    // apply ! operator
     queue.emplace(cst);
 
     while(!queue.empty())
     {
-        auto root(queue.front());
+        auto node(queue.front());
 
         queue.pop();
 
-        stack.push(root);
-
-        for(std::size_t k = 0, n = (*root).kids.size(); k < n; k++)
+        // ignore 'deleted' nodes
+        if(((*node).flags & parser_tree<token_type>::flags::deleted) == parser_tree<token_type>::flags::deleted)
         {
-            auto kid = (*root).kids[k];
+            continue;
+        }
+
+        if(((*node).flags & tree::flags::not_in_ast) == tree::flags::not_in_ast)
+        {
+            auto papa((*node).papa);
+
+            if(papa != nullptr)
+            {
+                (*papa).kids.erase((std::remove((*papa).kids.begin(), (*papa).kids.end(), node)));
+                (*node).flags |= parser_tree<token_type>::flags::deleted;
+            }
+
+            continue;
+        }
+
+        for(std::size_t k = 0, n = (*node).kids.size(); k < n; k++)
+        {
+            auto kid = (*node).kids[k];
+            queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type>>(kid));
+        }
+    }
+
+    // collapse single parents
+    std::swap(queue, empty_queue);
+    queue.emplace(cst);
+
+    while(!queue.empty())
+    {
+        auto node(queue.front());
+
+        queue.pop();
+
+        stack.push(node);
+
+        for(std::size_t k = 0, n = (*node).kids.size(); k < n; k++)
+        {
+            auto kid = (*node).kids[k];
             queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type>>(kid));
         }
     }
@@ -44,19 +83,6 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
         // ignore 'deleted' nodes
         if(((*node).flags & parser_tree<token_type>::flags::deleted) == parser_tree<token_type>::flags::deleted)
         {
-            continue;
-        }
-
-        // apply ! operator
-        if(((*(*node).symbol).flags() & symbol::flags::not_in_ast) == symbol::flags::not_in_ast)
-        {
-            auto papa((*node).papa);
-
-            if(papa != nullptr)
-            {
-                (*papa).kids.erase((std::remove((*papa).kids.begin(), (*papa).kids.end(), node)));
-            }
-
             continue;
         }
 
@@ -91,23 +117,20 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
     }
 
     // apply ^ operator
-    std::queue<tree_type> empty_queue;
-
     std::swap(queue, empty_queue);
-
     queue.emplace(cst);
 
     while(!queue.empty())
     {
-        auto root(queue.front());
+        auto node(queue.front());
 
         queue.pop();
 
-        stack.push(root);
+        stack.push(node);
 
-        for(std::size_t k = 0, n = (*root).kids.size(); k < n; k++)
+        for(std::size_t k = 0, n = (*node).kids.size(); k < n; k++)
         {
-            auto kid = (*root).kids[k];
+            auto kid = (*node).kids[k];
             queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type>>(kid));
         }
     }
@@ -124,7 +147,7 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
             continue;
         }
 
-        if(((*(*node).symbol).flags() & symbol::flags::root_in_ast) == symbol::flags::root_in_ast)
+        if(((*node).flags & tree::flags::root_in_ast) == tree::flags::root_in_ast)
         {
             auto papa((*node).papa);
 

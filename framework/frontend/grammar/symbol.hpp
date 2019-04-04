@@ -47,9 +47,7 @@ class symbol
 
         enum class flags : uint64_t
         {
-            clear       = 0x0000,
-            root_in_ast = 0x0002, // aka, ANTLR, expr : mexpr (’+’^ mexpr)* EOF! ;  \  mutual exclusive
-            not_in_ast  = 0x0004  // aka, ANTLR, expr : mexpr (’+’^ mexpr)* EOF! ;  /
+            clear = 0x0000
         };
 
         using flags_type = tmpl_flags<flags>;

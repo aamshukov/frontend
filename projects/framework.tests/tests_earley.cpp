@@ -160,28 +160,52 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>>
             return result;
         }
 
-        tree_type handle_terminal(const symbol_type& symbol, const token_type& token, const tree_type& node) override
+        tree_type handle_terminal(const symbol_type& symbol, uint32_t position, const rule_type& rule, const token_type& token, const tree_type& node) override
         {
             auto result(factory::create<parser_tree<token_type>>());
+
             (*result).symbol = symbol;
             (*result).token = token;
             (*result).papa = node;
+
+            if(node != nullptr && (*rule).rhs()[position] == symbol)
+            {
+                auto it = (*rule).ast_operators().find(position);
+                if(it != (*rule).ast_operators().end())
+                {
+                    (*result).flags = (*it).second;
+                }
+            }
+
             (*node).kids.emplace_back(result);
+
             return result;
         }
 
-        tree_type handle_before_nonterminal(const item_type& item, const tree_type& node, bool) override
+        tree_type handle_before_nonterminal(const item_type& item, uint32_t position, const rule_type& rule, const tree_type& node, bool) override
         {
             auto result(factory::create<parser_tree<token_type>>());
+
             (*result).symbol = ((*(*item).rule).lhs()[0]);
             (*result).papa = node;
+
+            if(node != nullptr)
+            {
+                auto it = (*rule).ast_operators().find(position);
+                if(it != (*rule).ast_operators().end())
+                {
+                    (*result).flags = (*it).second;
+                }
+            }
+
             (*node).kids.emplace_back(result);
+
             return result;
         }
 
-        tree_type handle_after_nonterminal(const item_type& item, const tree_type& node, bool) override
+        tree_type handle_after_nonterminal(const item_type& item, uint32_t position, const rule_type& rule, const tree_type& node, bool) override
         {
-            item;
+            item; position; rule;
             tree_type result(node);
             return result;
         }
@@ -198,8 +222,8 @@ void test_earley_parser()
 
     std::vector<input_element> inputs =
     {
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"(a+b+b+a)", LR"(d:\tmp\fsa\Expr.G0)" },
-        //{ LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+(a*b-(b-a)+b/a)+(a+b)", LR"(d:\tmp\fsa\Expr.G0)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"(a+b)", LR"(d:\tmp\fsa\Expr.G0)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+(a*b-(b-a)+b/a)+(a+b)", LR"(d:\tmp\fsa\Expr.G0)" },
         { LR"(D:\Projects\fe\grammars\Earley.G0.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G0)" },
         { LR"(D:\Projects\fe\grammars\Earley.G1.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G1)" },
         { LR"(D:\Projects\fe\grammars\Earley.G2.txt)", L"a*(a+a)", LR"(d:\tmp\fsa\Earley.G2)" },

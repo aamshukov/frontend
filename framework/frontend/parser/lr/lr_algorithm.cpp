@@ -10,6 +10,7 @@
 #include <core\text.hpp>
 #include <core\flags.hpp>
 #include <core\counter.hpp>
+#include <core\tree.hpp>
 
 #include <frontend\grammar\symbol.hpp>
 #include <frontend\grammar\rule.hpp>

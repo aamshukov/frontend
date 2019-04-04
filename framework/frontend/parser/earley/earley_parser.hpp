@@ -118,7 +118,7 @@ class earley_parser : public parser<T>
             {
                 item = 1, // earley item
                 rptrs,    // rightmost child(s), if grammar is ambiguous
-                symbol    // terminal
+                symbol    // terminal and its position in the rule.rhs
             };
 
             using data_type = std::variant<item_type, items_type, symbol_type>;
@@ -151,10 +151,22 @@ class earley_parser : public parser<T>
     protected:
         virtual tree_type       handle_start(const item_type& item) = 0;
 
-        virtual tree_type       handle_terminal(const symbol_type& symbol, const token_type& token, const tree_type& node) = 0;
+        virtual tree_type       handle_terminal(const symbol_type& symbol,
+                                                uint32_t position,     // for ast operators mapping
+                                                const rule_type& rule, // for ast operators mapping
+                                                const token_type& token,
+                                                const tree_type& node) = 0;
 
-        virtual tree_type       handle_before_nonterminal(const item_type& item, const tree_type& node, bool ambiguous) = 0;
-        virtual tree_type       handle_after_nonterminal(const item_type& item, const tree_type& node, bool ambiguous) = 0;
+        virtual tree_type       handle_before_nonterminal(const item_type& item,
+                                                          uint32_t position,     // for ast operators mapping
+                                                          const rule_type& rule, // for ast operators mapping
+                                                          const tree_type& node,
+                                                          bool ambiguous) = 0;
+        virtual tree_type       handle_after_nonterminal(const item_type& item,
+                                                         uint32_t position,     // for ast operators mapping
+                                                         const rule_type& rule, // for ast operators mapping
+                                                         const tree_type& node,
+                                                         bool ambiguous) = 0;
 
     private:
         static item_type        create_item(const rule_type& rule,            // production (rule)

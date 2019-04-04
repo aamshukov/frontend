@@ -8,14 +8,12 @@
 
 BEGIN_NAMESPACE(core)
 
-template <typename T>
 class visitor : private noncopyable
 {
-    public:
-        using concrete_acceptor_type = T;
-
     protected:
-        virtual void visit(const concrete_acceptor_type& concrete_acceptor) = 0;
+        virtual void visit(const tree::tree_type& /*acceptor*/)
+        {
+        }
 };
 
 END_NAMESPACE

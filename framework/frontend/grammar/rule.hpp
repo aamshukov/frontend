@@ -21,6 +21,7 @@ class rule
         };
 
         using flags_type = tmpl_flags<flags>;
+        using ast_operators_type = std::map<std::size_t, tree::flags_type>;
 
     private:
         uint32_t            my_id; // enumerable type, will be cast to specific enum values
@@ -39,6 +40,8 @@ class rule
         symbols_type        my_rhs;
 
         flags_type          my_flags;
+
+        ast_operators_type  my_ast_operators;
 
     public:
                             rule(uint32_t id, const string_type& name);
@@ -83,6 +86,9 @@ class rule
 
         flags_type          flags() const;
         flags_type&         flags();
+
+        const ast_operators_type&   ast_operators() const;
+        ast_operators_type&         ast_operators();
 
         bool                empty() const; // A -> λ
 
@@ -201,6 +207,16 @@ inline typename rule::flags_type rule::flags() const
 inline typename rule::flags_type& rule::flags()
 {
     return my_flags;
+}
+
+inline const typename rule::ast_operators_type& rule::ast_operators() const
+{
+    return my_ast_operators;
+}
+
+inline typename rule::ast_operators_type& rule::ast_operators()
+{
+    return my_ast_operators;
 }
 
 inline bool operator != (const rule& lhs, const rule& rhs)

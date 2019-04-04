@@ -9,6 +9,7 @@
 #include <core\factory.hpp>
 #include <core\flags.hpp>
 #include <core\text.hpp>
+#include <core\tree.hpp>
 
 #include <frontend\grammar\symbol.hpp>
 #include <frontend\grammar\rule.hpp>

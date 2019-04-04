@@ -8,6 +8,7 @@
 #include <core\logger.hpp>
 #include <core\factory.hpp>
 #include <core\flags.hpp>
+#include <core\tree.hpp>
 #include <core\text.hpp>
 
 #include <frontend\grammar\symbol.hpp>
