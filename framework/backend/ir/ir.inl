@@ -95,8 +95,13 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
                 break;
             }
 
-            if((*papa).papa == nullptr) // papa is root, make node the root
+            if((*papa).papa == nullptr && (*papa).kids.size() == 1)
             {
+                (*papa).kids.erase(std::remove((*papa).kids.begin(), (*papa).kids.end(), node));
+                (*node).papa = nullptr;
+
+                cst = node;
+
                 break;
             }
 
@@ -156,10 +161,10 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
                 continue;
             }
 
-            (*(*node).papa).flags |= parser_tree<token_type>::flags::deleted;
+            (*papa).flags |= parser_tree<token_type>::flags::deleted;
 
-            std::for_each((*(*node).papa).kids.begin(),
-                          (*(*node).papa).kids.end(),
+            std::for_each((*papa).kids.begin(),
+                          (*papa).kids.end(),
                           [&node](const auto& kid)
                           {
                               if(kid != node) (*node).kids.emplace_back(kid);

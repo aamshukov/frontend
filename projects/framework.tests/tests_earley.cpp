@@ -222,13 +222,13 @@ void test_earley_parser()
 
     std::vector<input_element> inputs =
     {
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"(a+b)", LR"(d:\tmp\fsa\Expr.G0)" },
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+(a*b-(b-a)+b/a)+(a+b)", LR"(d:\tmp\fsa\Expr.G0)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G0.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G0)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G1.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G1)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G2.txt)", L"a*(a+a)", LR"(d:\tmp\fsa\Earley.G2)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G3.AYCOCK.HORSPOOL.txt)", L"a", LR"(d:\tmp\fsa\G3.AYCOCK.HORSPOOL)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G4.epsilon.txt)", L"aa", LR"(d:\tmp\fsa\G4.epsilon)" },
+        //{ LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"(a+b)+a+b*a/a/b/b/b*a+(a+b)", LR"(d:\tmp\fsa\Expr.G0)" },
+        //{ LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+(a*b-(b-a)+b/a)+(a+b)", LR"(d:\tmp\fsa\Expr.G0)" },
+        //{ LR"(D:\Projects\fe\grammars\Earley.G0.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G0)" },
+        //{ LR"(D:\Projects\fe\grammars\Earley.G1.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G1)" },
+        //{ LR"(D:\Projects\fe\grammars\Earley.G2.txt)", L"a*(a+a)", LR"(d:\tmp\fsa\Earley.G2)" },
+        //{ LR"(D:\Projects\fe\grammars\Earley.G3.AYCOCK.HORSPOOL.txt)", L"a", LR"(d:\tmp\fsa\G3.AYCOCK.HORSPOOL)" },
+        //{ LR"(D:\Projects\fe\grammars\Earley.G4.epsilon.txt)", L"aa", LR"(d:\tmp\fsa\G4.epsilon)" },
         { LR"(D:\Projects\fe\grammars\Earley.G5.cycle.txt)", L"", LR"(d:\tmp\fsa\Earley.G5.cycle)" }
     };
 
@@ -270,8 +270,6 @@ void test_earley_parser()
             if(parser.status().custom_code() == status::custom_code::success)
             {
                 auto cst(std::dynamic_pointer_cast<my_earley_parser::earley_tree>(parser.trees()[0]));
-
-                //ir<token<earley_token_traits>>::tree_type ast;
 
                 ir<token<earley_token_traits>>::cst_to_ast(cst);
                 earley_visualization<my_earley_parser>::decorate_tree(cst, input.dot_file_name, 0);
