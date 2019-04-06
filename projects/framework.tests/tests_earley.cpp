@@ -227,8 +227,9 @@ void test_earley_parser()
 
     std::vector<input_element> inputs =
     {
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a*a+a*a", LR"(d:\tmp\fsa\Expr.G_0)" },
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"(a+b)+a+b*a/a/b/b/b*a+(a+b)", LR"(d:\tmp\fsa\Expr.G_1)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+a*(b-c)+(b-c)*d", LR"(d:\tmp\fsa\Expr.G_0)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a*b+a*b", LR"(d:\tmp\fsa\Expr.G_1)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"(a+b)+a+b*a/a/b/b/b*a+(a+b)", LR"(d:\tmp\fsa\Expr.G_2)" },
         { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+(a*b-(b-a)+b/a)+(a+b)", LR"(d:\tmp\fsa\Expr.G0)" },
         { LR"(D:\Projects\fe\grammars\Earley.G0.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G0)" },
         { LR"(D:\Projects\fe\grammars\Earley.G1.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G1)" },

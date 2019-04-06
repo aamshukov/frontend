@@ -109,10 +109,15 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
             {
                 (*(*node).papa).flags |= parser_tree<token_type>::flags::deleted;
 
-                (*(*papa).papa).kids.erase((std::remove((*(*papa).papa).kids.begin(), (*(*papa).papa).kids.end(), (*node).papa)));
+                auto it = std::find((*(*papa).papa).kids.begin(), (*(*papa).papa).kids.end(), (*node).papa);
+
+                std::size_t index = it - (*(*papa).papa).kids.begin();
+
+                (*(*papa).papa).kids.erase(it);
 
                 (*node).papa = (*papa).papa;
-                (*(*papa).papa).kids.emplace_back(node);
+
+                (*(*papa).papa).kids.emplace((*(*papa).papa).kids.begin() + index, node);
             }
             else
             {
@@ -181,8 +186,13 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
 
             if((*papa).papa != nullptr)
             {
-                (*(*papa).papa).kids.erase((std::remove((*(*papa).papa).kids.begin(), (*(*papa).papa).kids.end(), papa)));
-                (*(*papa).papa).kids.emplace_back(node);
+                auto it = std::find((*(*papa).papa).kids.begin(), (*(*papa).papa).kids.end(), papa);
+
+                std::size_t index = it - (*(*papa).papa).kids.begin();
+
+                (*(*papa).papa).kids.erase(it);
+
+                (*(*papa).papa).kids.emplace((*(*papa).papa).kids.begin() + index, node);
             }
             else
             {
@@ -195,7 +205,32 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
 template <typename T>
 void ir<T>::ast_to_asd(typename ir<T>::tree_type& ast)
 {
-    ast;//??
+    dag_cache_type cache;
+
+    std::stack<tree_type> stack;
+    std::queue<tree_type> queue;
+
+    queue.emplace(ast);
+
+    while(!queue.empty())
+    {
+        auto node(queue.front());
+
+        queue.pop();
+
+        for(std::size_t k = 0, n = (*node).kids.size(); k < n; k++)
+        {
+            auto kid = (*node).kids[k];
+            queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type>>(kid));
+        }
+    }
+
+    while(!stack.empty())
+    {
+        auto node(stack.top());
+
+        stack.pop();
+    }
 }
 
 END_NAMESPACE

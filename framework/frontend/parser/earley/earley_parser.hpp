@@ -55,7 +55,7 @@ class earley_parser : public parser<T>
 
         struct item_hash
         {
-            std::size_t operator()(const item_type&) const
+            std::size_t operator () (const item_type&) const
             {
                 return 0; // returning 0 causes item_key_comparator to be called
             }
@@ -63,7 +63,7 @@ class earley_parser : public parser<T>
 
         struct item_key_comparator
         {
-            bool operator() (const item_type& lhs, const item_type& rhs) const
+            bool operator () (const item_type& lhs, const item_type& rhs) const
             {
                 return *lhs == *rhs;
             }
