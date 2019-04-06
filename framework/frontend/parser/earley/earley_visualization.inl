@@ -205,7 +205,7 @@ void earley_visualization<T>::print_tree(const typename earley_visualization<T>:
 }
 
 template <typename T>
-void earley_visualization<T>::print_tree(const typename earley_visualization<T>::trees_type& trees, std::wostream& stream)
+void earley_visualization<T>::print_trees(const typename earley_visualization<T>::trees_type& trees, std::wostream& stream)
 {
     stream << std::endl;
 

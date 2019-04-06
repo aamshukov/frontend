@@ -81,21 +81,21 @@ struct earley_token_traits// : public token_traits
         uint32_t,
         unknown = 0,
         epsilon = 5,
-        eol,
-        eos,
+        eol, // 6
+        eos, // 7
 
-        a,
-        b,
-        c,
-        d,
-        e,
-        f,
-        g,
-        n,
-        p, // +
-        m, // *
-        l, // (
-        r, // )
+        a,   // 8
+        b,   // 9
+        c,   // 10
+        d,   // 11
+        e,   // 12
+        f,   // 13
+        g,   // 14
+        n,   // 15
+        p, // + 16
+        m, // * 17
+        l, // ( 18
+        r, // ) 19
 
         // the following one (1) entry MUST be the last entry in the enum
         size
@@ -120,7 +120,9 @@ class earley_lexical_analyzer : public lexical_analyzer<token<earley_token_trait
             else
             {
                 string_type name(text::codepoint_to_string((*content()).data()[k]));
+
                 auto& symbol((*(my_gr.pool().find(name))).second);
+
                 if(name == L"+")
                     name = L"p";
                 else if(name == L"*")
@@ -129,7 +131,9 @@ class earley_lexical_analyzer : public lexical_analyzer<token<earley_token_trait
                     name = L"l";
                 else if(name == L")")
                     name = L"r";
+
                 my_token.type = token_type::traits::value(name);
+
                 (*symbol).id() = static_cast<uint32_t>(my_token.type);
             }
 
@@ -192,6 +196,7 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>>
             if(node != nullptr)
             {
                 auto it = (*rule).ast_operators().find(position);
+
                 if(it != (*rule).ast_operators().end())
                 {
                     (*result).flags = (*it).second;
@@ -222,13 +227,14 @@ void test_earley_parser()
 
     std::vector<input_element> inputs =
     {
-        //{ LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"(a+b)+a+b*a/a/b/b/b*a+(a+b)", LR"(d:\tmp\fsa\Expr.G0)" },
-        //{ LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+(a*b-(b-a)+b/a)+(a+b)", LR"(d:\tmp\fsa\Expr.G0)" },
-        //{ LR"(D:\Projects\fe\grammars\Earley.G0.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G0)" },
-        //{ LR"(D:\Projects\fe\grammars\Earley.G1.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G1)" },
-        //{ LR"(D:\Projects\fe\grammars\Earley.G2.txt)", L"a*(a+a)", LR"(d:\tmp\fsa\Earley.G2)" },
-        //{ LR"(D:\Projects\fe\grammars\Earley.G3.AYCOCK.HORSPOOL.txt)", L"a", LR"(d:\tmp\fsa\G3.AYCOCK.HORSPOOL)" },
-        //{ LR"(D:\Projects\fe\grammars\Earley.G4.epsilon.txt)", L"aa", LR"(d:\tmp\fsa\G4.epsilon)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a*a+a*a", LR"(d:\tmp\fsa\Expr.G_0)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"(a+b)+a+b*a/a/b/b/b*a+(a+b)", LR"(d:\tmp\fsa\Expr.G_1)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+(a*b-(b-a)+b/a)+(a+b)", LR"(d:\tmp\fsa\Expr.G0)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G0.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G0)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G1.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G1)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G2.txt)", L"a*(a+a)", LR"(d:\tmp\fsa\Earley.G2)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G3.AYCOCK.HORSPOOL.txt)", L"a", LR"(d:\tmp\fsa\G3.AYCOCK.HORSPOOL)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G4.epsilon.txt)", L"aa", LR"(d:\tmp\fsa\G4.epsilon)" },
         { LR"(D:\Projects\fe\grammars\Earley.G5.cycle.txt)", L"", LR"(d:\tmp\fsa\Earley.G5.cycle)" }
     };
 
@@ -269,15 +275,15 @@ void test_earley_parser()
 
             if(parser.status().custom_code() == status::custom_code::success)
             {
+                std::wcout << earley_visualization<my_earley_parser>::decorate_charts(parser.charts()).c_str() << std::endl;
+
+                earley_visualization<my_earley_parser>::print_trees(parser.trees(), std::wcout);
+                earley_visualization<my_earley_parser>::decorate_trees(parser.trees(), input.dot_file_name);
+
                 auto cst(std::dynamic_pointer_cast<my_earley_parser::earley_tree>(parser.trees()[0]));
 
                 ir<token<earley_token_traits>>::cst_to_ast(cst);
                 earley_visualization<my_earley_parser>::decorate_tree(cst, input.dot_file_name, 0);
-
-                std::wcout << earley_visualization<my_earley_parser>::decorate_charts(parser.charts()).c_str() << std::endl;
-
-                earley_visualization<my_earley_parser>::print_tree(parser.trees(), std::wcout);
-                earley_visualization<my_earley_parser>::decorate_trees(parser.trees(), input.dot_file_name);
             }
             else
             {

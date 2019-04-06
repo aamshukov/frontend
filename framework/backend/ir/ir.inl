@@ -192,6 +192,12 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
     }
 }
 
+template <typename T>
+void ir<T>::ast_to_asd(typename ir<T>::tree_type& ast)
+{
+    ast;//??
+}
+
 END_NAMESPACE
 
 #endif // __IR_INL__

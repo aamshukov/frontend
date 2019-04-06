@@ -22,6 +22,7 @@ class ir : private noncopyable
 
     public:
         static void cst_to_ast(tree_type& cst);
+        static void ast_to_asd(tree_type& ast);
 };
 
 END_NAMESPACE
