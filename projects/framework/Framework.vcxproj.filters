@@ -184,6 +184,9 @@
     <ClInclude Include="..\..\framework\backend\ir\ir.hpp">
       <Filter>backend\ir</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\parser_visualization.hpp">
+      <Filter>frontend\parser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="backend">
@@ -363,6 +366,9 @@
     </None>
     <None Include="..\..\framework\backend\ir\ir.inl">
       <Filter>backend\ir</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\parser\parser_visualization.inl">
+      <Filter>frontend\parser</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

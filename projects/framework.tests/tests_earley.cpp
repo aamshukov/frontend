@@ -60,6 +60,9 @@
 #include <frontend\parser\parser.hpp>
 #include <frontend\parser\parser.inl>
 
+#include <frontend\parser\parser_visualization.hpp>
+#include <frontend\parser\parser_visualization.inl>
+
 #include <frontend\parser\earley\earley_parser.hpp>
 #include <frontend\parser\earley\earley_parser.inl>
 
@@ -278,13 +281,17 @@ void test_earley_parser()
             {
                 std::wcout << earley_visualization<my_earley_parser>::decorate_charts(parser.charts()).c_str() << std::endl;
 
-                earley_visualization<my_earley_parser>::print_trees(parser.trees(), std::wcout);
-                earley_visualization<my_earley_parser>::decorate_trees(parser.trees(), input.dot_file_name);
+                parser_visualization<my_earley_parser>::print_trees(parser.trees(), std::wcout);
+                parser_visualization<my_earley_parser>::decorate_trees(parser.trees(), input.dot_file_name);
 
                 auto cst(std::dynamic_pointer_cast<my_earley_parser::earley_tree>(parser.trees()[0]));
 
                 ir<token<earley_token_traits>>::cst_to_ast(cst);
-                earley_visualization<my_earley_parser>::decorate_tree(cst, input.dot_file_name, 0);
+                parser_visualization<my_earley_parser>::decorate_tree(cst, input.dot_file_name, 0);
+
+                ir<token<earley_token_traits>>::dag_type asd;
+                ir<token<earley_token_traits>>::ast_to_asd(cst, asd);
+                parser_visualization<my_earley_parser>::decorate_dag(asd, input.dot_file_name);
             }
             else
             {

@@ -9,18 +9,14 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
+template <typename T>
 struct parser_dag : public dag
 {
-    enum class flags : uint64_t
-    {
-        clear = 0x0000
-    };
-
+    using token_type = T;
     using symbol_type = grammar::symbol_type;
-    using flags_type = tmpl_flags<flags>;
 
     symbol_type symbol;
-    flags_type flags;
+    token_type token; // might be empty for non-terminals
 
     virtual ~parser_dag()
     {

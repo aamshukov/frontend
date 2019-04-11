@@ -20,52 +20,46 @@ class ir : private noncopyable
         using tree_type = typename parser<token_type>::tree_type;
         using trees_type = typename parser<token_type>::trees_type;
 
-        struct dag_node_hash
+        using dag_type = typename parser<token_type>::dag_type;
+        using dags_type = typename parser<token_type>::dags_type;
+
+        using dag_key_type = std::vector<uint32_t>;
+
+        struct dag_hash
         {
-            std::size_t operator () (const tree_type&) const
+            std::size_t operator () (const dag_key_type& key) const
             {
-                return 0;
+                std::size_t result = key.size();
+
+                for(auto e : key)
+                {
+                    result ^= std::hash<std::size_t>{}(e) + 0x9E3779B9 + (result << 6) + (result >> 2); // aka boost hash_combine
+                }
+
+                return result;
             }
         };
 
-        struct dag_node_key_comparator
+        struct dag_key_comparator
         {
-            bool operator() (const tree_type& lhs, const tree_type& rhs) const
+            bool operator () (const dag_key_type& lhs, const dag_key_type& rhs) const
             {
-                return *lhs == *rhs;
+                return lhs == rhs;
             }
         };
 
-        using dag_cache_type = std::unordered_map<tree_type, tree_type, dag_node_hash, dag_node_key_comparator>;
+        using dag_cache_type = std::unordered_map<dag_key_type, dag_type, dag_hash, dag_key_comparator>;
+
+        using kids_type = std::vector<dag_type>;
 
     private:
-        static uint32_t     hash(uint32_t c); // c is key
+        static dag_key_type build_dag_key(const tree_type& tree, const kids_type& kids);
+        static dag_type     find_dag(const dag_key_type& key, const dag_cache_type& cache);
 
     public:
         static void         cst_to_ast(tree_type& cst);
-        static void         ast_to_asd(tree_type& ast);
+        static void         ast_to_asd(const tree_type& ast, dag_type& result_asd);
 };
-
-template <typename T>
-inline uint32_t ir<T>::hash(uint32_t c)
-{
-    // https://gist.github.com/badboy/6267743
-    // Robert Jenkins' 96 bit Mix Function
-    const uint32_t a = 57979867;
-    const uint32_t b = 93252091;
-
-    a=a-b; a=a-c; a=a^(c >> 13);
-    b=b-c; b=b-a; b=b^(a << 8);
-    c=c-a; c=c-b; c=c^(b >> 13);
-    a=a-b; a=a-c; a=a^(c >> 12);
-    b=b-c; b=b-a; b=b^(a << 16);
-    c=c-a; c=c-b; c=c^(b >> 5);
-    a=a-b; a=a-c; a=a^(c >> 3);
-    b=b-c; b=b-a; b=b^(a << 10);
-    c=c-a; c=c-b; c=c^(b >> 15);
-
-    return c;
-}
 
 END_NAMESPACE
 

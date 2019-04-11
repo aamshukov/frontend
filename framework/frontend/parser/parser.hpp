@@ -19,6 +19,9 @@ class parser : private noncopyable
         using tree_type = std::shared_ptr<parser_tree<token_type>>;
         using trees_type = std::vector<tree_type>;
 
+        using dag_type = std::shared_ptr<parser_dag<token_type>>;
+        using dags_type = std::vector<dag_type>;
+
     protected:
         lexical_analyzer_type   my_lexical_analyzer;
         trees_type              my_trees;
