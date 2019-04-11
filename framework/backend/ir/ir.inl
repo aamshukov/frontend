@@ -271,7 +271,7 @@ void ir<T>::ast_to_asd(const typename ir<T>::tree_type& ast, typename ir<T>::dag
     }
 
     // build dag
-    dag_type result_dag(factory::create<parser_dag<token_type>>());
+    dag_type result_dag;
 
     dag_cache_type cache;
 
@@ -297,7 +297,16 @@ void ir<T>::ast_to_asd(const typename ir<T>::tree_type& ast, typename ir<T>::dag
         if(new_dag == nullptr)
         {
             new_dag = factory::create<parser_dag<token_type>>();
+
+            (*new_dag).symbol = (*entry.tree).symbol;
+            (*new_dag).token = (*entry.tree).token;
+
             cache.emplace(std::make_pair(key, new_dag));
+        }
+
+        if(result_dag == nullptr)
+        {
+            result_dag = new_dag;
         }
 
         for(auto kid : current_dag_kids)
