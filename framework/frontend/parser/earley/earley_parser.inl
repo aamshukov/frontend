@@ -369,7 +369,8 @@ void earley_parser<T>::populate_rhs_stack(const typename earley_parser<T>::item_
 }
 
 template <typename T>
-void earley_parser<T>::clone_tree(const typename earley_parser<T>::parse_tree_element& source, typename earley_parser<T>::parse_tree_element& result)
+void earley_parser<T>::clone_tree(const typename earley_parser<T>::parse_tree_element& source,
+                                  typename earley_parser<T>::parse_tree_element& result)
 {
     struct queue_entry
     {

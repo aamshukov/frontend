@@ -30,7 +30,7 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
         queue.pop();
 
         // ignore 'deleted' nodes
-        if(((*node).flags & parser_tree<token_type>::flags::deleted) == parser_tree<token_type>::flags::deleted)
+        if(((*node).flags & tree::flags::deleted) == tree::flags::deleted)
         {
             continue;
         }
@@ -42,7 +42,7 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
             if(papa != nullptr)
             {
                 (*papa).kids.erase((std::remove((*papa).kids.begin(), (*papa).kids.end(), node)));
-                (*node).flags |= parser_tree<token_type>::flags::deleted;
+                (*node).flags |= tree::flags::deleted;
             }
 
             continue;
@@ -81,7 +81,7 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
         stack.pop();
 
         // ignore 'deleted' nodes
-        if(((*node).flags & parser_tree<token_type>::flags::deleted) == parser_tree<token_type>::flags::deleted)
+        if(((*node).flags & tree::flags::deleted) == tree::flags::deleted)
         {
             continue;
         }
@@ -107,7 +107,7 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
 
             if((*papa).kids.size() == 1)
             {
-                (*(*node).papa).flags |= parser_tree<token_type>::flags::deleted;
+                (*(*node).papa).flags |= tree::flags::deleted;
 
                 auto it = std::find((*(*papa).papa).kids.begin(), (*(*papa).papa).kids.end(), (*node).papa);
 
@@ -152,7 +152,7 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
         stack.pop();
 
         // ignore 'deleted' nodes
-        if(((*node).flags & parser_tree<token_type>::flags::deleted) == parser_tree<token_type>::flags::deleted)
+        if(((*node).flags & tree::flags::deleted) == tree::flags::deleted)
         {
             continue;
         }
@@ -166,7 +166,7 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
                 continue;
             }
 
-            (*papa).flags |= parser_tree<token_type>::flags::deleted;
+            (*papa).flags |= tree::flags::deleted;
 
             std::for_each((*papa).kids.begin(),
                           (*papa).kids.end(),
@@ -203,13 +203,18 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
 }
 
 template <typename T>
-typename ir<T>::dag_key_type ir<T>::build_dag_key(const typename ir<T>::tree_type& tree, const typename ir<T>::kids_type& kids)
+typename ir<T>::dag_key_type ir<T>::build_dag_key(const typename ir<T>::tree_type& tree)
 {
     dag_key_type result;
 
     result.emplace_back((*(*tree).symbol).id());
 
-    std::for_each(kids.begin(), kids.end(), [&result](const auto& dag) { result.emplace_back((*(*dag).symbol).id()); });
+    std::for_each((*tree).kids.begin(),
+                  (*tree).kids.end(),
+                  [&result](const auto& kid)
+                  {
+                      result.emplace_back((*(*std::dynamic_pointer_cast<parser_tree<token_type>>(kid)).symbol).id());
+                  });
 
     return result;
 }
@@ -239,86 +244,75 @@ void ir<T>::ast_to_asd(const typename ir<T>::tree_type& ast, typename ir<T>::dag
     //      2.1 Pop a node from first stack and push it to second stack.
     //      2.2 Push left and right children of the popped node to first stack.
     // 3. Process contents of second stack.
-    struct stack_entry
-    {
-        tree_type tree;
-        kids_type dag_kids;
-    };
-
-    std::stack<stack_entry> stack1;
-    std::stack<stack_entry> stack2;
+    std::stack<tree_type> stack1;
+    std::stack<tree_type> stack2;
 
     // 1. Push root to first stack.
-    stack1.push(stack_entry { ast, kids_type() });
+    stack1.push(ast);
 
     // 2. Loop while first stack is not empty.
     while(!stack1.empty())
     {
         // 2.1 Pop a node from first stack ...
-        auto entry(stack1.top());
+        auto tree(stack1.top());
 
         stack1.pop();
 
         // ... and push it to second stack.
-        stack2.push(entry);
+        stack2.push(tree);
 
         // 2.2 Push left and right children of the popped node to first stack.
-        for(std::size_t k = 0, n = (*entry.tree).kids.size(); k < n; k++)
+        for(std::size_t k = 0, n = (*tree).kids.size(); k < n; k++)
         {
-            auto kid = (*entry.tree).kids[k];
-            stack1.push(stack_entry { std::dynamic_pointer_cast<parser_tree<token_type>>(kid), kids_type() });
+            auto kid = (*tree).kids[k];
+            stack1.push(std::dynamic_pointer_cast<parser_tree<token_type>>(kid));
         }
     }
 
     // build dag
-    dag_type result_dag;
-
+    dag_type dag;
     dag_cache_type cache;
 
-    tree_type current_tree;
-    kids_type current_dag_kids;
+    std::size_t id = 0;
+
+    using map_type = std::map<tree_type, dag_type>;
+    map_type map; // mapping an original tree node to the new dag node
 
     while(!stack2.empty())
     {
-        auto entry(stack2.top());
+        auto tree(stack2.top());
 
         stack2.pop();
 
-        if(current_tree != entry.tree)
+        dag_key_type key(build_dag_key(tree));
+
+        dag = find_dag(key, cache);
+
+        if(dag == nullptr)
         {
-            current_tree = entry.tree;
-            current_dag_kids.clear();
+            dag = factory::create<parser_dag<token_type>>();
+
+            (*dag).symbol = (*tree).symbol;
+            (*dag).token = (*tree).token;
+
+            (*dag).id = ++id;
+
+            cache.emplace(std::make_pair(key, dag));
+
+            for(const auto& tree_kid : (*tree).kids)
+            {
+                auto it(map.find(std::dynamic_pointer_cast<parser_tree<token_type>>(tree_kid)));
+                auto dag_kid((*it).second);
+
+                (*dag).kids.emplace(dag_kid);
+                (*dag_kid).papas.emplace_back(dag);
+            }
         }
 
-        dag_key_type key(build_dag_key(entry.tree, current_dag_kids));
-
-        dag_type new_dag(find_dag(key, cache));
-
-        if(new_dag == nullptr)
-        {
-            new_dag = factory::create<parser_dag<token_type>>();
-
-            (*new_dag).symbol = (*entry.tree).symbol;
-            (*new_dag).token = (*entry.tree).token;
-
-            cache.emplace(std::make_pair(key, new_dag));
-        }
-
-        if(result_dag == nullptr)
-        {
-            result_dag = new_dag;
-        }
-
-        for(auto kid : current_dag_kids)
-        {
-            (*new_dag).kids.emplace_back(std::dynamic_pointer_cast<parser_dag<token_type>>(kid));
-            (*kid).papas.emplace_back(new_dag);
-        }
-
-        current_dag_kids.emplace_back(new_dag);
+        map.emplace(std::make_pair(tree, dag));
     }
 
-    result_asd.swap(result_dag);
+    result_asd.swap(dag);
 }
 
 END_NAMESPACE

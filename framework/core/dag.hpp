@@ -12,8 +12,9 @@ struct dag
 {
     enum class flags : uint64_t
     {
-        clear   = 0x0000,
-        deleted = 0x0001
+        clear     = 0x0000,
+        deleted   = 0x0001,
+        processed = 0x0008
     };
 
     using flags_type = tmpl_flags<flags>;
@@ -21,8 +22,20 @@ struct dag
     using dag_type = std::shared_ptr<dag>;
     using dags_type = std::vector<dag_type>;
 
+    struct dag_key_comparator
+    {
+        bool operator () (const dag_type& lhs, const dag_type& rhs) const
+        {
+            return (*lhs).id < (*rhs).id;
+        }
+    };
+
+    using kids_type = std::set<dag_type, dag_key_comparator>;
+
+    std::size_t id; // key
+
     dags_type papas; // parents
-    dags_type kids;
+    kids_type kids;
 
     flags_type flags;
 

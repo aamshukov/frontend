@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\framework\backend\ir\ir.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\ir_visitor.hpp" />
+    <ClInclude Include="..\..\framework\backend\ir\ir_visualization.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\quadruple.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\ssa.hpp" />
     <ClInclude Include="..\..\framework\core\command_line.hpp" />
@@ -129,6 +130,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Projects\fe\framework\backend\generator\x64\gen.obj</Outputs>
     </MASM>
     <None Include="..\..\framework\backend\ir\ir.inl" />
+    <None Include="..\..\framework\backend\ir\ir_visualization.inl" />
     <None Include="..\..\framework\frontend\lexical_analyzer\lexical_analyzer.inl" />
     <None Include="..\..\framework\frontend\parser\backtracking\recursive_descent_parser.inl" />
     <None Include="..\..\framework\frontend\parser\earley\earley_parser.inl" />

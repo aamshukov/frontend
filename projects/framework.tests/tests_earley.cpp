@@ -71,6 +71,8 @@
 
 #include <backend\ir\ir.hpp>
 #include <backend\ir\ir.inl>
+#include <backend\ir\ir_visualization.hpp>
+#include <backend\ir\ir_visualization.inl>
 
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
@@ -230,13 +232,16 @@ void test_earley_parser()
 
     std::vector<input_element> inputs =
     {
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a*b+a*b", LR"(d:\tmp\fsa\Expr.G_1)" },
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+a*(b-c)+(b-c)*d", LR"(d:\tmp\fsa\Expr.G_0)" },
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"(a+b)+a+b*a/a/b/b/b*a+(a+b)", LR"(d:\tmp\fsa\Expr.G_2)" },
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+(a*b-(b-a)+b/a)+(a+b)", LR"(d:\tmp\fsa\Expr.G0)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G0.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G0)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G1.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G1)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G2.txt)", L"a*(a+a)", LR"(d:\tmp\fsa\Earley.G2)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+a*(b-c)+(b-c)*d", LR"(d:\tmp\fsa\Expr.G_0_1)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"(b-c)+(b-c)", LR"(d:\tmp\fsa\Expr.G_0_2)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a*b+a*b", LR"(d:\tmp\fsa\Expr.G_0_3)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+b*c", LR"(d:\tmp\fsa\Expr.G_0_4)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+a", LR"(d:\tmp\fsa\Expr.G_0_5)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"(a+b)+a+b*a/a/b/b/b*a+(a+b)", LR"(d:\tmp\fsa\Expr.G_0_6)" },
+        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+(a*b-(b-a)+b/a)+(b-a)", LR"(d:\tmp\fsa\Expr.G_0_7)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G0.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G_0_1)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G1.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G_1_1)" },
+        { LR"(D:\Projects\fe\grammars\Earley.G2.txt)", L"a*(a+a)", LR"(d:\tmp\fsa\Earley.G_2_1)" },
         { LR"(D:\Projects\fe\grammars\Earley.G3.AYCOCK.HORSPOOL.txt)", L"a", LR"(d:\tmp\fsa\G3.AYCOCK.HORSPOOL)" },
         { LR"(D:\Projects\fe\grammars\Earley.G4.epsilon.txt)", L"aa", LR"(d:\tmp\fsa\G4.epsilon)" },
         { LR"(D:\Projects\fe\grammars\Earley.G5.cycle.txt)", L"", LR"(d:\tmp\fsa\Earley.G5.cycle)" }
@@ -281,17 +286,17 @@ void test_earley_parser()
             {
                 std::wcout << earley_visualization<my_earley_parser>::decorate_charts(parser.charts()).c_str() << std::endl;
 
-                parser_visualization<my_earley_parser>::print_trees(parser.trees(), std::wcout);
-                parser_visualization<my_earley_parser>::decorate_trees(parser.trees(), input.dot_file_name);
+                ir_visualization<my_earley_parser>::print_trees(parser.trees(), std::wcout);
+                ir_visualization<my_earley_parser>::decorate_trees(parser.trees(), input.dot_file_name);
 
                 auto cst(std::dynamic_pointer_cast<my_earley_parser::earley_tree>(parser.trees()[0]));
 
                 ir<token<earley_token_traits>>::cst_to_ast(cst);
-                parser_visualization<my_earley_parser>::decorate_tree(cst, input.dot_file_name, 0);
+                ir_visualization<my_earley_parser>::decorate_tree(cst, input.dot_file_name, 0);
 
                 ir<token<earley_token_traits>>::dag_type asd;
                 ir<token<earley_token_traits>>::ast_to_asd(cst, asd);
-                parser_visualization<my_earley_parser>::decorate_dag(asd, input.dot_file_name);
+                ir_visualization<my_earley_parser>::decorate_dag(asd, input.dot_file_name);
             }
             else
             {
@@ -300,3 +305,5 @@ void test_earley_parser()
         }
     }
 }
+
+// for %i in (d:\tmp\fsa\*.dot) do D:\Soft\graphviz\2.38\release\bin\dot -Tpng %i -o %i.png
