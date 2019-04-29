@@ -76,6 +76,4 @@ USINGNAMESPACE(backend)
 
 void test_ir()
 {
-    quadruple<int, int, int> q1(0, 0, 0, 0);
-    quadruple<int, int, int> q2(0, 0, 0);
 }

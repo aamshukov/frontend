@@ -11,30 +11,43 @@ BEGIN_NAMESPACE(backend)
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
-template <typename O, typename A, typename R>
 struct quadruple
 {
-    using operation_type = O;
-    using argument_type = A;
-    using result_type = R;
+    using symbol_type = symbol::symbol_type;
+    using symbols_type = symbol::symbols_type;
 
-    operation_type  operation;
-    argument_type   argument1;
-    argument_type   argument2;
-    result_type     result;
+    symbol_type operation;
+    symbol_type argument1;
+    symbol_type argument2;
+    symbol_type result;
 
-    quadruple(const operation_type& operation,
-              const argument_type& argument1,
-              const argument_type& argument2,
-              const result_type& result)
+    quadruple()
+    {
+    }
+
+    quadruple(const symbol_type& operation,
+              const symbol_type& argument1,
+              const symbol_type& argument2,
+              const symbol_type& result)
         : operation(operation), argument1(argument1), argument2(argument2), result(result)
     {
     }
 
-    quadruple(const operation_type& operation,
-              const argument_type& argument1,
-              const result_type& result)
-        : quadruple(operation, argument1, argument_type{}, result)
+    quadruple(const symbol_type& operation,
+              const symbol_type& argument1,
+              const symbol_type& result)
+        : quadruple(operation, argument1, nullptr, result)
+    {
+    }
+
+    quadruple(const symbol_type& operation,
+              const symbol_type& result)
+        : quadruple(operation, nullptr, nullptr, result)
+    {
+    }
+
+    quadruple(const symbol_type& operation)
+        : quadruple(operation, nullptr, nullptr, nullptr)
     {
     }
 

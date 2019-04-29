@@ -69,6 +69,8 @@
 #include <frontend\parser\earley\earley_visualization.hpp>
 #include <frontend\parser\earley\earley_visualization.inl>
 
+#include <backend\ir\quadruple.hpp>
+
 #include <backend\ir\ir.hpp>
 #include <backend\ir\ir.inl>
 #include <backend\ir\ir_visualization.hpp>

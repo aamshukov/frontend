@@ -52,6 +52,8 @@ class ir : private noncopyable
 
         using kids_type = std::vector<dag_type>;
 
+        using code_type = std::list<quadruple>;
+
     private:
         static dag_key_type build_dag_key(const tree_type& tree);
         static dag_type     find_dag(const dag_key_type& key, const dag_cache_type& cache);
