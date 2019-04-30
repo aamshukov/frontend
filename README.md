@@ -20,6 +20,6 @@ Covers:
 - **IR** related algorithms, **TAC**, **QUADRUPLES** and **SSA**
 - **Compiler/Interpretator** controller implementation
 
-and much more ... stay tuned.
+... stay tuned.
 
 **MIT License**
