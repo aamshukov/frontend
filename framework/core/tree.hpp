@@ -8,8 +8,6 @@
 
 BEGIN_NAMESPACE(core)
 
-class visitor;
-
 struct tree : private noncopyable
 {
     enum class flags : uint64_t
@@ -31,10 +29,6 @@ struct tree : private noncopyable
     flags_type flags;
 
     virtual ~tree()
-    {
-    }
-
-    virtual void accept(const visitor& /*visitor*/)
     {
     }
 };

@@ -23,6 +23,7 @@
 #include <core\dag.hpp>
 
 #include <core\visitor.hpp>
+#include <core\visitable.hpp>
 
 #include <frontend\grammar\token.hpp>
 #include <frontend\grammar\symbol.hpp>

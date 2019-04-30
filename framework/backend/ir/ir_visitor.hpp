@@ -11,12 +11,22 @@ BEGIN_NAMESPACE(backend)
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
-struct ir_visitor : public visitor
-{
-    void visit(const tree::tree_type& /*acceptor*/) override
-    {
-    }
-};
+
+//template <typename T>
+//struct ir_visitor : public visitor<ir_visitor, >
+//{
+//    using token_type = T;
+//
+//    using tree_type = typename parser<token_type>::tree_type;
+//    using trees_type = typename parser<token_type>::trees_type;
+//
+//    using dag_type = typename parser<token_type>::dag_type;
+//    using dags_type = typename parser<token_type>::dags_type;
+//
+//    void visit(const tree_type& /*acceptor*/) override
+//    {
+//    }
+//};
 
 END_NAMESPACE
 

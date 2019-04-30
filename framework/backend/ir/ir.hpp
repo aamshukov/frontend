@@ -23,7 +23,8 @@ class ir : private noncopyable
         using dag_type = typename parser<token_type>::dag_type;
         using dags_type = typename parser<token_type>::dags_type;
 
-        using dag_key_type = std::vector<uint32_t>;
+        using dag_key_pair = std::pair<uint32_t, token_type>;
+        using dag_key_type = std::vector<dag_key_pair>;
 
         struct dag_hash
         {
@@ -33,7 +34,7 @@ class ir : private noncopyable
 
                 for(auto e : key)
                 {
-                    result ^= std::hash<std::size_t>{}(e) + 0x9E3779B9 + (result << 6) + (result >> 2); // aka boost hash_combine
+                    result ^= std::hash<std::size_t>{}(e.first) + 0x9E3779B9 + (result << 6) + (result >> 2); // aka boost hash_combine
                 }
 
                 return result;
@@ -52,7 +53,7 @@ class ir : private noncopyable
 
         using kids_type = std::vector<dag_type>;
 
-        using code_type = std::list<quadruple>;
+        using code_type = std::list<quadruple>; //??
 
     private:
         static dag_key_type build_dag_key(const tree_type& tree);

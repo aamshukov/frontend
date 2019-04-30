@@ -24,6 +24,7 @@
     <ClInclude Include="..\..\framework\backend\ir\ir_visualization.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\quadruple.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\ssa.hpp" />
+    <ClInclude Include="..\..\framework\backend\ir\tac_visitor.hpp" />
     <ClInclude Include="..\..\framework\core\command_line.hpp" />
     <ClInclude Include="..\..\framework\core\configurator.hpp" />
     <ClInclude Include="..\..\framework\core\content.hpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="..\..\framework\core\text.hpp" />
     <ClInclude Include="..\..\framework\core\tree.hpp" />
     <ClInclude Include="..\..\framework\core\unicode.hpp" />
+    <ClInclude Include="..\..\framework\core\visitable.hpp" />
     <ClInclude Include="..\..\framework\core\visitor.hpp" />
     <ClInclude Include="..\..\framework\frontend\fsa\fsa.hpp" />
     <ClInclude Include="..\..\framework\frontend\fsa\fsa_algorithm.hpp" />
@@ -147,33 +149,33 @@
     <ProjectGuid>{C0F31E66-9BE9-4349-B2F9-5E7B688F9BA2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Framework</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>framework</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>

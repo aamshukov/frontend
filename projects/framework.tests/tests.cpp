@@ -18,9 +18,13 @@
 #include <core\flags.hpp>
 #include <core\command_line.hpp>
 #include <core\configurator.hpp>
+#include <core\enumerate.hpp>
+
 #include <core\tree.hpp>
 #include <core\dag.hpp>
-#include <core\enumerate.hpp>
+
+#include <core\visitor.hpp>
+#include <core\visitable.hpp>
 
 #include <frontend\grammar\token.hpp>
 #include <frontend\grammar\symbol.hpp>

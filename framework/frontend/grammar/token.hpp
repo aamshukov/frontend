@@ -84,6 +84,15 @@ struct token
             return *this;
         }
 
+        bool operator == (const token& other) const
+        {
+            return type == other.type &&
+                   offset == other.offset &&
+                   length == other.length &&
+                   literal == other.literal &&
+                   flags == other.flags;
+        }
+
         void reset()
         {
             type = token_type::unknown;

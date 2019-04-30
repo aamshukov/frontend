@@ -9,17 +9,24 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-template <typename T>
-struct parser_dag : public dag
+template <typename Token>
+struct parser_dag : public dag, public visitable<parser_dag<Token>>
 {
-    using token_type = T;
+    using token_type = Token;
     using symbol_type = grammar::symbol_type;
+
+    using visitor_type = visitor<parser_dag<token_type>>;
 
     symbol_type symbol;
     token_type token; // might be empty for non-terminals
 
     virtual ~parser_dag()
     {
+    }
+
+    void accept(visitor_type& visitor) override
+    {
+        visitor.visit(static_cast<parser_dag<token_type>&>(*this));
     }
 };
 

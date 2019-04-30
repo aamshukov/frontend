@@ -190,6 +190,12 @@
     <ClInclude Include="..\..\framework\backend\ir\ir_visualization.hpp">
       <Filter>backend\ir</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\backend\ir\tac_visitor.hpp">
+      <Filter>backend\ir</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\visitable.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="backend">

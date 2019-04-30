@@ -25,6 +25,7 @@
 #include <core\dag.hpp>
 
 #include <core\visitor.hpp>
+#include <core\visitable.hpp>
 
 #include <frontend\grammar\token.hpp>
 #include <frontend\grammar\symbol.hpp>
@@ -75,6 +76,8 @@
 #include <backend\ir\ir.inl>
 #include <backend\ir\ir_visualization.hpp>
 #include <backend\ir\ir_visualization.inl>
+
+#include <backend\ir\tac_visitor.hpp>
 
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
@@ -299,6 +302,12 @@ void test_earley_parser()
                 ir<token<earley_token_traits>>::dag_type asd;
                 ir<token<earley_token_traits>>::ast_to_asd(cst, asd);
                 ir_visualization<my_earley_parser>::decorate_dag(asd, input.dot_file_name);
+
+                using token_type = token<earley_token_traits>;
+
+                tac_visitor<token_type> visitor;
+
+                (*asd).accept(visitor);
             }
             else
             {

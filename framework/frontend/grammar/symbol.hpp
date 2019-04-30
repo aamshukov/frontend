@@ -81,7 +81,7 @@ class symbol
 
         string_type                     my_semantic_action; // semantic action (C++ code)
 
-        std::size_t                     my_ssa_id;
+        std::size_t                     my_ssa_id;          // 0 - unassigned, 1+
 
     public:
                                         symbol(uint32_t id, const string_type& name, kind type);

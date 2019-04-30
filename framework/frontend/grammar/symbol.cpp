@@ -19,13 +19,14 @@ symbol::symbol(uint32_t id, const string_type& name, symbol::kind type)
       : my_id(id),
         my_name(name),
         my_kind(type),
+        my_flags(flags::clear),
         my_nullable(false),
         my_productive(false),
         my_accessible(false),
         my_precedence(0),
         my_associativity(symbol::associativity_type::left),
         my_erroneous(false),
-        my_flags(flags::clear)
+        my_ssa_id(0)
 {
 }
 
@@ -55,6 +56,10 @@ symbol::symbol(const symbol& other)
         my_eff_sets = other.my_eff_sets;
 
         my_la_sets = other.my_la_sets;
+
+        my_semantic_action = other.my_semantic_action;
+
+        my_ssa_id = other.my_ssa_id;
     }
 }
 
@@ -82,6 +87,12 @@ symbol::symbol(symbol&& other)
         my_follow_sets = std::move(other.my_follow_sets);
 
         my_eff_sets = std::move(other.my_eff_sets);
+
+        my_la_sets = std::move(other.my_la_sets);
+
+        my_semantic_action = std::move(other.my_semantic_action);
+
+        my_ssa_id = other.my_ssa_id;
     }
 }
 
@@ -115,6 +126,10 @@ const symbol& symbol::operator = (const symbol& other)
         my_eff_sets = other.my_eff_sets;
 
         my_la_sets = other.my_la_sets;
+
+        my_semantic_action = other.my_semantic_action;
+
+        my_ssa_id = other.my_ssa_id;
     }
 
     return *this;
@@ -146,6 +161,10 @@ symbol& symbol::operator = (symbol&& other)
         my_eff_sets = std::move(other.my_eff_sets);
 
         my_la_sets = std::move(other.my_la_sets);
+
+        my_semantic_action = std::move(other.my_semantic_action);
+
+        my_ssa_id = other.my_ssa_id;
     }
 
     return *this;

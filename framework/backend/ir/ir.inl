@@ -207,13 +207,15 @@ typename ir<T>::dag_key_type ir<T>::build_dag_key(const typename ir<T>::tree_typ
 {
     dag_key_type result;
 
-    result.emplace_back((*(*tree).symbol).id());
+    result.emplace_back(std::make_pair((*(*tree).symbol).id(), (*tree).token));
 
     std::for_each((*tree).kids.begin(),
                   (*tree).kids.end(),
                   [&result](const auto& kid)
                   {
-                      result.emplace_back((*(*std::dynamic_pointer_cast<parser_tree<token_type>>(kid)).symbol).id());
+                      auto tree_kid(std::dynamic_pointer_cast<parser_tree<token_type>>(kid));
+
+                      result.emplace_back(std::make_pair((*(*tree_kid).symbol).id(), (*tree_kid).token));
                   });
 
     return result;
