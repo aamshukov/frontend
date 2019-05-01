@@ -77,7 +77,8 @@
 #include <backend\ir\ir_visualization.hpp>
 #include <backend\ir\ir_visualization.inl>
 
-#include <backend\ir\tac_visitor.hpp>
+#include <backend\ir\tree_tac_visitor.hpp>
+#include <backend\ir\dag_tac_visitor.hpp>
 
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
@@ -305,9 +306,11 @@ void test_earley_parser()
 
                 using token_type = token<earley_token_traits>;
 
-                tac_visitor<token_type> visitor;
+                tree_tac_visitor<token_type> tree_visitor;
+                (*cst).accept(tree_visitor);
 
-                (*asd).accept(visitor);
+                dag_tac_visitor<token_type> dag_visitor;
+                (*asd).accept(dag_visitor);
             }
             else
             {

@@ -1,8 +1,8 @@
 //..............................
 // UI Lab Inc. Arthur Amshukov .
 //..............................
-#ifndef __TAC_VISITOR_H__
-#define __TAC_VISITOR_H__
+#ifndef __DAG_TAC_VISITOR_H__
+#define __DAG_TAC_VISITOR_H__
 
 #pragma once
 
@@ -13,7 +13,7 @@ USINGNAMESPACE(frontend)
 
 
 template <typename Token>
-struct tac_visitor : public visitor<parser_dag<Token>>
+struct dag_tac_visitor : public visitor<parser_dag<Token>>
 {
     using dag_type = parser_dag<Token>;
 
@@ -25,4 +25,4 @@ struct tac_visitor : public visitor<parser_dag<Token>>
 
 END_NAMESPACE
 
-#endif // __TAC_VISITOR_H__
+#endif // __DAG_TAC_VISITOR_H__

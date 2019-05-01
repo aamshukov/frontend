@@ -9,17 +9,24 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-template <typename T>
-struct parser_tree : public tree
+template <typename Token>
+struct parser_tree : public tree, public visitable<parser_tree<Token>>
 {
-    using token_type = T;
+    using token_type = Token;
     using symbol_type = grammar::symbol_type;
+
+    using visitor_type = visitor<parser_tree<token_type>>;
 
     symbol_type symbol;
     token_type token; // might be empty for non-terminals
 
     virtual ~parser_tree()
     {
+    }
+
+    void accept(visitor_type& visitor) override
+    {
+        visitor.visit(static_cast<parser_tree<token_type>&>(*this));
     }
 };
 

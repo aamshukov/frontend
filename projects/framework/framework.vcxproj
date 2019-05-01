@@ -24,7 +24,8 @@
     <ClInclude Include="..\..\framework\backend\ir\ir_visualization.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\quadruple.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\ssa.hpp" />
-    <ClInclude Include="..\..\framework\backend\ir\tac_visitor.hpp" />
+    <ClInclude Include="..\..\framework\backend\ir\dag_tac_visitor.hpp" />
+    <ClInclude Include="..\..\framework\backend\ir\tree_tac_visitor.hpp" />
     <ClInclude Include="..\..\framework\core\command_line.hpp" />
     <ClInclude Include="..\..\framework\core\configurator.hpp" />
     <ClInclude Include="..\..\framework\core\content.hpp" />
