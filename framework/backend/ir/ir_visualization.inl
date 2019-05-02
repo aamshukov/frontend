@@ -114,7 +114,7 @@ void ir_visualization<T>::collect_dag_dot_labels(const typename ir_visualization
 
         queue.pop();
 
-        stream << L"    " << (*dag).id << L" [label=\"" << (*(*dag).symbol).name() << L"  " << (*dag).papas <<  "\"];" << std::endl;
+        stream << L"    " << (*dag).id << L" [label=\"" << (*(*dag).symbol).name() << L"  " << (*dag).papas.size() <<  "\"];" << std::endl;
 
         for(auto kid : (*dag).kids)
         {
@@ -148,8 +148,14 @@ void ir_visualization<T>::build_dag_dot_graph(const typename ir_visualization<T>
 
         for(auto kid : (*node).kids)
         {
-            auto dag_kid(std::dynamic_pointer_cast<parser_dag<token_type>>(kid));
-            stream << L"    " << (*node).id << L" -> " << (*dag_kid).id << L";" << std::endl;
+            for(auto papa : (*kid).papas)
+            {
+                if(papa == node)
+                {
+                    auto dag_kid(std::dynamic_pointer_cast<parser_dag<token_type>>(kid));
+                    stream << L"    " << (*node).id << L" -> " << (*dag_kid).id << L";" << std::endl;
+                }
+            }
 
             queue.emplace(std::dynamic_pointer_cast<parser_dag<token_type>>(kid));
         }

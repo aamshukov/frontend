@@ -311,18 +311,18 @@ void ir<T>::ast_to_asd(const typename ir<T>::tree_type& ast, typename ir<T>::dag
                 auto dag_kid((*it).second);
 
                 (*dag).kids.emplace(dag_kid);
-
-                //(*dag_kid).papas.emplace_back(dag);
-                (*dag_kid).papa = dag;
+                (*dag_kid).papas.emplace_back(dag);
             }
         }
-
-        for(const auto& tree_kid : (*tree).kids)
+        else
         {
-            auto it(map.find(std::dynamic_pointer_cast<parser_tree<token_type>>(tree_kid)));
-            auto dag_kid((*it).second);
+            //for(const auto& tree_kid : (*tree).kids)
+            //{
+            //    auto it(map.find(std::dynamic_pointer_cast<parser_tree<token_type>>(tree_kid)));
+            //    auto dag_kid((*it).second);
 
-            (*dag_kid).papas++;
+            //    (*dag_kid).papas++;
+            //}
         }
 
         map.emplace(std::make_pair(tree, dag));
