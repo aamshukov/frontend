@@ -199,6 +199,12 @@
     <ClInclude Include="..\..\framework\backend\symtable\symbol_table.hpp">
       <Filter>backend\symtable</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\semantics\semantics.hpp">
+      <Filter>frontend\semantics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\controller\controller.hpp">
+      <Filter>controller</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="backend">
@@ -384,6 +390,9 @@
     </None>
     <None Include="..\..\framework\backend\symtable\symbol_table.inl">
       <Filter>backend\symtable</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\semantics\semantics.inl">
+      <Filter>frontend\semantics</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

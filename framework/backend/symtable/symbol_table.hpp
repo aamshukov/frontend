@@ -11,7 +11,7 @@ BEGIN_NAMESPACE(backend)
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
-template <typename T>
+template <typename Token>
 class symbol_table : private noncopyable
 {
     // hashtable and stack, LeBlanc/Cook
@@ -25,9 +25,9 @@ class symbol_table : private noncopyable
     //    symbol_attributes_type  table;
     //    stack_type              stack; // display
 
-    //public:
-    //                            symbol_table();
-    //                           ~symbol_table();
+    public:
+                                symbol_table();
+                               ~symbol_table();
     //    // enter scope
     //    // leave scope
 

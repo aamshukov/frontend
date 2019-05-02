@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="core">
+      <UniqueIdentifier>{1470877b-a90a-4f7e-83c1-2dab35e88466}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend">
+      <UniqueIdentifier>{145ca342-2ef5-42ff-85f7-925a8e31c52c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\lexical_analyzer">
+      <UniqueIdentifier>{d4b8677a-824a-470a-b60a-1ad54861639a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\grammar">
+      <UniqueIdentifier>{f981c3ac-554e-4711-a7b5-8ccb181011f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="backend">
+      <UniqueIdentifier>{8bdffc61-9774-496f-976c-5498a72a8f68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="backend\symtable">
+      <UniqueIdentifier>{965b0d43-cea2-46fa-9f11-1406e800d391}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="docs">
+      <UniqueIdentifier>{69ef14e2-4e41-4986-a290-20d640843faf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\framework\core\pch.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\languages\arcturus\docs\arcturus-grammar.txt">
+      <Filter>docs</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
