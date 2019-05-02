@@ -1,10 +1,10 @@
-docs
 staging
 grammars
 libs
 build
 projects/.vs
 x64
+tmp
 *.user
 
 

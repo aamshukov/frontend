@@ -30,6 +30,9 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">core\pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\languages\arcturus\docs\arcturus-grammar.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{F0641911-1131-4178-B9D5-01F32347DB6F}</ProjectGuid>

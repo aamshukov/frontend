@@ -19,10 +19,18 @@
     <Filter Include="backend\symtable">
       <UniqueIdentifier>{965b0d43-cea2-46fa-9f11-1406e800d391}</UniqueIdentifier>
     </Filter>
+    <Filter Include="docs">
+      <UniqueIdentifier>{69ef14e2-4e41-4986-a290-20d640843faf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\core\pch.cpp">
       <Filter>core</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\languages\arcturus\docs\arcturus-grammar.txt">
+      <Filter>docs</Filter>
+    </Text>
   </ItemGroup>
 </Project>
