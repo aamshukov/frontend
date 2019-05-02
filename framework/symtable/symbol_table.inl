@@ -6,7 +6,7 @@
 
 #pragma once
 
-BEGIN_NAMESPACE(backend)
+BEGIN_NAMESPACE(symtable)
 
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)

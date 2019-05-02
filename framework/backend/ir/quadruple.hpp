@@ -10,6 +10,7 @@ BEGIN_NAMESPACE(backend)
 
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
+USINGNAMESPACE(symtable)
 
 template <typename Token>
 struct quadruple

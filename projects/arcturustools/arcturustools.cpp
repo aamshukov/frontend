@@ -65,9 +65,9 @@
 #include <frontend/parser/parser_visualization.hpp>
 #include <frontend/parser/parser_visualization.inl>
 
-#include <backend/symtable/symtab_symbol.hpp>
-#include <backend/symtable/symbol_table.hpp>
-#include <backend/symtable/symbol_table.inl>
+#include <symtable/symtab_symbol.hpp>
+#include <symtable/symbol_table.hpp>
+#include <symtable/symbol_table.inl>
 
 #include <frontend/semantics/semantics.hpp>
 #include <frontend/semantics/semantics.inl>
@@ -86,6 +86,7 @@
 #include <backend/ir/ir_visualization.inl>
 
 #include <controller/controller.hpp>
+
 
 BEGIN_NAMESPACE(arcturus)
 
