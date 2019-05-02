@@ -73,8 +73,9 @@
 #include <frontend\parser\lr\lr_parser.hpp>
 #include <frontend\parser\lr\lr_parser.inl>
 
-#include <frontend\semantics\symbol_attribute.hpp>
-#include <frontend\semantics\symbol_table.hpp>
+#include <backend\symtable\symtab_symbol.hpp>
+#include <backend\symtable\symbol_table.hpp>
+#include <backend\symtable\symbol_table.hpp>
 
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)

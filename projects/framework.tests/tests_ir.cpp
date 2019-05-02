@@ -64,6 +64,10 @@
 #include <frontend\parser\lr\lr_parser.hpp>
 #include <frontend\parser\lr\lr_parser.inl>
 
+#include <backend\symtable\symtab_symbol.hpp>
+#include <backend\symtable\symbol_table.hpp>
+#include <backend\symtable\symbol_table.hpp>
+
 #include <backend\ir\quadruple.hpp>
 #include <backend\ir\ssa.hpp>
 #include <backend\ir\ir_visitor.hpp>

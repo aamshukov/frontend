@@ -11,10 +11,13 @@ BEGIN_NAMESPACE(backend)
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
+template <typename Token>
 struct quadruple
 {
-    using symbol_type = symbol::symbol_type;
-    using symbols_type = symbol::symbols_type;
+    using token_type = Token;
+
+    using symbol_type = typename symtab_symbol<token_type>::symbol_type;
+    using symbols_type = typename symtab_symbol<token_type>::symbols_type;
 
     symbol_type operation;
     symbol_type argument1;

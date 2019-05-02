@@ -12,7 +12,6 @@
 #include <core\data_provider.hpp>
 #include <core\file_data_provider.hpp>
 #include <core\string_data_provider.hpp>
-#include <core\content.hpp>
 #include <core\counter.hpp>
 #include <core\factory.hpp>
 #include <core\singleton.hpp>
@@ -69,6 +68,10 @@
 
 #include <frontend\parser\earley\earley_visualization.hpp>
 #include <frontend\parser\earley\earley_visualization.inl>
+
+#include <backend\symtable\symtab_symbol.hpp>
+#include <backend\symtable\symbol_table.hpp>
+#include <backend\symtable\symbol_table.hpp>
 
 #include <backend\ir\quadruple.hpp>
 

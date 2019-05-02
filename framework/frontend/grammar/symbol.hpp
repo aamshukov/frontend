@@ -9,7 +9,6 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-
 class symbol
 {
     public:
@@ -81,8 +80,6 @@ class symbol
 
         string_type                     my_semantic_action; // semantic action (C++ code)
 
-        std::size_t                     my_ssa_id;          // 0 - unassigned, 1+
-
     public:
                                         symbol(uint32_t id, const string_type& name, kind type);
 
@@ -137,9 +134,6 @@ class symbol
 
         const string_type&              semantic_action() const;
         string_type&                    semantic_action();
-
-        std::size_t                     ssa_id() const;
-        std::size_t&                    ssa_id();
 };
 
 inline uint32_t symbol::id() const
@@ -285,16 +279,6 @@ inline const string_type& symbol::semantic_action() const
 inline string_type& symbol::semantic_action()
 {
     return const_cast<string_type&>(static_cast<const symbol&>(*this).semantic_action());
-}
-
-inline std::size_t symbol::ssa_id() const
-{
-    return my_ssa_id;
-}
-
-inline std::size_t& symbol::ssa_id()
-{
-    return my_ssa_id;
 }
 
 END_NAMESPACE

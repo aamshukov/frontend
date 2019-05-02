@@ -289,6 +289,11 @@ void ir<T>::ast_to_asd(const typename ir<T>::tree_type& ast, typename ir<T>::dag
 
         dag = find_dag(key, cache);
 
+        //if(dag need to be invalidated)
+        //{
+        //    dag = nullptr;
+        //}
+
         if(dag == nullptr)
         {
             dag = factory::create<parser_dag<token_type>>();

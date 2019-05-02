@@ -25,8 +25,7 @@ symbol::symbol(uint32_t id, const string_type& name, symbol::kind type)
         my_accessible(false),
         my_precedence(0),
         my_associativity(symbol::associativity_type::left),
-        my_erroneous(false),
-        my_ssa_id(0)
+        my_erroneous(false)
 {
 }
 
@@ -58,8 +57,6 @@ symbol::symbol(const symbol& other)
         my_la_sets = other.my_la_sets;
 
         my_semantic_action = other.my_semantic_action;
-
-        my_ssa_id = other.my_ssa_id;
     }
 }
 
@@ -91,8 +88,6 @@ symbol::symbol(symbol&& other)
         my_la_sets = std::move(other.my_la_sets);
 
         my_semantic_action = std::move(other.my_semantic_action);
-
-        my_ssa_id = other.my_ssa_id;
     }
 }
 
@@ -128,8 +123,6 @@ const symbol& symbol::operator = (const symbol& other)
         my_la_sets = other.my_la_sets;
 
         my_semantic_action = other.my_semantic_action;
-
-        my_ssa_id = other.my_ssa_id;
     }
 
     return *this;
@@ -163,8 +156,6 @@ symbol& symbol::operator = (symbol&& other)
         my_la_sets = std::move(other.my_la_sets);
 
         my_semantic_action = std::move(other.my_semantic_action);
-
-        my_ssa_id = other.my_ssa_id;
     }
 
     return *this;

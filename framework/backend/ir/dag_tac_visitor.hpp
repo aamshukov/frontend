@@ -17,9 +17,8 @@ struct dag_tac_visitor : public visitor<parser_dag<Token>>
 {
     using dag_type = parser_dag<Token>;
 
-    void visit(dag_type& dag) override
+    void visit(dag_type& /*dag*/) override
     {
-        dag;//??
     }
 };
 

@@ -26,6 +26,8 @@
     <ClInclude Include="..\..\framework\backend\ir\ssa.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\dag_tac_visitor.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\tree_tac_visitor.hpp" />
+    <ClInclude Include="..\..\framework\backend\symtable\symbol_table.hpp" />
+    <ClInclude Include="..\..\framework\backend\symtable\symtab_symbol.hpp" />
     <ClInclude Include="..\..\framework\core\command_line.hpp" />
     <ClInclude Include="..\..\framework\core\configurator.hpp" />
     <ClInclude Include="..\..\framework\core\content.hpp" />
@@ -83,8 +85,6 @@
     <ClInclude Include="..\..\framework\frontend\parser\parser_dag.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\parser_tree.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\parser_visualization.hpp" />
-    <ClInclude Include="..\..\framework\frontend\semantics\symbol_attribute.hpp" />
-    <ClInclude Include="..\..\framework\frontend\semantics\symbol_table.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\core\content.cpp" />
@@ -134,6 +134,7 @@
     </MASM>
     <None Include="..\..\framework\backend\ir\ir.inl" />
     <None Include="..\..\framework\backend\ir\ir_visualization.inl" />
+    <None Include="..\..\framework\backend\symtable\symbol_table.inl" />
     <None Include="..\..\framework\frontend\lexical_analyzer\lexical_analyzer.inl" />
     <None Include="..\..\framework\frontend\parser\backtracking\recursive_descent_parser.inl" />
     <None Include="..\..\framework\frontend\parser\earley\earley_parser.inl" />
@@ -143,8 +144,6 @@
     <None Include="..\..\framework\frontend\parser\operator_precedence\precedence_parser.inl" />
     <None Include="..\..\framework\frontend\parser\parser.inl" />
     <None Include="..\..\framework\frontend\parser\parser_visualization.inl" />
-    <None Include="..\..\framework\frontend\semantics\symbol_attribute.inl" />
-    <None Include="..\..\framework\frontend\semantics\symbol_table.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C0F31E66-9BE9-4349-B2F9-5E7B688F9BA2}</ProjectGuid>

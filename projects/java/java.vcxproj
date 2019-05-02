@@ -29,8 +29,13 @@
     <ClCompile Include="..\..\languages\java\frontend\lexical_analyzer\java_lexical_analyzer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\languages\java\backend\symtable\java_symbol_table.hpp" />
+    <ClInclude Include="..\..\languages\java\backend\symtable\java_symtab_symbol.hpp" />
     <ClInclude Include="..\..\languages\java\frontend\grammar\java_token.hpp" />
     <ClInclude Include="..\..\languages\java\frontend\lexical_analyzer\java_lexical_analyzer.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\languages\java\backend\symtable\java_symbol_table.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -164,6 +169,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\languages;$(SolutionDir)..\framework;$(SolutionDir)..\libs\ICU\icu4c-60_2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>core\pch.hpp</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

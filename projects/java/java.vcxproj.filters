@@ -13,6 +13,12 @@
     <Filter Include="frontend\grammar">
       <UniqueIdentifier>{7abfcd8e-fff4-4493-9bbc-9b31eb9797b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="backend">
+      <UniqueIdentifier>{50f9830c-c594-4381-8b9d-291223278227}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="backend\symtable">
+      <UniqueIdentifier>{8eb70ddf-4fa4-49cb-83eb-725f44f96c13}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\core\pch.cpp">
@@ -32,5 +38,16 @@
     <ClInclude Include="..\..\languages\java\frontend\grammar\java_token.hpp">
       <Filter>frontend\grammar</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\languages\java\backend\symtable\java_symtab_symbol.hpp">
+      <Filter>backend\symtable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\languages\java\backend\symtable\java_symbol_table.hpp">
+      <Filter>backend\symtable</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\languages\java\backend\symtable\java_symbol_table.inl">
+      <Filter>backend\symtable</Filter>
+    </None>
   </ItemGroup>
 </Project>

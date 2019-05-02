@@ -118,6 +118,8 @@ inline void lexical_analyzer<T>::epilog()
 
     my_token.offset = std::ptrdiff_t(my_ptr_lexeme - my_start_content);
     my_token.length = static_cast<uint32_t>(std::ptrdiff_t(my_ptr - my_ptr_lexeme));
+
+    my_token.literal.assign(my_ptr_lexeme, my_token.length);
 }
 
 END_NAMESPACE

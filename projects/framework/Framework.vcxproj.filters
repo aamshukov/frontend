@@ -148,20 +148,11 @@
     <ClInclude Include="..\..\framework\core\enumerate.hpp">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\frontend\semantics\symbol_table.hpp">
-      <Filter>frontend\semantics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\frontend\semantics\symbol_attribute.hpp">
-      <Filter>frontend\semantics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\core\statistics.hpp">
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\core\string_data_provider.hpp">
       <Filter>core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\framework\backend\ir\quadruple.hpp">
-      <Filter>backend\ir</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\backend\ir\ir_visitor.hpp">
       <Filter>backend\ir</Filter>
@@ -198,6 +189,15 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\backend\ir\tree_tac_visitor.hpp">
       <Filter>backend\ir</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\backend\ir\quadruple.hpp">
+      <Filter>backend\ir</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\backend\symtable\symtab_symbol.hpp">
+      <Filter>backend\symtable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\backend\symtable\symbol_table.hpp">
+      <Filter>backend\symtable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -254,6 +254,9 @@
     </Filter>
     <Filter Include="backend\generator\x64">
       <UniqueIdentifier>{99edacde-fd9e-49ea-aabb-23e15810fa7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="backend\symtable">
+      <UniqueIdentifier>{2a72f62e-cd1b-4f0c-b493-edf005b33872}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -367,12 +370,6 @@
     <None Include="..\..\framework\frontend\parser\earley\earley_parser.inl">
       <Filter>frontend\parser\earley</Filter>
     </None>
-    <None Include="..\..\framework\frontend\semantics\symbol_attribute.inl">
-      <Filter>frontend\semantics</Filter>
-    </None>
-    <None Include="..\..\framework\frontend\semantics\symbol_table.inl">
-      <Filter>frontend\semantics</Filter>
-    </None>
     <None Include="..\..\framework\frontend\parser\earley\earley_visualization.inl">
       <Filter>frontend\parser\earley</Filter>
     </None>
@@ -384,6 +381,9 @@
     </None>
     <None Include="..\..\framework\backend\ir\ir_visualization.inl">
       <Filter>backend\ir</Filter>
+    </None>
+    <None Include="..\..\framework\backend\symtable\symbol_table.inl">
+      <Filter>backend\symtable</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
