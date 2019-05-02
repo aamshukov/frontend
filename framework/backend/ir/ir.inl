@@ -289,7 +289,7 @@ void ir<T>::ast_to_asd(const typename ir<T>::tree_type& ast, typename ir<T>::dag
 
         dag = find_dag(key, cache);
 
-        //if(dag need to be invalidated)
+        //if(dag need to be invalidated, assignement = ...)
         //{
         //    dag = nullptr;
         //}
@@ -311,8 +311,18 @@ void ir<T>::ast_to_asd(const typename ir<T>::tree_type& ast, typename ir<T>::dag
                 auto dag_kid((*it).second);
 
                 (*dag).kids.emplace(dag_kid);
-                (*dag_kid).papas.emplace_back(dag);
+
+                //(*dag_kid).papas.emplace_back(dag);
+                (*dag_kid).papa = dag;
             }
+        }
+
+        for(const auto& tree_kid : (*tree).kids)
+        {
+            auto it(map.find(std::dynamic_pointer_cast<parser_tree<token_type>>(tree_kid)));
+            auto dag_kid((*it).second);
+
+            (*dag_kid).papas++;
         }
 
         map.emplace(std::make_pair(tree, dag));

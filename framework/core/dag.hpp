@@ -34,7 +34,10 @@ struct dag
 
     std::size_t id; // key
 
-    dags_type papas; // parents
+    //dags_type papas; // parents
+    dag_type papa;
+    std::size_t papas; // parents
+
     kids_type kids;
 
     flags_type flags;

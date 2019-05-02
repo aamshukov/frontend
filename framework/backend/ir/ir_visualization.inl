@@ -110,13 +110,13 @@ void ir_visualization<T>::collect_dag_dot_labels(const typename ir_visualization
 
     while(!queue.empty())
     {
-        auto entry(queue.front());
+        auto dag(queue.front());
 
         queue.pop();
 
-        stream << L"    " << (*entry).id << L" [label=\"" << (*(*entry).symbol).name() << L"\"];" << std::endl;
+        stream << L"    " << (*dag).id << L" [label=\"" << (*(*dag).symbol).name() << L"  " << (*dag).papas <<  "\"];" << std::endl;
 
-        for(auto kid : (*entry).kids)
+        for(auto kid : (*dag).kids)
         {
             auto dag_kid(std::dynamic_pointer_cast<parser_dag<token_type>>(kid));
             queue.emplace(dag_kid);
