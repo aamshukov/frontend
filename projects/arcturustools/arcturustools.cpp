@@ -65,7 +65,7 @@
 #include <frontend/parser/parser_visualization.hpp>
 #include <frontend/parser/parser_visualization.inl>
 
-#include <symtable/symtab_symbol.hpp>
+#include <symtable/symbol_table_record.hpp>
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
 

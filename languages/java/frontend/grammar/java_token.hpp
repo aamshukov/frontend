@@ -22,6 +22,8 @@ struct java_token_traits : public token_traits
         eol, // LF, CR, CR LF
         eos,
         ws,
+        indent,
+        dedent,
 
         binary_integer_lit,
         octal_integer_lit,

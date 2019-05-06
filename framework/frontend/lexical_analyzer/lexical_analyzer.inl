@@ -15,7 +15,9 @@ lexical_analyzer<T>::lexical_analyzer(const typename lexical_analyzer<T>::conten
                      my_start_content((*my_content).data()),
                      my_end_content(my_start_content + (*my_content).count()),
                      my_ptr(my_start_content),
-                     my_ptr_lexeme(nullptr)
+                     my_ptr_lexeme(nullptr),
+                     my_indent(0),
+                     my_begining_of_line(true)
 {
 }
 

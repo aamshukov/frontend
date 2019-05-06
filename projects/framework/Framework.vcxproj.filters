@@ -199,10 +199,10 @@
     <ClInclude Include="..\..\framework\controller\controller.hpp">
       <Filter>controller</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\symtable\symtab_symbol.hpp">
+    <ClInclude Include="..\..\framework\symtable\symbol_table.hpp">
       <Filter>symtable</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\symtable\symbol_table.hpp">
+    <ClInclude Include="..\..\framework\symtable\symbol_table_record.hpp">
       <Filter>symtable</Filter>
     </ClInclude>
   </ItemGroup>

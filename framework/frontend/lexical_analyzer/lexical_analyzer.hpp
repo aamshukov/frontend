@@ -23,6 +23,8 @@ class lexical_analyzer : private noncopyable
 
         using snapshots_type = std::stack<const datum_type*>;
 
+        using indents_type = std::stack<std::size_t>;
+
     protected:
         content_type                my_content;         // loaded content
 
@@ -36,6 +38,10 @@ class lexical_analyzer : private noncopyable
         const datum_type*           my_ptr_lexeme;      // begining position of lexeme in content
 
         snapshots_type              my_snapshots;       // backtracking's snapshots
+
+        std::size_t                 my_indent;          // current indentation index, aka python
+        indents_type                my_indents;         // stack of indents, theoretically unlimited
+        bool                        my_begining_of_line;// true if at the begining of a new line
 
     private:
         void                        prolog();

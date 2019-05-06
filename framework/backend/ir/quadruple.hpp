@@ -17,40 +17,40 @@ struct quadruple
 {
     using token_type = Token;
 
-    using symbol_type = typename symtab_symbol<token_type>::symbol_type;
-    using symbols_type = typename symtab_symbol<token_type>::symbols_type;
+    using record_type = typename symbol_table_record<token_type>::record_type;
+    using records_type = typename symbol_table_record<token_type>::records_type;
 
-    symbol_type operation;
-    symbol_type argument1;
-    symbol_type argument2;
-    symbol_type result;
+    record_type operation;
+    record_type argument1;
+    record_type argument2;
+    record_type result;
 
     quadruple()
     {
     }
 
-    quadruple(const symbol_type& operation,
-              const symbol_type& argument1,
-              const symbol_type& argument2,
-              const symbol_type& result)
+    quadruple(const record_type& operation,
+              const record_type& argument1,
+              const record_type& argument2,
+              const record_type& result)
         : operation(operation), argument1(argument1), argument2(argument2), result(result)
     {
     }
 
-    quadruple(const symbol_type& operation,
-              const symbol_type& argument1,
-              const symbol_type& result)
+    quadruple(const record_type& operation,
+              const record_type& argument1,
+              const record_type& result)
         : quadruple(operation, argument1, nullptr, result)
     {
     }
 
-    quadruple(const symbol_type& operation,
-              const symbol_type& result)
+    quadruple(const record_type& operation,
+              const record_type& result)
         : quadruple(operation, nullptr, nullptr, result)
     {
     }
 
-    quadruple(const symbol_type& operation)
+    quadruple(const record_type& operation)
         : quadruple(operation, nullptr, nullptr, nullptr)
     {
     }

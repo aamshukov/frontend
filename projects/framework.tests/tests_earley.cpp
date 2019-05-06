@@ -1,87 +1,87 @@
 ﻿//..............................
 // UI Lab Inc. Arthur Amshukov .
 //..............................
-#include <core\pch.hpp>
-#include <core\noncopyable.hpp>
-#include <core\status.hpp>
-#include <core\enumerate.hpp>
-#include <core\unicode.hpp>
-#include <core\text.hpp>
-#include <core\domain_helper.hpp>
-#include <core\logger.hpp>
-#include <core\data_provider.hpp>
-#include <core\file_data_provider.hpp>
-#include <core\string_data_provider.hpp>
-#include <core\counter.hpp>
-#include <core\factory.hpp>
-#include <core\singleton.hpp>
-#include <core\enum.hpp>
-#include <core\flags.hpp>
-#include <core\command_line.hpp>
-#include <core\configurator.hpp>
+#include <core/pch.hpp>
+#include <core/noncopyable.hpp>
+#include <core/status.hpp>
+#include <core/enumerate.hpp>
+#include <core/unicode.hpp>
+#include <core/text.hpp>
+#include <core/domain_helper.hpp>
+#include <core/logger.hpp>
+#include <core/data_provider.hpp>
+#include <core/file_data_provider.hpp>
+#include <core/string_data_provider.hpp>
+#include <core/counter.hpp>
+#include <core/factory.hpp>
+#include <core/singleton.hpp>
+#include <core/enum.hpp>
+#include <core/flags.hpp>
+#include <core/command_line.hpp>
+#include <core/configurator.hpp>
 
-#include <core\tree.hpp>
-#include <core\dag.hpp>
+#include <core/tree.hpp>
+#include <core/dag.hpp>
 
-#include <core\visitor.hpp>
-#include <core\visitable.hpp>
+#include <core/visitor.hpp>
+#include <core/visitable.hpp>
 
-#include <frontend\grammar\token.hpp>
-#include <frontend\grammar\symbol.hpp>
-#include <frontend\grammar\rule.hpp>
-#include <frontend\grammar\grammar.hpp>
-#include <frontend\grammar\grammar_algorithm.hpp>
-#include <frontend\grammar\grammar_visualization.hpp>
+#include <frontend/grammar/token.hpp>
+#include <frontend/grammar/symbol.hpp>
+#include <frontend/grammar/rule.hpp>
+#include <frontend/grammar/grammar.hpp>
+#include <frontend/grammar/grammar_algorithm.hpp>
+#include <frontend/grammar/grammar_visualization.hpp>
 
-#include <frontend\fsa\fsa_transition.hpp>
-#include <frontend\fsa\fsa_state.hpp>
-#include <frontend\fsa\fsa.hpp>
-#include <frontend\fsa\fsa_re.hpp>
-#include <frontend\fsa\fsa_state_set.hpp>
-#include <frontend\fsa\fsa_algorithm.hpp>
+#include <frontend/fsa/fsa_transition.hpp>
+#include <frontend/fsa/fsa_state.hpp>
+#include <frontend/fsa/fsa.hpp>
+#include <frontend/fsa/fsa_re.hpp>
+#include <frontend/fsa/fsa_state_set.hpp>
+#include <frontend/fsa/fsa_algorithm.hpp>
 
-#include <frontend\fsa\fsa_visualization.hpp>
-#include <frontend\fsa\fsa_codegen.hpp>
+#include <frontend/fsa/fsa_visualization.hpp>
+#include <frontend/fsa/fsa_codegen.hpp>
 
-#include <core\data_provider.hpp>
-#include <core\file_data_provider.hpp>
-#include <core\content.hpp>
+#include <core/data_provider.hpp>
+#include <core/file_data_provider.hpp>
+#include <core/content.hpp>
 
-#include <core\diagnostics.hpp>
-#include <core\statistics.hpp>
+#include <core/diagnostics.hpp>
+#include <core/statistics.hpp>
 
-#include <frontend\lexical_analyzer\lexical_analyzer.hpp>
+#include <frontend/lexical_analyzer/lexical_analyzer.hpp>
 
-#include <frontend\parser\parser_algorithm.hpp>
+#include <frontend/parser/parser_algorithm.hpp>
 
-#include <frontend\parser\parser_tree.hpp>
-#include <frontend\parser\parser_dag.hpp>
+#include <frontend/parser/parser_tree.hpp>
+#include <frontend/parser/parser_dag.hpp>
 
-#include <frontend\parser\parser.hpp>
-#include <frontend\parser\parser.inl>
+#include <frontend/parser/parser.hpp>
+#include <frontend/parser/parser.inl>
 
-#include <frontend\parser\parser_visualization.hpp>
-#include <frontend\parser\parser_visualization.inl>
+#include <frontend/parser/parser_visualization.hpp>
+#include <frontend/parser/parser_visualization.inl>
 
-#include <frontend\parser\earley\earley_parser.hpp>
-#include <frontend\parser\earley\earley_parser.inl>
+#include <frontend/parser/earley/earley_parser.hpp>
+#include <frontend/parser/earley/earley_parser.inl>
 
-#include <frontend\parser\earley\earley_visualization.hpp>
-#include <frontend\parser\earley\earley_visualization.inl>
+#include <frontend/parser/earley/earley_visualization.hpp>
+#include <frontend/parser/earley/earley_visualization.inl>
 
-#include <symtable/symtab_symbol.hpp>
+#include <symtable/symbol_table_record.hpp>
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
 
-#include <backend\ir\quadruple.hpp>
+#include <backend/ir/quadruple.hpp>
 
-#include <backend\ir\ir.hpp>
-#include <backend\ir\ir.inl>
-#include <backend\ir\ir_visualization.hpp>
-#include <backend\ir\ir_visualization.inl>
+#include <backend/ir/ir.hpp>
+#include <backend/ir/ir.inl>
+#include <backend/ir/ir_visualization.hpp>
+#include <backend/ir/ir_visualization.inl>
 
-#include <backend\ir\tree_tac_visitor.hpp>
-#include <backend\ir\dag_tac_visitor.hpp>
+#include <backend/ir/tree_tac_visitor.hpp>
+#include <backend/ir/dag_tac_visitor.hpp>
 
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
@@ -97,6 +97,8 @@ struct earley_token_traits// : public token_traits
         epsilon = 5,
         eol, // 6
         eos, // 7
+        indent,
+        dedent,
 
         a,   // 8
         b,   // 9

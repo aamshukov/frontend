@@ -86,7 +86,7 @@
     <ClInclude Include="..\..\framework\frontend\parser\parser_visualization.hpp" />
     <ClInclude Include="..\..\framework\frontend\semantics\semantics.hpp" />
     <ClInclude Include="..\..\framework\symtable\symbol_table.hpp" />
-    <ClInclude Include="..\..\framework\symtable\symtab_symbol.hpp" />
+    <ClInclude Include="..\..\framework\symtable\symbol_table_record.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\core\content.cpp" />

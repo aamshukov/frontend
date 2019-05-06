@@ -80,6 +80,8 @@ struct earley_token_traits : public token_traits
         epsilon = 5,
         eol,
         eos,
+        indent,
+        dedent,
 
         a,
         b,

@@ -86,6 +86,8 @@ struct my_token_traits : public token_traits
         epsilon = 5,
         eol,
         eos,
+        indent,
+        dedent,
 
         binary_integer_lit,
         octal_integer_lit,
@@ -254,8 +256,68 @@ void test_re_dfa();
 extern "C" double CombineA(int a, int b, int c, int d, int e, double f);
 extern "C" void _start();
 
+
+template <typename E>
+[[nodiscard]] constexpr std::string_view name_impl() noexcept
+{
+    bool isenum = std::is_enum_v<E>;
+    isenum;
+
+    constexpr std::string_view name{__FUNCSIG__, sizeof(__FUNCSIG__) - 17};
+
+    constexpr auto prefix = name.find_last_of(" :,-)") + 1;
+
+    if constexpr (name[prefix] >= '0' && name[prefix] <= '9')
+    {
+        return {}; // Value does not have name.
+    }
+    else
+    {
+        return name.substr(prefix, name.length() - prefix);
+    }
+}
+
+template <typename E>
+[[nodiscard]] constexpr int min_impl() {
+  using U = std::underlying_type_t<E>;
+  constexpr int min = 0;
+  return min;
+}
+
+template <typename E, E V>
+[[nodiscard]] constexpr std::string_view name_impl() noexcept {
+  constexpr std::string_view name{__FUNCSIG__, sizeof(__FUNCSIG__) - 17};
+  constexpr auto prefix = name.find_last_of(" :,-)") + 1;
+
+  if constexpr (name[prefix] >= '0' && name[prefix] <= '9') {
+    return {}; // Value does not have name.
+  } else {
+    return name.substr(prefix, name.length() - prefix);
+  }
+}
+template <typename E, int... I>
+[[nodiscard]] constexpr auto strings_impl(std::integer_sequence<int, I...>) noexcept {
+  constexpr std::array<std::string_view, sizeof...(I)> names{{name_impl<E, static_cast<E>(I + min_impl<E>())>()...}};
+
+  return names;
+}
+
+enum class color
+{
+    RED, BLUE, GREEN = 5
+};
+
 int main()
 {
+    auto enumname = name_impl<color>();
+    auto range = std::make_integer_sequence<int, 6>{};
+    auto names = strings_impl<color>(range);
+
+    auto funcsig = __FUNCSIG__;
+    funcsig;
+
+    constexpr std::string_view name{__FUNCSIG__, sizeof(__FUNCSIG__) - 17};
+
     USINGNAMESPACE(core)
     USINGNAMESPACE(frontend)
 

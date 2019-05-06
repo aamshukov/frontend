@@ -1,0 +1,42 @@
+primary-expression:
+    literal
+    identifier
+    ( expression )
+
+
+
+
+
+
+
+
+
+expression:
+
+
+assignment-expression:
+
+
+
+
+conditional-expression:
+
+
+unary-expresssion:
+
+multiplicative-expression:
+
+
+additive-expression:
+
+
+shift-expression:
+
+
+
+relational-expression:
+
+
+
+
+
