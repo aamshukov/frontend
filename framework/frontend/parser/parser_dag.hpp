@@ -11,18 +11,18 @@ BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 USINGNAMESPACE(symtable)
 
-template <typename Token, typename TreeKind>
-struct parser_dag : public dag, public visitable<parser_dag<Token, TreeKind>>
+template <typename Token, typename TreeTraits>
+struct parser_dag : public dag, public visitable<parser_dag<Token, TreeTraits>>
 {
     using token_type = Token;
-    using tree_kind_type = TreeKind;
+    using tree_traits_type = TreeTraits;
 
     using symbol_type = grammar::symbol_type;
 
     using record_type = typename symbol_table_record<token_type>::record_type;
     using records_type = typename symbol_table_record<token_type>::records_type;
 
-    using visitor_type = visitor<parser_dag<token_type, tree_kind_type>>;
+    using visitor_type = visitor<parser_dag<token_type, tree_traits_type>>;
 
     symbol_type symbol;
     record_type record;
@@ -33,7 +33,7 @@ struct parser_dag : public dag, public visitable<parser_dag<Token, TreeKind>>
 
     void accept(visitor_type& visitor) override
     {
-        visitor.visit(static_cast<parser_dag<token_type, tree_kind_type>&>(*this));
+        visitor.visit(static_cast<parser_dag<token_type, tree_traits_type>&>(*this));
     }
 };
 

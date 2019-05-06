@@ -9,19 +9,19 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-template <typename Token, typename TreeKind>
+template <typename Token, typename TreeTraits>
 class parser : private noncopyable
 {
     public:
         using token_type = Token;
-        using tree_kind_type = TreeKind;
+        using tree_traits_type = TreeTraits;
 
         using lexical_analyzer_type = std::shared_ptr<lexical_analyzer<token_type>>;
 
-        using tree_type = std::shared_ptr<parser_tree<token_type, tree_kind_type>>;
+        using tree_type = std::shared_ptr<parser_tree<token_type, tree_traits_type>>;
         using trees_type = std::vector<tree_type>;
 
-        using dag_type = std::shared_ptr<parser_dag<token_type, tree_kind_type>>;
+        using dag_type = std::shared_ptr<parser_dag<token_type, tree_traits_type>>;
         using dags_type = std::vector<dag_type>;
 
     protected:
@@ -43,20 +43,20 @@ class parser : private noncopyable
         operation_status&       status();
 };
 
-template <typename Token, typename TreeKind>
-const typename parser<Token, TreeKind>::trees_type& parser<Token, TreeKind>::trees() const
+template <typename Token, typename TreeTraits>
+const typename parser<Token, TreeTraits>::trees_type& parser<Token, TreeTraits>::trees() const
 {
     return my_trees;
 }
 
-template <typename Token, typename TreeKind>
-const operation_status& parser<Token, TreeKind>::status() const
+template <typename Token, typename TreeTraits>
+const operation_status& parser<Token, TreeTraits>::status() const
 {
     return my_status;
 }
 
-template <typename Token, typename TreeKind>
-operation_status& parser<Token, TreeKind>::status()
+template <typename Token, typename TreeTraits>
+operation_status& parser<Token, TreeTraits>::status()
 {
     return my_status;
 }

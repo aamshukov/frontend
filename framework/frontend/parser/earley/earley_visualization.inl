@@ -9,8 +9,8 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-template <typename Token, typename TreeKind>
-string_type earley_visualization<Token, TreeKind>::decorate_item(const typename earley_visualization<Token, TreeKind>::item_type& item, bool recursive)
+template <typename Token, typename TreeTraits>
+string_type earley_visualization<Token, TreeTraits>::decorate_item(const typename earley_visualization<Token, TreeTraits>::item_type& item, bool recursive)
 {
     string_type result;
 
@@ -134,8 +134,8 @@ string_type earley_visualization<Token, TreeKind>::decorate_item(const typename 
     return result;
 }
 
-template <typename Token, typename TreeKind>
-string_type earley_visualization<Token, TreeKind>::decorate_chart(const typename earley_visualization<Token, TreeKind>::chart_type& chart)
+template <typename Token, typename TreeTraits>
+string_type earley_visualization<Token, TreeTraits>::decorate_chart(const typename earley_visualization<Token, TreeTraits>::chart_type& chart)
 {
     string_type result;
 
@@ -164,8 +164,8 @@ string_type earley_visualization<Token, TreeKind>::decorate_chart(const typename
     return result;
 }
 
-template <typename Token, typename TreeKind>
-string_type earley_visualization<Token, TreeKind>::decorate_charts(const typename earley_visualization<Token, TreeKind>::charts_type& charts)
+template <typename Token, typename TreeTraits>
+string_type earley_visualization<Token, TreeTraits>::decorate_charts(const typename earley_visualization<Token, TreeTraits>::charts_type& charts)
 {
     string_type result;
 

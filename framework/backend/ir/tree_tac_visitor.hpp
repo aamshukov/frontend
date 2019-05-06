@@ -12,10 +12,10 @@ USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
 
-template <typename Token, typename TreeKind>
-struct tree_tac_visitor : public visitor<parser_tree<Token, TreeKind>>
+template <typename Token, typename TreeTraits>
+struct tree_tac_visitor : public visitor<parser_tree<Token, TreeTraits>>
 {
-    using tree_type = parser_tree<Token, TreeKind>;
+    using tree_type = parser_tree<Token, TreeTraits>;
 
     void visit(tree_type& tree) override
     {

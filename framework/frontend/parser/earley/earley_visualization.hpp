@@ -9,7 +9,7 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-template <typename Token, typename TreeKind>
+template <typename Token, typename TreeTraits>
 class earley_visualization : private noncopyable
 {
     public:
@@ -22,7 +22,7 @@ class earley_visualization : private noncopyable
         using rule_type = grammar::rule_type;
         using rules_type = grammar::rules_type;
 
-        using earley_parser_type = earley_parser<Token, TreeKind>;
+        using earley_parser_type = earley_parser<Token, TreeTraits>;
 
         using item_type = typename earley_parser_type::item_type;
         using chart_type = typename earley_parser_type::chart_type;

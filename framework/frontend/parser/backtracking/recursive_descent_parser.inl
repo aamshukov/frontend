@@ -9,14 +9,14 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-template <typename Token, typename TreeKind>
-recursive_descent_parser<Token, TreeKind>::recursive_descent_parser(const typename recursive_descent_parser<Token, TreeKind>::lexical_analyzer_type& lexical_analyzer)
-                                         : parser<Token, TreeKind>(lexical_analyzer)
+template <typename Token, typename TreeTraits>
+recursive_descent_parser<Token, TreeTraits>::recursive_descent_parser(const typename recursive_descent_parser<Token, TreeTraits>::lexical_analyzer_type& lexical_analyzer)
+                                           : parser<Token, TreeTraits>(lexical_analyzer)
 {
 }
 
-template <typename Token, typename TreeKind>
-recursive_descent_parser<Token, TreeKind>::~recursive_descent_parser()
+template <typename Token, typename TreeTraits>
+recursive_descent_parser<Token, TreeTraits>::~recursive_descent_parser()
 {
 }
 

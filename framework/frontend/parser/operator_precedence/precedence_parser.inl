@@ -9,14 +9,14 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-template <typename Token, typename TreeKind>
-precedence_parser<Token, TreeKind>::precedence_parser(const typename precedence_parser<Token, TreeKind>::lexical_analyzer_type& lexical_analyzer)
-                                  : parser<Token, TreeKind>(lexical_analyzer)
+template <typename Token, typename TreeTraits>
+precedence_parser<Token, TreeTraits>::precedence_parser(const typename precedence_parser<Token, TreeTraits>::lexical_analyzer_type& lexical_analyzer)
+                                    : parser<Token, TreeTraits>(lexical_analyzer)
 {
 }
 
-template <typename Token, typename TreeKind>
-op_parser<Token, TreeKind>::~op_parser()
+template <typename Token, typename TreeTraits>
+op_parser<Token, TreeTraits>::~op_parser()
 {
 }
 

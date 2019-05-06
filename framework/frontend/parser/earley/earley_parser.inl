@@ -11,23 +11,23 @@ USINGNAMESPACE(core)
 
 // α β ε λ ∅ ∈ Σ ∪
 
-template <typename Token, typename TreeKind>
-earley_parser<Token, TreeKind>::earley_parser(const typename earley_parser<Token, TreeKind>::lexical_analyzer_type& lexical_analyzer, grammar& gr, tree_kind kind)
-                              : parser<Token, TreeKind>(lexical_analyzer), my_grammar(gr), my_tree_kind(kind)
+template <typename Token, typename TreeTraits>
+earley_parser<Token, TreeTraits>::earley_parser(const typename earley_parser<Token, TreeTraits>::lexical_analyzer_type& lexical_analyzer, grammar& gr, tree_kind kind)
+                                : parser<Token, TreeTraits>(lexical_analyzer), my_grammar(gr), my_tree_kind(kind)
 {
 }
 
-template <typename Token, typename TreeKind>
-earley_parser<Token, TreeKind>::~earley_parser()
+template <typename Token, typename TreeTraits>
+earley_parser<Token, TreeTraits>::~earley_parser()
 {
 }
 
-template <typename Token, typename TreeKind>
-typename earley_parser<Token, TreeKind>::item_type earley_parser<Token, TreeKind>::create_item(const typename earley_parser<Token, TreeKind>::rule_type& rule,
-                                                                                               const typename earley_parser<Token, TreeKind>::chart_type& origin_chart,
-                                                                                               const typename earley_parser<Token, TreeKind>::chart_type& master_chart,
-                                                                                               const typename earley_parser<Token, TreeKind>::item_type& lptr,
-                                                                                               flags action)
+template <typename Token, typename TreeTraits>
+typename earley_parser<Token, TreeTraits>::item_type earley_parser<Token, TreeTraits>::create_item(const typename earley_parser<Token, TreeTraits>::rule_type& rule,
+                                                                                                   const typename earley_parser<Token, TreeTraits>::chart_type& origin_chart,
+                                                                                                   const typename earley_parser<Token, TreeTraits>::chart_type& master_chart,
+                                                                                                   const typename earley_parser<Token, TreeTraits>::item_type& lptr,
+                                                                                                   flags action)
 {
     item_type result(factory::create<item>());
 
@@ -46,8 +46,8 @@ typename earley_parser<Token, TreeKind>::item_type earley_parser<Token, TreeKind
     return result;
 }
 
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::set_rptr(typename earley_parser<Token, TreeKind>::item_type& item, const typename earley_parser<Token, TreeKind>::item_type& new_item)
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::set_rptr(typename earley_parser<Token, TreeTraits>::item_type& item, const typename earley_parser<Token, TreeTraits>::item_type& new_item)
 {
     if(!std::any_of((*item).rptrs.begin(), (*item).rptrs.end(), [&new_item](const auto& item0){ return *item0 == *new_item; }))
     {
@@ -55,27 +55,27 @@ void earley_parser<Token, TreeKind>::set_rptr(typename earley_parser<Token, Tree
     }
 }
 
-template <typename Token, typename TreeKind>
-bool earley_parser<Token, TreeKind>::is_item_marked(typename const earley_parser<Token, TreeKind>::item_type& item)
+template <typename Token, typename TreeTraits>
+bool earley_parser<Token, TreeTraits>::is_item_marked(typename const earley_parser<Token, TreeTraits>::item_type& item)
 {
     return ((*item).flags & flags::marked) == flags::marked;
 }
 
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::mark_item(typename earley_parser<Token, TreeKind>::item_type& item)
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::mark_item(typename earley_parser<Token, TreeTraits>::item_type& item)
 {
     (*item).flags |= flags::marked;
 }
 
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::unmark_item(typename earley_parser<Token, TreeKind>::item_type& item)
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::unmark_item(typename earley_parser<Token, TreeTraits>::item_type& item)
 {
     // crappy C++ syntax, need this hack for templates
-    (*item).flags &= ~static_cast<std::underlying_type_t<earley_parser<Token, TreeKind>::flags>>(flags::marked);
+    (*item).flags &= ~static_cast<std::underlying_type_t<earley_parser<Token, TreeTraits>::flags>>(flags::marked);
 }
 
-template <typename Token, typename TreeKind>
-typename earley_parser<Token, TreeKind>::chart_type earley_parser<Token, TreeKind>::create_chart(uint32_t id)
+template <typename Token, typename TreeTraits>
+typename earley_parser<Token, TreeTraits>::chart_type earley_parser<Token, TreeTraits>::create_chart(uint32_t id)
 {
     chart_type result(factory::create<chart>());
 
@@ -84,8 +84,8 @@ typename earley_parser<Token, TreeKind>::chart_type earley_parser<Token, TreeKin
     return result;
 }
 
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::closure(const grammar& gr, typename earley_parser<Token, TreeKind>::chart_type& chart)
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::closure(const grammar& gr, typename earley_parser<Token, TreeTraits>::chart_type& chart)
 {
     // 'λ case' - special case for empty rule, always assume the dot is at the end
     // Grune and Jacobs:
@@ -111,10 +111,10 @@ void earley_parser<Token, TreeKind>::closure(const grammar& gr, typename earley_
     }
 }
 
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::predict(const grammar& gr,
-                                             const typename earley_parser<Token, TreeKind>::item_type& item,
-                                             typename earley_parser<Token, TreeKind>::chart_type& chart)
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::predict(const grammar& gr,
+                                               const typename earley_parser<Token, TreeTraits>::item_type& item,
+                                               typename earley_parser<Token, TreeTraits>::chart_type& chart)
 {
     const auto& rhs((*(*item).rule).rhs());
 
@@ -140,8 +140,8 @@ void earley_parser<Token, TreeKind>::predict(const grammar& gr,
     }
 }
 
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::complete(typename earley_parser<Token, TreeKind>::item_type& item, typename earley_parser<Token, TreeKind>::chart_type& chart)
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::complete(typename earley_parser<Token, TreeTraits>::item_type& item, typename earley_parser<Token, TreeTraits>::chart_type& chart)
 {
     const auto& rhs((*(*item).rule).rhs());
 
@@ -194,11 +194,11 @@ void earley_parser<Token, TreeKind>::complete(typename earley_parser<Token, Tree
     }
 }
 
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::scan(typename earley_parser<Token, TreeKind>::chart_type& chart,
-                                          typename earley_parser<Token, TreeKind>::charts_type& charts,
-                                          typename const earley_parser<Token, TreeKind>::token_type& token,
-                                          typename earley_parser<Token, TreeKind>::chart_type& result)
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::scan(typename earley_parser<Token, TreeTraits>::chart_type& chart,
+                                            typename earley_parser<Token, TreeTraits>::charts_type& charts,
+                                            typename const earley_parser<Token, TreeTraits>::token_type& token,
+                                            typename earley_parser<Token, TreeTraits>::chart_type& result)
 {
     chart_type new_chart(create_chart(static_cast<uint32_t>(charts.size())));
 
@@ -234,8 +234,8 @@ void earley_parser<Token, TreeKind>::scan(typename earley_parser<Token, TreeKind
     }
 }
 
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::build_charts()
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::build_charts()
 {
     // Адаптированный для построения деревьев вывода алгоритм Эрли, Владимир Анатольевич Лапшин.
     log_info(L"Building charts ...");
@@ -332,9 +332,9 @@ void earley_parser<Token, TreeKind>::build_charts()
     log_info(L"Built charts.");
 }
 
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::populate_rhs_stack(const typename earley_parser<Token, TreeKind>::item_type& item,
-                                                        typename earley_parser<Token, TreeKind>::rhs_stack_type& stack)
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::populate_rhs_stack(const typename earley_parser<Token, TreeTraits>::item_type& item,
+                                                          typename earley_parser<Token, TreeTraits>::rhs_stack_type& stack)
 {
     // Заполнение магазина ссылками на ситуации текущего уровня.
     for(auto current_item = item; (*current_item).dot > 0; current_item = (*current_item).lptr)
@@ -368,9 +368,9 @@ void earley_parser<Token, TreeKind>::populate_rhs_stack(const typename earley_pa
     }
 }
 
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::clone_tree(const typename earley_parser<Token, TreeKind>::parse_tree_element& source,
-                                                typename earley_parser<Token, TreeKind>::parse_tree_element& result)
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::clone_tree(const typename earley_parser<Token, TreeTraits>::parse_tree_element& source,
+                                                  typename earley_parser<Token, TreeTraits>::parse_tree_element& result)
 {
     struct queue_entry
     {
@@ -433,11 +433,11 @@ void earley_parser<Token, TreeKind>::clone_tree(const typename earley_parser<Tok
 }
 
 // BuildTreeLevel([A -> X1...Xm •, i, l, <s>], P, Tr)
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::build_parse_trees(typename earley_parser<Token, TreeKind>::item_type& item,
-                                                       typename earley_parser<Token, TreeKind>::tree_type& papa,
-                                                       typename earley_parser<Token, TreeKind>::tree_type& tree,
-                                                       typename earley_parser<Token, TreeKind>::trees_type& trees)
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::build_parse_trees(typename earley_parser<Token, TreeTraits>::item_type& item,
+                                                         typename earley_parser<Token, TreeTraits>::tree_type& papa,
+                                                         typename earley_parser<Token, TreeTraits>::tree_type& tree,
+                                                         typename earley_parser<Token, TreeTraits>::trees_type& trees)
 {
     // Заполнение магазина ссылками на ситуации текущего уровня.
     rhs_stack_type rhs_stack;
@@ -578,8 +578,8 @@ void earley_parser<Token, TreeKind>::build_parse_trees(typename earley_parser<To
     }
 }
 
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::build_parse_trees()
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::build_parse_trees()
 {
     //  S  -> S + S
     //  S  -> S
@@ -698,11 +698,11 @@ void earley_parser<Token, TreeKind>::build_parse_trees()
 }
 
 // BuildAstLevel([A -> X1...Xm •, i, l, <s>], P, Tr)
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::build_ast_tree(typename earley_parser<Token, TreeKind>::item_type& item,
-                                                    typename earley_parser<Token, TreeKind>::tree_type& papa,
-                                                    typename earley_parser<Token, TreeKind>::tree_type& tree,
-                                                    typename earley_parser<Token, TreeKind>::trees_type& trees)
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::build_ast_tree(typename earley_parser<Token, TreeTraits>::item_type& item,
+                                                      typename earley_parser<Token, TreeTraits>::tree_type& papa,
+                                                      typename earley_parser<Token, TreeTraits>::tree_type& tree,
+                                                      typename earley_parser<Token, TreeTraits>::trees_type& trees)
 {
     // Заполнение магазина ссылками на ситуации текущего уровня.
     rhs_stack_type rhs_stack;
@@ -801,8 +801,8 @@ void earley_parser<Token, TreeKind>::build_ast_tree(typename earley_parser<Token
     }
 }
 
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::build_ast()
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::build_ast()
 {
     log_info(L"Building AST tree(s) ...");
 
@@ -847,8 +847,8 @@ void earley_parser<Token, TreeKind>::build_ast()
     log_info(L"Built AST tree(s).");
 }
 
-template <typename Token, typename TreeKind>
-void earley_parser<Token, TreeKind>::parse()
+template <typename Token, typename TreeTraits>
+void earley_parser<Token, TreeTraits>::parse()
 {
     log_info(L"Parsing ...");
 
@@ -876,8 +876,8 @@ void earley_parser<Token, TreeKind>::parse()
     }
 }
 
-template <typename Token, typename TreeKind>
-bool earley_parser<Token, TreeKind>::validate_charts(const typename earley_parser<Token, TreeKind>::chart_type& chart)
+template <typename Token, typename TreeTraits>
+bool earley_parser<Token, TreeTraits>::validate_charts(const typename earley_parser<Token, TreeTraits>::chart_type& chart)
 {
     bool result = false;
 

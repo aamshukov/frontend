@@ -11,18 +11,18 @@ BEGIN_NAMESPACE(backend)
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
-template <typename Token, typename TreeKind>
+template <typename Token, typename TreeTraits>
 class ir : private noncopyable
 {
     public:
         using token_type = Token;
-        using tree_kind_type = TreeKind;
+        using tree_traits_type = TreeTraits;
 
-        using tree_type = typename parser<token_type, tree_kind_type>::tree_type;
-        using trees_type = typename parser<token_type, tree_kind_type>::trees_type;
+        using tree_type = typename parser<token_type, tree_traits_type>::tree_type;
+        using trees_type = typename parser<token_type, tree_traits_type>::trees_type;
 
-        using dag_type = typename parser<token_type, tree_kind_type>::dag_type;
-        using dags_type = typename parser<token_type, tree_kind_type>::dags_type;
+        using dag_type = typename parser<token_type, tree_traits_type>::dag_type;
+        using dags_type = typename parser<token_type, tree_traits_type>::dags_type;
 
         using record_type = typename symbol_table_record<token_type>::record_type;
 

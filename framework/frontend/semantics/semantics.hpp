@@ -9,12 +9,12 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-template <typename Token, typename TreeKind>
+template <typename Token, typename TreeTraits>
 class semantics : private noncopyable
 {
     public:
-        using token_type = typename parser<Token, TreeKind>::token_type;
-        using tree_kind_type = typename parser<Token, TreeKind>::tree_kind_type;
+        using token_type = typename parser<Token, TreeTraits>::token_type;
+        using tree_traits_type = typename parser<Token, TreeTraits>::tree_traits_type;
 };
 
 END_NAMESPACE
