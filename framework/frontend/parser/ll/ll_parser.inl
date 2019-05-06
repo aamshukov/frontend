@@ -9,14 +9,14 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-template <typename T>
-ll_parser<T>::ll_parser(const typename ll_parser<T>::lexical_analyzer_type& lexical_analyzer)
-            : parser<T>(lexical_analyzer)
+template <typename Token, typename TreeKind>
+ll_parser<Token, TreeKind>::ll_parser(const typename ll_parser<Token, TreeKind>::lexical_analyzer_type& lexical_analyzer)
+                          : parser<T>(lexical_analyzer)
 {
 }
 
-template <typename T>
-ll_parser<T>::~ll_parser()
+template <typename Token, typename TreeKind>
+ll_parser<Token, TreeKind>::~ll_parser()
 {
 }
 

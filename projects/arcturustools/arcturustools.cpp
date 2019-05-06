@@ -45,6 +45,10 @@
 #include <frontend/grammar/grammar_algorithm.hpp>
 #include <frontend/grammar/grammar_visualization.hpp>
 
+#include <symtable/symbol_table_record.hpp>
+#include <symtable/symbol_table.hpp>
+#include <symtable/symbol_table.inl>
+
 #include <frontend/fsa/fsa_transition.hpp>
 #include <frontend/fsa/fsa_state.hpp>
 #include <frontend/fsa/fsa_state_set.hpp>
@@ -65,10 +69,6 @@
 #include <frontend/parser/parser_visualization.hpp>
 #include <frontend/parser/parser_visualization.inl>
 
-#include <symtable/symbol_table_record.hpp>
-#include <symtable/symbol_table.hpp>
-#include <symtable/symbol_table.inl>
-
 #include <frontend/semantics/semantics.hpp>
 #include <frontend/semantics/semantics.inl>
 
@@ -86,7 +86,6 @@
 #include <backend/ir/ir_visualization.inl>
 
 #include <controller/controller.hpp>
-
 
 BEGIN_NAMESPACE(arcturus)
 

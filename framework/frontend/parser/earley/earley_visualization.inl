@@ -9,8 +9,8 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-template <typename T>
-string_type earley_visualization<T>::decorate_item(const typename earley_visualization<T>::item_type& item, bool recursive)
+template <typename Token, typename TreeKind>
+string_type earley_visualization<Token, TreeKind>::decorate_item(const typename earley_visualization<Token, TreeKind>::item_type& item, bool recursive)
 {
     string_type result;
 
@@ -134,8 +134,8 @@ string_type earley_visualization<T>::decorate_item(const typename earley_visuali
     return result;
 }
 
-template <typename T>
-string_type earley_visualization<T>::decorate_chart(const typename earley_visualization<T>::chart_type& chart)
+template <typename Token, typename TreeKind>
+string_type earley_visualization<Token, TreeKind>::decorate_chart(const typename earley_visualization<Token, TreeKind>::chart_type& chart)
 {
     string_type result;
 
@@ -164,8 +164,8 @@ string_type earley_visualization<T>::decorate_chart(const typename earley_visual
     return result;
 }
 
-template <typename T>
-string_type earley_visualization<T>::decorate_charts(const typename earley_visualization<T>::charts_type& charts)
+template <typename Token, typename TreeKind>
+string_type earley_visualization<Token, TreeKind>::decorate_charts(const typename earley_visualization<Token, TreeKind>::charts_type& charts)
 {
     string_type result;
 

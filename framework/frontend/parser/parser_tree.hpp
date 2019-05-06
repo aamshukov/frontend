@@ -7,18 +7,25 @@
 #pragma once
 
 BEGIN_NAMESPACE(frontend)
-USINGNAMESPACE(core)
 
-template <typename Token>
-struct parser_tree : public tree, public visitable<parser_tree<Token>>
+USINGNAMESPACE(core)
+USINGNAMESPACE(symtable)
+
+template <typename Token, typename TreeKind>
+struct parser_tree : public tree, public visitable<parser_tree<Token, TreeKind>>
 {
     using token_type = Token;
+    using tree_kind_type = TreeKind;
+
     using symbol_type = grammar::symbol_type;
 
-    using visitor_type = visitor<parser_tree<token_type>>;
+    using record_type = typename symbol_table_record<token_type>::record_type;
+    using records_type = typename symbol_table_record<token_type>::records_type;
+
+    using visitor_type = visitor<parser_tree<token_type, tree_kind_type>>;
 
     symbol_type symbol;
-    token_type token; // might be empty for non-terminals
+    record_type record;
 
     virtual ~parser_tree()
     {
@@ -26,7 +33,7 @@ struct parser_tree : public tree, public visitable<parser_tree<Token>>
 
     void accept(visitor_type& visitor) override
     {
-        visitor.visit(static_cast<parser_tree<token_type>&>(*this));
+        visitor.visit(static_cast<parser_tree<token_type, tree_kind_type>&>(*this));
     }
 };
 

@@ -11,29 +11,29 @@ BEGIN_NAMESPACE(backend)
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
-template <typename T>
-void ir_visualization<T>::print_tree(const typename ir_visualization<T>::tree_type& tree, std::size_t level, std::wostream& stream)
+template <typename Token, typename TreeKind>
+void ir_visualization<Token, TreeKind>::print_tree(const typename ir_visualization<Token, TreeKind>::tree_type& tree, std::size_t level, std::wostream& stream)
 {
     for(std::size_t i = 0; i < level; i++)
     {
         stream << "    ";
     }
 
-    if(static_cast<uint32_t>((*tree).token.type) != 0)
-        stream << (*(*tree).symbol).name() << L":" << static_cast<uint32_t>((*tree).token.type) << std::endl;
+    if(static_cast<uint32_t>((*(*tree).record).token().type) != 0)
+        stream << (*(*tree).symbol).name() << L":" << static_cast<uint32_t>((*(*tree).record).token().type) << std::endl;
     else
         stream << (*(*tree).symbol).name() << std::endl;
 
     for(const auto& kid : (*tree).kids)
     {
-        print_tree(std::dynamic_pointer_cast<parser_tree<token_type>>(kid), level + 1, stream);
+        print_tree(std::dynamic_pointer_cast<parser_tree<token_type, tree_kind_type>>(kid), level + 1, stream);
     }
 
     stream << std::endl;
 }
 
-template <typename T>
-void ir_visualization<T>::print_trees(const typename ir_visualization<T>::trees_type& trees, std::wostream& stream)
+template <typename Token, typename TreeKind>
+void ir_visualization<Token, TreeKind>::print_trees(const typename ir_visualization<Token, TreeKind>::trees_type& trees, std::wostream& stream)
 {
     stream << std::endl;
 
@@ -46,8 +46,8 @@ void ir_visualization<T>::print_trees(const typename ir_visualization<T>::trees_
     stream << std::endl;
 }
 
-template <typename T>
-void ir_visualization<T>::collect_tree_dot_labels(const typename ir_visualization<T>::tree_type& root, std::wostream& stream)
+template <typename Token, typename TreeKind>
+void ir_visualization<Token, TreeKind>::collect_tree_dot_labels(const typename ir_visualization<Token, TreeKind>::tree_type& root, std::wostream& stream)
 {
     std::size_t k = 1;
 
@@ -65,15 +65,15 @@ void ir_visualization<T>::collect_tree_dot_labels(const typename ir_visualizatio
 
         for(auto kid : (*entry).kids)
         {
-            queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type>>(kid));
+            queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type, tree_kind_type>>(kid));
         }
     }
 
     stream << std::endl;
 }
 
-template <typename T>
-void ir_visualization<T>::build_tree_dot_graph(const typename ir_visualization<T>::tree_type& tree, std::wostream& stream)
+template <typename Token, typename TreeKind>
+void ir_visualization<Token, TreeKind>::build_tree_dot_graph(const typename ir_visualization<Token, TreeKind>::tree_type& tree, std::wostream& stream)
 {
     struct queue_entry
     {
@@ -96,13 +96,13 @@ void ir_visualization<T>::build_tree_dot_graph(const typename ir_visualization<T
         for(auto kid : (*entry.node).kids)
         {
             stream << L"    " << entry.papa << L" -> " << ++k << L";" << std::endl;
-            queue.emplace(queue_entry{ std::dynamic_pointer_cast<parser_tree<token_type>>(kid), k });
+            queue.emplace(queue_entry{ std::dynamic_pointer_cast<parser_tree<token_type, tree_kind_type>>(kid), k });
         }
     }
 }
 
-template <typename T>
-void ir_visualization<T>::collect_dag_dot_labels(const typename ir_visualization<T>::dag_type& root, std::wostream& stream)
+template <typename Token, typename TreeKind>
+void ir_visualization<Token, TreeKind>::collect_dag_dot_labels(const typename ir_visualization<Token, TreeKind>::dag_type& root, std::wostream& stream)
 {
     std::queue<dag_type> queue;
 
@@ -118,7 +118,7 @@ void ir_visualization<T>::collect_dag_dot_labels(const typename ir_visualization
 
         for(auto kid : (*dag).kids)
         {
-            auto dag_kid(std::dynamic_pointer_cast<parser_dag<token_type>>(kid));
+            auto dag_kid(std::dynamic_pointer_cast<parser_dag<token_type, tree_kind_type>>(kid));
             queue.emplace(dag_kid);
         }
     }
@@ -126,8 +126,8 @@ void ir_visualization<T>::collect_dag_dot_labels(const typename ir_visualization
     stream << std::endl;
 }
 
-template <typename T>
-void ir_visualization<T>::build_dag_dot_graph(const typename ir_visualization<T>::dag_type& dag, std::wostream& stream)
+template <typename Token, typename TreeKind>
+void ir_visualization<Token, TreeKind>::build_dag_dot_graph(const typename ir_visualization<Token, TreeKind>::dag_type& dag, std::wostream& stream)
 {
     std::queue<dag_type> queue;
 
@@ -152,18 +152,18 @@ void ir_visualization<T>::build_dag_dot_graph(const typename ir_visualization<T>
             {
                 if(papa == node)
                 {
-                    auto dag_kid(std::dynamic_pointer_cast<parser_dag<token_type>>(kid));
+                    auto dag_kid(std::dynamic_pointer_cast<parser_dag<token_type, tree_kind_type>>(kid));
                     stream << L"    " << (*node).id << L" -> " << (*dag_kid).id << L";" << std::endl;
                 }
             }
 
-            queue.emplace(std::dynamic_pointer_cast<parser_dag<token_type>>(kid));
+            queue.emplace(std::dynamic_pointer_cast<parser_dag<token_type, tree_kind_type>>(kid));
         }
     }
 }
 
-template <typename T>
-void ir_visualization<T>::decorate_tree(const typename ir_visualization<T>::tree_type& tree, const string_type& dot_file_name, std::size_t k)
+template <typename Token, typename TreeKind>
+void ir_visualization<Token, TreeKind>::decorate_tree(const typename ir_visualization<Token, TreeKind>::tree_type& tree, const string_type& dot_file_name, std::size_t k)
 {
     string_type file_name(dot_file_name + std::to_wstring(k) + L".etree.dot");
 
@@ -196,8 +196,8 @@ void ir_visualization<T>::decorate_tree(const typename ir_visualization<T>::tree
     }
 }
 
-template <typename T>
-void ir_visualization<T>::decorate_trees(const typename ir_visualization<T>::trees_type& trees, const string_type& dot_file_name)
+template <typename Token, typename TreeKind>
+void ir_visualization<Token, TreeKind>::decorate_trees(const typename ir_visualization<Token, TreeKind>::trees_type& trees, const string_type& dot_file_name)
 {
     // generate Graphviz dot file ...
     // for %i in (d:\tmp\fsa\*.dot) do D:\Soft\graphviz\2.38\release\bin\dot -Tpng %i -o %i.png
@@ -207,8 +207,8 @@ void ir_visualization<T>::decorate_trees(const typename ir_visualization<T>::tre
     }
 }
 
-template <typename T>
-void ir_visualization<T>::decorate_dag(const typename ir_visualization<T>::dag_type& dag, const string_type& dot_file_name)
+template <typename Token, typename TreeKind>
+void ir_visualization<Token, TreeKind>::decorate_dag(const typename ir_visualization<Token, TreeKind>::dag_type& dag, const string_type& dot_file_name)
 {
     string_type file_name(dot_file_name + L".dag.dot");
 

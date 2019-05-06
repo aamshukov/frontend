@@ -9,7 +9,7 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-template <typename T>
+template <typename Token>
 class lexical_analyzer : private noncopyable
 {
     public:
@@ -18,7 +18,7 @@ class lexical_analyzer : private noncopyable
         using datum_type = text::datum_type;
         using codepoints_type = std::basic_string<datum_type>;
 
-        using token_type = T;
+        using token_type = Token;
         using tokens_type = std::queue<token_type>;
 
         using snapshots_type = std::stack<const datum_type*>;
@@ -41,7 +41,8 @@ class lexical_analyzer : private noncopyable
 
         std::size_t                 my_indent;          // current indentation index, aka python
         indents_type                my_indents;         // stack of indents, theoretically unlimited
-        bool                        my_begining_of_line;// true if at the begining of a new line
+        bool                        my_boll;            // true if at the begining of a new logical line
+        bool                        my_eoll;            // true if at the end of a new logical line
 
     private:
         void                        prolog();
@@ -78,68 +79,68 @@ class lexical_analyzer : private noncopyable
         void                        rewind_to_snapshot(); // backtrack
 };
 
-template <typename T>
-inline const typename lexical_analyzer<T>::content_type& lexical_analyzer<T>::content() const
+template <typename Token>
+inline const typename lexical_analyzer<Token>::content_type& lexical_analyzer<Token>::content() const
 {
     return my_content;
 }
 
-template <typename T>
-inline typename lexical_analyzer<T>::content_type& lexical_analyzer<T>::content()
+template <typename Token>
+inline typename lexical_analyzer<Token>::content_type& lexical_analyzer<Token>::content()
 {
     return const_cast<content_type&>(static_cast<const lexical_analyzer&>(*this).content());
 }
 
-template <typename T>
-inline const typename lexical_analyzer<T>::token_type& lexical_analyzer<T>::token()
+template <typename Token>
+inline const typename lexical_analyzer<Token>::token_type& lexical_analyzer<Token>::token()
 {
     return my_token;
 }
 
-template <typename T>
-inline bool lexical_analyzer<T>::is_eol() const
+template <typename Token>
+inline bool lexical_analyzer<Token>::is_eol() const
 {
     return my_token.type == token_type::traits::type::eol;
 }
 
-template <typename T>
-inline bool lexical_analyzer<T>::is_eos() const
+template <typename Token>
+inline bool lexical_analyzer<Token>::is_eos() const
 {
     return my_token.type == token_type::traits::type::eos;
 }
 
-template <typename T>
-inline typename lexical_analyzer<T>::codepoints_type lexical_analyzer<T>::lexeme_to_codepoints() const
+template <typename Token>
+inline typename lexical_analyzer<Token>::codepoints_type lexical_analyzer<Token>::lexeme_to_codepoints() const
 {
     return my_token.codepoints(my_start_content);
 }
 
-template <typename T>
-inline typename lexical_analyzer<T>::codepoints_type lexical_analyzer<T>::lexeme_to_codepoints(const typename lexical_analyzer<T>::token_type& token) const
+template <typename Token>
+inline typename lexical_analyzer<Token>::codepoints_type lexical_analyzer<Token>::lexeme_to_codepoints(const typename lexical_analyzer<Token>::token_type& token) const
 {
     return token.codepoints(my_start_content);
 }
 
-template <typename T>
-inline string_type lexical_analyzer<T>::lexeme_to_string() const
+template <typename Token>
+inline string_type lexical_analyzer<Token>::lexeme_to_string() const
 {
     return my_token.to_string(my_start_content);
 }
 
-template <typename T>
-inline string_type lexical_analyzer<T>::lexeme_to_string(const typename lexical_analyzer<T>::token_type& token) const
+template <typename Token>
+inline string_type lexical_analyzer<Token>::lexeme_to_string(const typename lexical_analyzer<Token>::token_type& token) const
 {
     return token.to_string(my_start_content);
 }
 
-template <typename T>
-inline void lexical_analyzer<T>::take_snapshot()
+template <typename Token>
+inline void lexical_analyzer<Token>::take_snapshot()
 {
     my_snapshots.push(my_ptr);
 }
 
-template <typename T>
-inline void lexical_analyzer<T>::rewind_to_snapshot()
+template <typename Token>
+inline void lexical_analyzer<Token>::rewind_to_snapshot()
 {
     if(!my_snapshots.empty())
     {

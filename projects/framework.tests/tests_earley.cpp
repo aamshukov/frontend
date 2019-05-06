@@ -3,28 +3,40 @@
 //..............................
 #include <core/pch.hpp>
 #include <core/noncopyable.hpp>
-#include <core/status.hpp>
+
+#include <core/enum.hpp>
 #include <core/enumerate.hpp>
-#include <core/unicode.hpp>
-#include <core/text.hpp>
+#include <core/flags.hpp>
+#include <core/counter.hpp>
+
+#include <core/factory.hpp>
+#include <core/singleton.hpp>
+
 #include <core/domain_helper.hpp>
-#include <core/logger.hpp>
+
+#include <core/status.hpp>
+#include <core/diagnostics.hpp>
+#include <core/statistics.hpp>
+
+#include <core/text.hpp>
+#include <core/unicode.hpp>
+
 #include <core/data_provider.hpp>
 #include <core/file_data_provider.hpp>
 #include <core/string_data_provider.hpp>
-#include <core/counter.hpp>
-#include <core/factory.hpp>
-#include <core/singleton.hpp>
-#include <core/enum.hpp>
-#include <core/flags.hpp>
+
+#include <core/content.hpp>
+
 #include <core/command_line.hpp>
 #include <core/configurator.hpp>
 
-#include <core/tree.hpp>
 #include <core/dag.hpp>
+#include <core/tree.hpp>
 
 #include <core/visitor.hpp>
 #include <core/visitable.hpp>
+
+#include <core/logger.hpp>
 
 #include <frontend/grammar/token.hpp>
 #include <frontend/grammar/symbol.hpp>
@@ -33,33 +45,27 @@
 #include <frontend/grammar/grammar_algorithm.hpp>
 #include <frontend/grammar/grammar_visualization.hpp>
 
+#include <symtable/symbol_table_record.hpp>
+#include <symtable/symbol_table.hpp>
+#include <symtable/symbol_table.inl>
+
 #include <frontend/fsa/fsa_transition.hpp>
 #include <frontend/fsa/fsa_state.hpp>
-#include <frontend/fsa/fsa.hpp>
-#include <frontend/fsa/fsa_re.hpp>
 #include <frontend/fsa/fsa_state_set.hpp>
+#include <frontend/fsa/fsa.hpp>
 #include <frontend/fsa/fsa_algorithm.hpp>
-
-#include <frontend/fsa/fsa_visualization.hpp>
+#include <frontend/fsa/fsa_re.hpp>
 #include <frontend/fsa/fsa_codegen.hpp>
-
-#include <core/data_provider.hpp>
-#include <core/file_data_provider.hpp>
-#include <core/content.hpp>
-
-#include <core/diagnostics.hpp>
-#include <core/statistics.hpp>
+#include <frontend/fsa/fsa_visualization.hpp>
 
 #include <frontend/lexical_analyzer/lexical_analyzer.hpp>
+#include <frontend/lexical_analyzer/lexical_analyzer.inl>
 
-#include <frontend/parser/parser_algorithm.hpp>
-
-#include <frontend/parser/parser_tree.hpp>
 #include <frontend/parser/parser_dag.hpp>
-
+#include <frontend/parser/parser_tree.hpp>
 #include <frontend/parser/parser.hpp>
 #include <frontend/parser/parser.inl>
-
+#include <frontend/parser/parser_algorithm.hpp>
 #include <frontend/parser/parser_visualization.hpp>
 #include <frontend/parser/parser_visualization.inl>
 
@@ -69,21 +75,18 @@
 #include <frontend/parser/earley/earley_visualization.hpp>
 #include <frontend/parser/earley/earley_visualization.inl>
 
-#include <symtable/symbol_table_record.hpp>
-#include <symtable/symbol_table.hpp>
-#include <symtable/symbol_table.inl>
-
 #include <backend/ir/quadruple.hpp>
+#include <backend/ir/tree_tac_visitor.hpp>
+#include <backend/ir/dag_tac_visitor.hpp>
 
 #include <backend/ir/ir.hpp>
 #include <backend/ir/ir.inl>
 #include <backend/ir/ir_visualization.hpp>
 #include <backend/ir/ir_visualization.inl>
 
-#include <backend/ir/tree_tac_visitor.hpp>
-#include <backend/ir/dag_tac_visitor.hpp>
 
 USINGNAMESPACE(core)
+USINGNAMESPACE(symtable)
 USINGNAMESPACE(frontend)
 USINGNAMESPACE(backend)
 
@@ -163,10 +166,23 @@ class earley_lexical_analyzer : public lexical_analyzer<token<earley_token_trait
         }
 };
 
-class my_earley_parser : public earley_parser<token<earley_token_traits>>
+struct my_earley_tree_traits
+{
+    DECLARE_ENUM
+    (
+        kind,
+        uint32_t,
+        unknown = 0,
+
+        // the following one (1) entry MUST be the last entry in the enum
+        size
+    )
+};
+
+class my_earley_parser : public earley_parser<token<earley_token_traits>, my_earley_tree_traits>
 {
     public:
-        using eparser_type = earley_parser<token<earley_token_traits>>;
+        using eparser_type = earley_parser<token<earley_token_traits>, my_earley_tree_traits>;
 
     public:
         my_earley_parser(const lexical_analyzer_type& lexical_analyzer, grammar& gr, earley_parser::tree_kind kind) : earley_parser(lexical_analyzer, gr, kind)
@@ -175,17 +191,19 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>>
 
         tree_type handle_start(const item_type& item) override
         {
-            auto result(factory::create<parser_tree<token_type>>());
+            auto result(factory::create<parser_tree<token_type, my_earley_tree_traits>>());
             (*result).symbol = ((*(*item).rule).lhs()[0]);
+            (*result).record = factory::create<symbol_table_record<token_type>>();
             return result;
         }
 
         tree_type handle_terminal(const symbol_type& symbol, uint32_t position, const rule_type& rule, const token_type& token, const tree_type& node) override
         {
-            auto result(factory::create<parser_tree<token_type>>());
+            auto result(factory::create<parser_tree<token_type, my_earley_tree_traits>>());
 
             (*result).symbol = symbol;
-            (*result).token = token;
+            (*result).record = factory::create<symbol_table_record<token_type>>();
+            (*(*result).record).token() = token;
             (*result).papa = node;
 
             if(node != nullptr && (*rule).rhs()[position] == symbol)
@@ -204,9 +222,10 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>>
 
         tree_type handle_before_nonterminal(const item_type& item, uint32_t position, const rule_type& rule, const tree_type& node, bool) override
         {
-            auto result(factory::create<parser_tree<token_type>>());
+            auto result(factory::create<parser_tree<token_type, my_earley_tree_traits>>());
 
             (*result).symbol = ((*(*item).rule).lhs()[0]);
+            (*result).record = factory::create<symbol_table_record<token_type>>();
             (*result).papa = node;
 
             if(node != nullptr)
@@ -295,26 +314,26 @@ void test_earley_parser()
 
             if(parser.status().custom_code() == status::custom_code::success)
             {
-                std::wcout << earley_visualization<my_earley_parser>::decorate_charts(parser.charts()).c_str() << std::endl;
+                using token_type = token<earley_token_traits>;
 
-                ir_visualization<my_earley_parser>::print_trees(parser.trees(), std::wcout);
-                ir_visualization<my_earley_parser>::decorate_trees(parser.trees(), input.dot_file_name);
+                std::wcout << earley_visualization<token<earley_token_traits>, my_earley_tree_traits>::decorate_charts(parser.charts()).c_str() << std::endl;
+
+                ir_visualization<token_type, my_earley_tree_traits>::print_trees(parser.trees(), std::wcout);
+                ir_visualization<token_type, my_earley_tree_traits>::decorate_trees(parser.trees(), input.dot_file_name);
 
                 auto cst(std::dynamic_pointer_cast<my_earley_parser::earley_tree>(parser.trees()[0]));
 
-                ir<token<earley_token_traits>>::cst_to_ast(cst);
-                ir_visualization<my_earley_parser>::decorate_tree(cst, input.dot_file_name, 0);
+                ir<token_type, my_earley_tree_traits>::cst_to_ast(cst);
+                ir_visualization<token_type, my_earley_tree_traits>::decorate_tree(cst, input.dot_file_name, 0);
 
-                ir<token<earley_token_traits>>::dag_type asd;
-                ir<token<earley_token_traits>>::ast_to_asd(cst, asd);
-                ir_visualization<my_earley_parser>::decorate_dag(asd, input.dot_file_name);
+                ir<token_type, my_earley_tree_traits>::dag_type asd;
+                ir<token_type, my_earley_tree_traits>::ast_to_asd(cst, asd);
+                ir_visualization<token_type, my_earley_tree_traits>::decorate_dag(asd, input.dot_file_name);
 
-                using token_type = token<earley_token_traits>;
-
-                tree_tac_visitor<token_type> tree_visitor;
+                tree_tac_visitor<token_type, my_earley_tree_traits> tree_visitor;
                 (*cst).accept(tree_visitor);
 
-                dag_tac_visitor<token_type> dag_visitor;
+                dag_tac_visitor<token_type, my_earley_tree_traits> dag_visitor;
                 (*asd).accept(dag_visitor);
             }
             else

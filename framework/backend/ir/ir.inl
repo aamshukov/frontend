@@ -11,8 +11,8 @@ BEGIN_NAMESPACE(backend)
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
-template <typename T>
-void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
+template <typename Token, typename TreeKind>
+void ir<Token, TreeKind>::cst_to_ast(typename ir<Token, TreeKind>::tree_type& cst)
 {
     // will be split later ...
     std::stack<tree_type> stack;
@@ -51,7 +51,7 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
         for(std::size_t k = 0, n = (*node).kids.size(); k < n; k++)
         {
             auto kid = (*node).kids[k];
-            queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type>>(kid));
+            queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type, tree_kind_type>>(kid));
         }
     }
 
@@ -70,7 +70,7 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
         for(std::size_t k = 0, n = (*node).kids.size(); k < n; k++)
         {
             auto kid = (*node).kids[k];
-            queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type>>(kid));
+            queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type, tree_kind_type>>(kid));
         }
     }
 
@@ -141,7 +141,7 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
         for(std::size_t k = 0, n = (*node).kids.size(); k < n; k++)
         {
             auto kid = (*node).kids[k];
-            queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type>>(kid));
+            queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type, tree_kind_type>>(kid));
         }
     }
 
@@ -202,26 +202,26 @@ void ir<T>::cst_to_ast(typename ir<T>::tree_type& cst)
     }
 }
 
-template <typename T>
-typename ir<T>::dag_key_type ir<T>::build_dag_key(const typename ir<T>::tree_type& tree)
+template <typename Token, typename TreeKind>
+typename ir<Token, TreeKind>::dag_key_type ir<Token, TreeKind>::build_dag_key(const typename ir<Token, TreeKind>::tree_type& tree)
 {
     dag_key_type result;
 
-    result.emplace_back(std::make_tuple((*(*tree).symbol).id(), (*tree).token.type, (*tree).token.literal));
+    result.emplace_back(std::make_tuple((*(*tree).record).token().type, (*(*tree).record).token().literal, (*(*tree).record).value()));
 
     std::for_each((*tree).kids.begin(),
                   (*tree).kids.end(),
                   [&result](const auto& kid)
                   {
-                      auto tree_kid(std::dynamic_pointer_cast<parser_tree<token_type>>(kid));
-                      result.emplace_back(std::make_tuple((*(*tree_kid).symbol).id(), (*tree_kid).token.type, (*tree_kid).token.literal));
+                      auto tree_kid(std::dynamic_pointer_cast<parser_tree<token_type, tree_kind_type>>(kid));
+                      result.emplace_back(std::make_tuple((*(*tree_kid).record).token().type, (*(*tree_kid).record).token().literal, (*(*tree_kid).record).value()));
                   });
 
     return result;
 }
 
-template <typename T>
-typename ir<T>::dag_type ir<T>::find_dag(const typename ir<T>::dag_key_type& key, const typename ir<T>::dag_cache_type& cache)
+template <typename Token, typename TreeKind>
+typename ir<Token, TreeKind>::dag_type ir<Token, TreeKind>::find_dag(const typename ir<Token, TreeKind>::dag_key_type& key, const typename ir<Token, TreeKind>::dag_cache_type& cache)
 {
     dag_type result;
 
@@ -235,8 +235,8 @@ typename ir<T>::dag_type ir<T>::find_dag(const typename ir<T>::dag_key_type& key
     return result;
 }
 
-template <typename T>
-void ir<T>::ast_to_asd(const typename ir<T>::tree_type& ast, typename ir<T>::dag_type& result_asd)
+template <typename Token, typename TreeKind>
+void ir<Token, TreeKind>::ast_to_asd(const typename ir<Token, TreeKind>::tree_type& ast, typename ir<Token, TreeKind>::dag_type& result_asd)
 {
     // collect nodes
 
@@ -266,7 +266,7 @@ void ir<T>::ast_to_asd(const typename ir<T>::tree_type& ast, typename ir<T>::dag
         for(std::size_t k = 0, n = (*tree).kids.size(); k < n; k++)
         {
             auto kid = (*tree).kids[k];
-            stack1.push(std::dynamic_pointer_cast<parser_tree<token_type>>(kid));
+            stack1.push(std::dynamic_pointer_cast<parser_tree<token_type, tree_kind_type>>(kid));
         }
     }
 
@@ -296,10 +296,10 @@ void ir<T>::ast_to_asd(const typename ir<T>::tree_type& ast, typename ir<T>::dag
 
         if(dag == nullptr)
         {
-            dag = factory::create<parser_dag<token_type>>();
+            dag = factory::create<parser_dag<token_type, tree_kind_type>>();
 
             (*dag).symbol = (*tree).symbol;
-            (*dag).token = (*tree).token;
+            (*dag).record = (*tree).record;
 
             (*dag).id = ++id;
 
@@ -307,7 +307,7 @@ void ir<T>::ast_to_asd(const typename ir<T>::tree_type& ast, typename ir<T>::dag
 
             for(const auto& tree_kid : (*tree).kids)
             {
-                auto it(map.find(std::dynamic_pointer_cast<parser_tree<token_type>>(tree_kid)));
+                auto it(map.find(std::dynamic_pointer_cast<parser_tree<token_type, tree_kind_type>>(tree_kid)));
                 auto dag_kid((*it).second);
 
                 (*dag).kids.emplace(dag_kid);

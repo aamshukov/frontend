@@ -65,8 +65,8 @@ status& status::operator = (status&& other)
     return *this;
 }
 
-#define XL(x)	L ## x
-#define XL2(x)	XL(x)
+#define XL(x)    L ## x
+#define XL2(x)    XL(x)
 
 string_type status::get_system_error_message()
 {

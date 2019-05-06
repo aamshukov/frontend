@@ -2626,7 +2626,7 @@ bool grammar_algorithm::is_less(const typename grammar_algorithm::set_type& seq1
         }
     }
 
-	return (it1 == it1_end && it2 != it2_end);
+    return (it1 == it1_end && it2 != it2_end);
 }
 
 void grammar_algorithm::make_vector_unique(typename grammar_algorithm::sets_type& sequence)

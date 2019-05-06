@@ -9,25 +9,26 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-template <typename T>
-lexical_analyzer<T>::lexical_analyzer(const typename lexical_analyzer<T>::content_type& content)
-                   : my_content(content),
-                     my_start_content((*my_content).data()),
-                     my_end_content(my_start_content + (*my_content).count()),
-                     my_ptr(my_start_content),
-                     my_ptr_lexeme(nullptr),
-                     my_indent(0),
-                     my_begining_of_line(true)
+template <typename Token>
+lexical_analyzer<Token>::lexical_analyzer(const typename lexical_analyzer<Token>::content_type& content)
+                       : my_content(content),
+                         my_start_content((*my_content).data()),
+                         my_end_content(my_start_content + (*my_content).count()),
+                         my_ptr(my_start_content),
+                         my_ptr_lexeme(nullptr),
+                         my_indent(0),
+                         my_boll(true),
+                         my_eoll(false)
 {
 }
 
-template <typename T>
-lexical_analyzer<T>::~lexical_analyzer()
+template <typename Token>
+lexical_analyzer<Token>::~lexical_analyzer()
 {
 }
 
-template <typename T>
-void lexical_analyzer<T>::next_lexeme()
+template <typename Token>
+void lexical_analyzer<Token>::next_lexeme()
 {
     if(!is_eos())
     {
@@ -48,8 +49,8 @@ void lexical_analyzer<T>::next_lexeme()
     }
 }
 
-template <typename T>
-const typename lexical_analyzer<T>::token_type& lexical_analyzer<T>::lookahead_lexeme()
+template <typename Token>
+const typename lexical_analyzer<Token>::token_type& lexical_analyzer<Token>::lookahead_lexeme()
 {
     token_type* result(nullptr);
 
@@ -103,15 +104,15 @@ const typename lexical_analyzer<T>::token_type& lexical_analyzer<T>::lookahead_l
     return *result;
 }
 
-template <typename T>
-inline void lexical_analyzer<T>::prolog()
+template <typename Token>
+inline void lexical_analyzer<Token>::prolog()
 {
     my_token.reset();
     my_ptr_lexeme = my_ptr;
 }
 
-template <typename T>
-inline void lexical_analyzer<T>::epilog()
+template <typename Token>
+inline void lexical_analyzer<Token>::epilog()
 {
     if(my_ptr > my_end_content)
     {

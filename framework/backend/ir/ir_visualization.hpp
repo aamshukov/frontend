@@ -11,7 +11,7 @@ BEGIN_NAMESPACE(backend)
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
-template <typename T>
+template <typename Token, typename TreeKind>
 class ir_visualization : private noncopyable
 {
     public:
@@ -24,8 +24,9 @@ class ir_visualization : private noncopyable
         using rule_type = grammar::rule_type;
         using rules_type = grammar::rules_type;
 
-        using ir_type = T;
+        using ir_type = typename ir<Token, TreeKind>;
         using token_type = typename ir_type::token_type;
+        using tree_kind_type = typename ir_type::tree_kind_type;
 
         using tree_type = typename ir_type::tree_type;
         using trees_type = typename ir_type::trees_type;

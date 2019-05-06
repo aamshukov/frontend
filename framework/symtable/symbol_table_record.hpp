@@ -1,8 +1,8 @@
 //..............................
 // UI Lab Inc. Arthur Amshukov .
 //..............................
-#ifndef __record_H__
-#define __record_H__
+#ifndef __SYMBOL_TABLE_RECORD_H__
+#define __SYMBOL_TABLE_RECORD_H__
 
 #pragma once
 
@@ -30,6 +30,8 @@ class symbol_table_record : private noncopyable
                                         uint64_t,
                                         float,
                                         double,
+                                        void*,
+                                        datum_type,
                                         codepoints_type>;
 
         using record_type = std::shared_ptr<symbol_table_record<token_type>>;
@@ -37,7 +39,7 @@ class symbol_table_record : private noncopyable
 
     private:
         token_type          my_token;
-	    value_type          my_value;
+        value_type          my_value;
 
         std::size_t         my_ssa_id;          // 0 - unassigned, 1+
 
@@ -93,4 +95,4 @@ inline std::size_t& symbol_table_record<Token>::ssa_id()
 
 END_NAMESPACE
 
-#endif // __record_H__
+#endif // __SYMBOL_TABLE_RECORD_H__

@@ -11,6 +11,20 @@ USINGNAMESPACE(core)
 
 struct token_traits
 {
+    DECLARE_ENUM
+    (
+        type,
+        uint32_t,
+        unknown = 0,
+        epsilon = 5,
+        eol, // 6
+        eos, // 7
+        indent,
+        dedent,
+
+        // the following one (1) entry MUST be the last entry in the enum
+        size
+    )
 };
 
 template <typename Traits = token_traits>

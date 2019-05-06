@@ -1,12 +1,34 @@
-primary-expression:
-    literal
-    identifier
-    ( expression )
+translation-unit    : declarations-opt
+                    ;
 
 
 
 
 
+
+
+
+
+
+primary-expression          : literal
+                            | field-access
+                            | '('! expression ')'!
+                            ;
+
+field-access                : primary-expression '.' identifier
+                            ;
+
+expression                  :
+
+
+
+
+
+
+
+fully-qualified-name        : fully-qualified-name '.' identifier
+                            | identifier
+                            ;
 
 
 
@@ -38,5 +60,82 @@ relational-expression:
 
 
 
+
+
+comments:
+
+
+structure:
+
+tuple:
+   destructure
+
+enum:
+
+invocation-experession:
+lambda-expression:
+callable:
+    function
+        foo a b c
+    lambda
+        lambda a b c
+
+
+
+
+for
+foreach
+while
+do while
+
+
+if 
+else if
+else if
+else
+
+case  when
+
+
+
+continue
+break
+return
+yield
+
+
+no null, everything always initialized
+no NULL or NIL, all types have a default ctor so anytime exists a default instance 
+
+
+
+parameters passing types
+
+
+templates/generics
+template <uint16 SHORT_TEXT_SIZE = 64> struct status
+
+
+scalars:
+    a = 0
+    b = 10
+    c = 0x10
+    d = 4.5
+    f = 'abc'
+    g = true/false
+
+
+arrays:
+   a[2]             - checked array
+   a(2)             - raw unchecked array
+   b[-2:3]          - checked ranged-based array
+   b[-2:3, 0:10]    - checked ranged-based array, multidimensional
+   c[-2:3]          - checked ranged-based array
+   c(-2:3, 0:10)    - raw unchecked ranged-based array, multidimensional
+   d[2,c]           - checked array, column based, aka FORTRAN
+   d(2,c)           - raw unchecked array, column based, aka FORTRAN
+   d[2,r]           - checked array, row based, aka C, 'r' is optional
+   d(2,r)           - raw unchecked array, raw based, aka C, 'r' is optional
+   f[-2..3, 0..10]  - checked ranged-based array, multidimensional, alternative syntax as in PASCAL
 
 

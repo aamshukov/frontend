@@ -11,23 +11,23 @@ USINGNAMESPACE(core)
 
 // α β ε λ ∅ ∈ Σ ∪
 
-template <typename T>
-earley_parser<T>::earley_parser(const typename earley_parser<T>::lexical_analyzer_type& lexical_analyzer, grammar& gr, tree_kind kind)
-                : parser<T>(lexical_analyzer), my_grammar(gr), my_tree_kind(kind)
+template <typename Token, typename TreeKind>
+earley_parser<Token, TreeKind>::earley_parser(const typename earley_parser<Token, TreeKind>::lexical_analyzer_type& lexical_analyzer, grammar& gr, tree_kind kind)
+                              : parser<Token, TreeKind>(lexical_analyzer), my_grammar(gr), my_tree_kind(kind)
 {
 }
 
-template <typename T>
-earley_parser<T>::~earley_parser()
+template <typename Token, typename TreeKind>
+earley_parser<Token, TreeKind>::~earley_parser()
 {
 }
 
-template <typename T>
-typename earley_parser<T>::item_type earley_parser<T>::create_item(const typename earley_parser<T>::rule_type& rule,
-                                                                   const typename earley_parser<T>::chart_type& origin_chart,
-                                                                   const typename earley_parser<T>::chart_type& master_chart,
-                                                                   const typename earley_parser<T>::item_type& lptr,
-                                                                   flags action)
+template <typename Token, typename TreeKind>
+typename earley_parser<Token, TreeKind>::item_type earley_parser<Token, TreeKind>::create_item(const typename earley_parser<Token, TreeKind>::rule_type& rule,
+                                                                                               const typename earley_parser<Token, TreeKind>::chart_type& origin_chart,
+                                                                                               const typename earley_parser<Token, TreeKind>::chart_type& master_chart,
+                                                                                               const typename earley_parser<Token, TreeKind>::item_type& lptr,
+                                                                                               flags action)
 {
     item_type result(factory::create<item>());
 
@@ -46,8 +46,8 @@ typename earley_parser<T>::item_type earley_parser<T>::create_item(const typenam
     return result;
 }
 
-template <typename T>
-void earley_parser<T>::set_rptr(typename earley_parser<T>::item_type& item, const typename earley_parser<T>::item_type& new_item)
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::set_rptr(typename earley_parser<Token, TreeKind>::item_type& item, const typename earley_parser<Token, TreeKind>::item_type& new_item)
 {
     if(!std::any_of((*item).rptrs.begin(), (*item).rptrs.end(), [&new_item](const auto& item0){ return *item0 == *new_item; }))
     {
@@ -55,27 +55,27 @@ void earley_parser<T>::set_rptr(typename earley_parser<T>::item_type& item, cons
     }
 }
 
-template <typename T>
-bool earley_parser<T>::is_item_marked(typename const earley_parser<T>::item_type& item)
+template <typename Token, typename TreeKind>
+bool earley_parser<Token, TreeKind>::is_item_marked(typename const earley_parser<Token, TreeKind>::item_type& item)
 {
     return ((*item).flags & flags::marked) == flags::marked;
 }
 
-template <typename T>
-void earley_parser<T>::mark_item(typename earley_parser<T>::item_type& item)
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::mark_item(typename earley_parser<Token, TreeKind>::item_type& item)
 {
     (*item).flags |= flags::marked;
 }
 
-template <typename T>
-void earley_parser<T>::unmark_item(typename earley_parser<T>::item_type& item)
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::unmark_item(typename earley_parser<Token, TreeKind>::item_type& item)
 {
     // crappy C++ syntax, need this hack for templates
-    (*item).flags &= ~static_cast<std::underlying_type_t<earley_parser<T>::flags>>(flags::marked);
+    (*item).flags &= ~static_cast<std::underlying_type_t<earley_parser<Token, TreeKind>::flags>>(flags::marked);
 }
 
-template <typename T>
-typename earley_parser<T>::chart_type earley_parser<T>::create_chart(uint32_t id)
+template <typename Token, typename TreeKind>
+typename earley_parser<Token, TreeKind>::chart_type earley_parser<Token, TreeKind>::create_chart(uint32_t id)
 {
     chart_type result(factory::create<chart>());
 
@@ -84,8 +84,8 @@ typename earley_parser<T>::chart_type earley_parser<T>::create_chart(uint32_t id
     return result;
 }
 
-template <typename T>
-void earley_parser<T>::closure(const grammar& gr, typename earley_parser<T>::chart_type& chart)
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::closure(const grammar& gr, typename earley_parser<Token, TreeKind>::chart_type& chart)
 {
     // 'λ case' - special case for empty rule, always assume the dot is at the end
     // Grune and Jacobs:
@@ -111,10 +111,10 @@ void earley_parser<T>::closure(const grammar& gr, typename earley_parser<T>::cha
     }
 }
 
-template <typename T>
-void earley_parser<T>::predict(const grammar& gr,
-                               const typename earley_parser<T>::item_type& item,
-                               typename earley_parser<T>::chart_type& chart)
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::predict(const grammar& gr,
+                                             const typename earley_parser<Token, TreeKind>::item_type& item,
+                                             typename earley_parser<Token, TreeKind>::chart_type& chart)
 {
     const auto& rhs((*(*item).rule).rhs());
 
@@ -140,8 +140,8 @@ void earley_parser<T>::predict(const grammar& gr,
     }
 }
 
-template <typename T>
-void earley_parser<T>::complete(typename earley_parser<T>::item_type& item, typename earley_parser<T>::chart_type& chart)
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::complete(typename earley_parser<Token, TreeKind>::item_type& item, typename earley_parser<Token, TreeKind>::chart_type& chart)
 {
     const auto& rhs((*(*item).rule).rhs());
 
@@ -194,11 +194,11 @@ void earley_parser<T>::complete(typename earley_parser<T>::item_type& item, type
     }
 }
 
-template <typename T>
-void earley_parser<T>::scan(typename earley_parser<T>::chart_type& chart,
-                            typename earley_parser<T>::charts_type& charts,
-                            typename const earley_parser<T>::token_type& token,
-                            typename earley_parser<T>::chart_type& result)
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::scan(typename earley_parser<Token, TreeKind>::chart_type& chart,
+                                          typename earley_parser<Token, TreeKind>::charts_type& charts,
+                                          typename const earley_parser<Token, TreeKind>::token_type& token,
+                                          typename earley_parser<Token, TreeKind>::chart_type& result)
 {
     chart_type new_chart(create_chart(static_cast<uint32_t>(charts.size())));
 
@@ -234,8 +234,8 @@ void earley_parser<T>::scan(typename earley_parser<T>::chart_type& chart,
     }
 }
 
-template <typename T>
-void earley_parser<T>::build_charts()
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::build_charts()
 {
     // Адаптированный для построения деревьев вывода алгоритм Эрли, Владимир Анатольевич Лапшин.
     log_info(L"Building charts ...");
@@ -332,9 +332,9 @@ void earley_parser<T>::build_charts()
     log_info(L"Built charts.");
 }
 
-template <typename T>
-void earley_parser<T>::populate_rhs_stack(const typename earley_parser<T>::item_type& item,
-                                          typename earley_parser<T>::rhs_stack_type& stack)
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::populate_rhs_stack(const typename earley_parser<Token, TreeKind>::item_type& item,
+                                                        typename earley_parser<Token, TreeKind>::rhs_stack_type& stack)
 {
     // Заполнение магазина ссылками на ситуации текущего уровня.
     for(auto current_item = item; (*current_item).dot > 0; current_item = (*current_item).lptr)
@@ -368,9 +368,9 @@ void earley_parser<T>::populate_rhs_stack(const typename earley_parser<T>::item_
     }
 }
 
-template <typename T>
-void earley_parser<T>::clone_tree(const typename earley_parser<T>::parse_tree_element& source,
-                                  typename earley_parser<T>::parse_tree_element& result)
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::clone_tree(const typename earley_parser<Token, TreeKind>::parse_tree_element& source,
+                                                typename earley_parser<Token, TreeKind>::parse_tree_element& result)
 {
     struct queue_entry
     {
@@ -398,7 +398,8 @@ void earley_parser<T>::clone_tree(const typename earley_parser<T>::parse_tree_el
             new_node = new_tree;
 
             (*new_tree).symbol = (*source.tree).symbol;
-            (*new_tree).token = (*source.tree).token;
+            (*new_tree).record = (*source.tree).record;
+
             (*new_tree).papa = nullptr;
         }
         else
@@ -406,9 +407,9 @@ void earley_parser<T>::clone_tree(const typename earley_parser<T>::parse_tree_el
             new_node = factory::create<earley_tree>();
 
             (*new_node).symbol = (*entry.org_node).symbol;
-            (*new_node).token = (*entry.org_node).token;
-            (*new_node).papa = entry.new_papa;
+            (*new_node).record = (*entry.org_node).record;
 
+            (*new_node).papa = entry.new_papa;
             (*entry.new_papa).kids.emplace_back(new_node);
         }
 
@@ -432,11 +433,11 @@ void earley_parser<T>::clone_tree(const typename earley_parser<T>::parse_tree_el
 }
 
 // BuildTreeLevel([A -> X1...Xm •, i, l, <s>], P, Tr)
-template <typename T>
-void earley_parser<T>::build_parse_trees(typename earley_parser<T>::item_type& item,
-                                         typename earley_parser<T>::tree_type& papa,
-                                         typename earley_parser<T>::tree_type& tree,
-                                         typename earley_parser<T>::trees_type& trees)
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::build_parse_trees(typename earley_parser<Token, TreeKind>::item_type& item,
+                                                       typename earley_parser<Token, TreeKind>::tree_type& papa,
+                                                       typename earley_parser<Token, TreeKind>::tree_type& tree,
+                                                       typename earley_parser<Token, TreeKind>::trees_type& trees)
 {
     // Заполнение магазина ссылками на ситуации текущего уровня.
     rhs_stack_type rhs_stack;
@@ -471,9 +472,11 @@ void earley_parser<T>::build_parse_trees(typename earley_parser<T>::item_type& i
                     auto new_node(factory::create<earley_tree>());
 
                     (*new_node).symbol = symbol;
-                    (*new_node).token = token;
-                    (*new_node).papa = parse_root.papa;
 
+                    (*new_node).record = factory::create<symbol_table_record<token_type>>();
+                    (*(*new_node).record).token() = token;
+
+                    (*new_node).papa = parse_root.papa;
                     (*parse_root.papa).kids.emplace_back(new_node);
                 }
 
@@ -491,9 +494,11 @@ void earley_parser<T>::build_parse_trees(typename earley_parser<T>::item_type& i
                     auto new_node(factory::create<earley_tree>());
 
                     (*new_node).symbol = symbol;
-                    (*new_node).token = token;
-                    (*new_node).papa = parse_root.papa;
 
+                    (*new_node).record = factory::create<symbol_table_record<token_type>>();
+                    (*(*new_node).record).token() = token;
+
+                    (*new_node).papa = parse_root.papa;
                     (*parse_root.papa).kids.emplace_back(new_node);
 
                     mark_item(current_item);
@@ -548,9 +553,11 @@ void earley_parser<T>::build_parse_trees(typename earley_parser<T>::item_type& i
                             auto new_node(factory::create<earley_tree>());
 
                             (*new_node).symbol = symbol;
-                            (*new_node).token = token;
-                            (*new_node).papa = parse_root.papa;
 
+                            (*new_node).record = factory::create<symbol_table_record<token_type>>();
+                            (*(*new_node).record).token() = token;
+
+                            (*new_node).papa = parse_root.papa;
                             (*parse_root.papa).kids.emplace_back(new_node);
 
                             mark_item(rptr_item);
@@ -571,8 +578,8 @@ void earley_parser<T>::build_parse_trees(typename earley_parser<T>::item_type& i
     }
 }
 
-template <typename T>
-void earley_parser<T>::build_parse_trees()
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::build_parse_trees()
 {
     //  S  -> S + S
     //  S  -> S
@@ -668,7 +675,8 @@ void earley_parser<T>::build_parse_trees()
 
             // ... добавить в него узел S как корень ...
             (*root).symbol = my_grammar.start_symbol();
-            (*root).token = (*(*current_item).master_chart).token;
+            (*root).record = factory::create<symbol_table_record<token_type>>();
+            (*(*root).record).token() = (*(*current_item).master_chart).token;
 
             // ... добавить Tr в список trees
             trees.emplace_back(root);
@@ -690,11 +698,11 @@ void earley_parser<T>::build_parse_trees()
 }
 
 // BuildAstLevel([A -> X1...Xm •, i, l, <s>], P, Tr)
-template <typename T>
-void earley_parser<T>::build_ast_tree(typename earley_parser<T>::item_type& item,
-                                      typename earley_parser<T>::tree_type& papa,
-                                      typename earley_parser<T>::tree_type& tree,
-                                      typename earley_parser<T>::trees_type& trees)
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::build_ast_tree(typename earley_parser<Token, TreeKind>::item_type& item,
+                                                    typename earley_parser<Token, TreeKind>::tree_type& papa,
+                                                    typename earley_parser<Token, TreeKind>::tree_type& tree,
+                                                    typename earley_parser<Token, TreeKind>::trees_type& trees)
 {
     // Заполнение магазина ссылками на ситуации текущего уровня.
     rhs_stack_type rhs_stack;
@@ -793,8 +801,8 @@ void earley_parser<T>::build_ast_tree(typename earley_parser<T>::item_type& item
     }
 }
 
-template <typename T>
-void earley_parser<T>::build_ast()
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::build_ast()
 {
     log_info(L"Building AST tree(s) ...");
 
@@ -839,8 +847,8 @@ void earley_parser<T>::build_ast()
     log_info(L"Built AST tree(s).");
 }
 
-template <typename T>
-void earley_parser<T>::parse()
+template <typename Token, typename TreeKind>
+void earley_parser<Token, TreeKind>::parse()
 {
     log_info(L"Parsing ...");
 
@@ -868,8 +876,8 @@ void earley_parser<T>::parse()
     }
 }
 
-template <typename T>
-bool earley_parser<T>::validate_charts(const typename earley_parser<T>::chart_type& chart)
+template <typename Token, typename TreeKind>
+bool earley_parser<Token, TreeKind>::validate_charts(const typename earley_parser<Token, TreeKind>::chart_type& chart)
 {
     bool result = false;
 

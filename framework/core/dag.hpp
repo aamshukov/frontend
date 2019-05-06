@@ -8,7 +8,7 @@
 
 BEGIN_NAMESPACE(core)
 
-struct dag
+struct dag : private noncopyable
 {
     enum class flags : uint64_t
     {

@@ -9,8 +9,8 @@
 BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
-template <typename T>
-class earley_parser : public parser<T>
+template <typename Token, typename TreeKind>
+class earley_parser : public parser<Token, TreeKind>
 {
     // optimization heuristics might be introduced:
     //  - optimization lists, which are predictor-list, completer-list and scanner-list
@@ -20,7 +20,10 @@ class earley_parser : public parser<T>
     //  - 'execute predictor' flag indicates if predictor should proceed, set when an item is added
     //  - 'execute completer' flag indicates if completer should proceed, set when an item is added
     public:
-        using token_type = parser<T>::token_type;
+        using token_type = typename parser<Token, TreeKind>::token_type;
+        using tree_kind_type = typename parser<Token, TreeKind>::tree_kind_type;
+
+        using lexical_analyzer_type = typename parser<token_type, tree_kind_type>::lexical_analyzer_type;
 
         using symbol_type = grammar::symbol_type;
         using symbols_type = grammar::symbols_type;
@@ -130,12 +133,12 @@ class earley_parser : public parser<T>
 
         using rhs_stack_type = std::stack<rhs_stack_element>;
 
-        using earley_tree = parser_tree<token_type>;
+        using earley_tree = parser_tree<token_type, tree_kind_type>;
 
         struct parse_tree_element // (Tr = parsing tree, P = papa)
         {
             tree_type tree; // Tr
-	        tree_type papa; // P
+            tree_type papa; // P
         };
 
         using parse_tree_elements_type = std::list<parse_tree_element>;
@@ -215,14 +218,14 @@ class earley_parser : public parser<T>
         void                    parse() override;
 };
 
-template <typename T>
-inline const typename earley_parser<T>::charts_type& earley_parser<T>::charts() const
+template <typename Token, typename TreeKind>
+inline const typename earley_parser<Token, TreeKind>::charts_type& earley_parser<Token, TreeKind>::charts() const
 {
     return my_charts;
 }
 
-template <typename T>
-inline const typename earley_parser<T>::trees_type& earley_parser<T>::trees() const
+template <typename Token, typename TreeKind>
+inline const typename earley_parser<Token, TreeKind>::trees_type& earley_parser<Token, TreeKind>::trees() const
 {
     return my_trees;
 }

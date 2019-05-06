@@ -11,19 +11,24 @@ BEGIN_NAMESPACE(backend)
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
-template <typename T>
+template <typename Token, typename TreeKind>
 class ir : private noncopyable
 {
     public:
-        using token_type = T;
+        using token_type = Token;
+        using tree_kind_type = TreeKind;
 
-        using tree_type = typename parser<token_type>::tree_type;
-        using trees_type = typename parser<token_type>::trees_type;
+        using tree_type = typename parser<token_type, tree_kind_type>::tree_type;
+        using trees_type = typename parser<token_type, tree_kind_type>::trees_type;
 
-        using dag_type = typename parser<token_type>::dag_type;
-        using dags_type = typename parser<token_type>::dags_type;
+        using dag_type = typename parser<token_type, tree_kind_type>::dag_type;
+        using dags_type = typename parser<token_type, tree_kind_type>::dags_type;
 
-        using dag_key_pair = std::tuple<uint32_t, typename token_type::token_type, typename token_type::codepoints_type>;
+        using record_type = typename symbol_table_record<token_type>::record_type;
+
+        using dag_key_pair = std::tuple<typename token_type::token_type,
+                                        typename token_type::codepoints_type,
+                                        typename symbol_table_record<token_type>::value_type>;
         using dag_key_type = std::vector<dag_key_pair>;
 
         struct dag_hash
@@ -34,7 +39,7 @@ class ir : private noncopyable
 
                 for(auto e : key)
                 {
-                    result ^= std::hash<std::size_t>{}(std::get<0>(e)) + 0x9E3779B9 + (result << 6) + (result >> 2); // aka boost hash_combine
+                    result ^= std::hash<std::size_t>{}(static_cast<std::size_t>(std::get<0>(e))) + 0x9E3779B9 + (result << 6) + (result >> 2); // aka boost hash_combine
                 }
 
                 return result;
