@@ -3,24 +3,13 @@ translation-unit    : declarations-opt
 
 
 
+declarations-opt    : declarations
+                    | e(psilon)
+                    ;
 
-
-
-
-
-
-
-primary-expression          : literal
-                            | field-access
-                            | '('! expression ')'!
-                            ;
-
-field-access                : primary-expression '.' identifier
-                            ;
-
-expression                  :
-
-
+declarations        : declarations declaration
+                    | declaration
+                    ;
 
 
 
@@ -32,16 +21,84 @@ fully-qualified-name        : fully-qualified-name '.' identifier
 
 
 
+primary-expression          : literal
+                            | fully-qualified-name
+                            | '('! expression ')'!
+                            ;
 
-expression:
+expression                  : conditional-expression
+                            | assignement-expression
+                            ;
+
+assignment-expression       : unary-expression '=' expression
+                            ;
+
+conditional-expression      : conditional-or-expression
+                            | conditional-or-expression '?' expression ':' conditional-or-expression
+                            ;
+
+conditional-or-expression   : conditional-and-expression
+                            | conditional-or-expression '||' conditional-and-expression
+                            ;
+
+conditional-and-expression  : inclusive-or-expression
+                            | conditional-and-expression '&&' inclusive-or-expression
+                            ;
+
+inclusive-or-expression     : exclusive-or-expression
+                            | inclusive-or-expression '|' exclusive-or-expression
+                            ;
+
+exclusive-or-expression     : and-expression
+                            | exclusive-or-expression '^' and-expression
+                            ;
+
+and-expression              : equality-expression
+                            | and-expression '&' equality-expression
+                            ;
+
+equality-expression         : relational-expression
+                            | equality-expression '==' relational-expression
+                            | equality-expression '!=' relational-expression
+                            ;
+
+relational-expression       : shift-expression
+                            | relational-expression '<' shift-expression
+                            | relational-expression '>' shift-expression
+                            | relational-expression '<=' shift-expression
+                            | relational-expression '>=' shift-expression
+                            ;
+
+shift-expression            : additive-expression
+                            | shift-expression '<<' additive-expression
+                            | shift-expression '>>' additive-expression
+                            ;
+
+additive-expression         : multiplicative-expression
+                            | additive-expression '+' multiplicative-expression
+                            | additive-expression '-' multiplicative-expression
+                            ;
+
+multiplicative-expression   : unary-expression
+                            | multiplicative-expression '*' unary-expression
+                            | multiplicative-expression '/' unary-expression
+                            ;
+
+unary-expression            : primary-expression
+                            | '+' unary-expression
+                            | '-' unary-expression
+                            | '!' unary-expression
+                            | '~' unary-expression
+                            ;
 
 
-assignment-expression:
 
 
 
 
-conditional-expression:
+
+
+
 
 
 unary-expresssion:
@@ -65,7 +122,9 @@ relational-expression:
 comments:
 
 
-structure:
+structure/record:
+    inheritance?
+
 
 tuple:
    destructure
@@ -94,7 +153,10 @@ else if
 else if
 else
 
-case  when
+case
+    when 1
+    when 's'
+    when a is string || a is real && a is customtype
 
 
 
@@ -123,7 +185,9 @@ scalars:
     d = 4.5
     f = 'abc'
     g = true/false
-
+    integer
+    real
+    boolean
 
 arrays:
    a[2]             - checked array
@@ -137,5 +201,9 @@ arrays:
    d[2,r]           - checked array, row based, aka C, 'r' is optional
    d(2,r)           - raw unchecked array, raw based, aka C, 'r' is optional
    f[-2..3, 0..10]  - checked ranged-based array, multidimensional, alternative syntax as in PASCAL
+
+
+type byte = 0..255
+type sbyte = -127..127
 
 
