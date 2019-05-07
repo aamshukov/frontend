@@ -337,6 +337,8 @@ enum class color
 
 int main()
 {
+    1+2;
+    
     auto enumname = name_impl<color>();
     auto range = std::make_integer_sequence<int, 6>{};
     auto names = strings_impl<color>(range);
