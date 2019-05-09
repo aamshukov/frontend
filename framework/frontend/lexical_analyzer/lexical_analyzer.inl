@@ -16,10 +16,12 @@ lexical_analyzer<Token>::lexical_analyzer(const typename lexical_analyzer<Token>
                          my_end_content(my_start_content + (*my_content).count()),
                          my_ptr(my_start_content),
                          my_ptr_lexeme(nullptr),
+                         my_pending_indents(0),
                          my_indent(0),
-                         my_boll(true),
+                         my_boll(false), // not implemented by default
                          my_eoll(false)
 {
+    my_indents.reserve(our_max_indents);
 }
 
 template <typename Token>
@@ -108,7 +110,11 @@ template <typename Token>
 inline void lexical_analyzer<Token>::prolog()
 {
     my_token.reset();
+
     my_ptr_lexeme = my_ptr;
+
+    my_boll = false;
+    my_eoll = false;
 }
 
 template <typename Token>
@@ -123,6 +129,65 @@ inline void lexical_analyzer<Token>::epilog()
     my_token.length = static_cast<uint32_t>(std::ptrdiff_t(my_ptr - my_ptr_lexeme));
 
     my_token.literal.assign(my_ptr_lexeme, my_token.length);
+
+
+    //??
+    if(my_boll && my_token.type == token_type::traits::type::ws)
+    {
+        std::size_t length = my_token.literal.size(); //?? need to verify only spaces must be here, if tabs report tab-error
+
+
+        if(length == my_indents[my_indent])
+        {
+            // same indent, continue
+        }
+        else if(length > my_indents[my_indent])
+        {
+            if(my_indent + 1 >= our_max_indents)
+            {
+                //?? error, too deep
+                my_token.type = token_type::traits::type::unknown;
+            }
+
+            my_pending_indents++;
+            my_indents[++my_indent] = length;
+        }
+        else // if(length > my_indents[my_indent])
+        {
+            while(my_indent > 0 && length < my_indents[my_indent])
+            {
+                my_pending_indents--;
+                my_indent--;
+            }
+
+            if(length != my_indents[my_indent])
+            {
+                //?? error dedent
+                my_token.type = token_type::traits::type::unknown;
+            }
+        }
+
+
+
+        if(my_pending_indents != 0)
+        {
+            if(my_pending_indents < 0)
+            {
+                my_pending_indents++;
+                my_token.type = token_type::traits::type::dedent;
+            }
+            else
+            {
+                my_pending_indents--;
+                my_token.type = token_type::traits::type::indent;
+            }
+        }
+
+
+
+        my_boll = true;
+        my_eoll = true; // ... default implementation assumes each eol is logical eol
+    }
 }
 
 END_NAMESPACE

@@ -98,10 +98,11 @@ struct earley_token_traits// : public token_traits
         uint32_t,
         unknown = 0,
         epsilon = 5,
-        eol, // 6
-        eos, // 7
-        indent,
-        dedent,
+        ws,     //  6
+        eol,    //  7
+        eos,    //  8
+        indent, //  9, literal = '    '
+        dedent, // 10, literal = '    '
 
         a,   // 8
         b,   // 9

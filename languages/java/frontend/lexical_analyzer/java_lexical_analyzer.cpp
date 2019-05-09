@@ -49,6 +49,7 @@ java_lexical_analyzer::java_lexical_analyzer(const content_type& content, uint8_
                        my_cached_line_position(-1),
                        my_tab_size(tab_size)
 {
+    my_boll = true; //??
 }
 
 java_lexical_analyzer::~java_lexical_analyzer()

@@ -23,7 +23,10 @@ class lexical_analyzer : private noncopyable
 
         using snapshots_type = std::stack<const datum_type*>;
 
-        using indents_type = std::stack<std::size_t>;
+        using indents_type = std::vector<std::size_t>;
+
+    private:
+        const std::size_t our_max_indents = 1024;
 
     protected:
         content_type                my_content;         // loaded content
@@ -39,10 +42,12 @@ class lexical_analyzer : private noncopyable
 
         snapshots_type              my_snapshots;       // backtracking's snapshots
 
-        std::size_t                 my_indent;          // current indentation index, aka python
+                                                        // off-side rule support, Peter Landin
+        std::int32_t                my_pending_indents; // > 0 indents, < 0 dedents, python
+        std::size_t                 my_indent;          // current indentation index, python
         indents_type                my_indents;         // stack of indents, theoretically unlimited
-        bool                        my_boll;            // true if at the begining of a new logical line
-        bool                        my_eoll;            // true if at the end of a new logical line
+        bool                        my_boll;            // true if at the begining of a new logical line, controls if off-side rule support implemented
+        bool                        my_eoll;            // true if at the end of a new logical line, default implementation assumes each eol is logical eol
 
     private:
         void                        prolog();
