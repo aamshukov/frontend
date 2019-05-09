@@ -23,11 +23,6 @@ class lexical_analyzer : private noncopyable
 
         using snapshots_type = std::stack<const datum_type*>;
 
-        using indents_type = std::vector<std::size_t>;
-
-    private:
-        const std::size_t our_max_indents = 1024;
-
     protected:
         content_type                my_content;         // loaded content
 
@@ -41,13 +36,6 @@ class lexical_analyzer : private noncopyable
         const datum_type*           my_ptr_lexeme;      // begining position of lexeme in content
 
         snapshots_type              my_snapshots;       // backtracking's snapshots
-
-                                                        // off-side rule support, Peter Landin
-        std::int32_t                my_pending_indents; // > 0 indents, < 0 dedents, python
-        std::size_t                 my_indent;          // current indentation index, python
-        indents_type                my_indents;         // stack of indents, theoretically unlimited
-        bool                        my_boll;            // true if at the begining of a new logical line, controls if off-side rule support implemented
-        bool                        my_eoll;            // true if at the end of a new logical line, default implementation assumes each eol is logical eol
 
     private:
         void                        prolog();
@@ -158,7 +146,7 @@ inline void lexical_analyzer<Token>::rewind_to_snapshot()
 
 END_NAMESPACE
 
-#define CURRENT_LOCATION get_line_number(std::ptrdiff_t(std::ptrdiff_t(my_ptr - my_start_content) - std::ptrdiff_t(my_ptr - my_ptr_lexeme))), get_column_number(std::ptrdiff_t(std::ptrdiff_t(my_ptr - my_start_content) - std::ptrdiff_t(my_ptr - my_ptr_lexeme))) //??
+#define CURRENT_LOCATION get_line_number(std::ptrdiff_t(std::ptrdiff_t(my_ptr - my_start_content) - std::ptrdiff_t(my_ptr - my_ptr_lexeme))), get_column_number(std::ptrdiff_t(std::ptrdiff_t(my_ptr - my_start_content) - std::ptrdiff_t(my_ptr - my_ptr_lexeme)))
 
 #include <frontend\lexical_analyzer\lexical_analyzer.inl>
 

@@ -47,9 +47,12 @@ java_lexical_analyzer::java_lexical_analyzer(const content_type& content, uint8_
                        my_line_map_size(0),
                        my_cached_line(-1),
                        my_cached_line_position(-1),
-                       my_tab_size(tab_size)
+                       my_tab_size(tab_size),
+                       my_pending_indents(0),
+                       my_boll(true),
+                       my_eoll(false)
 {
-    my_boll = true; //??
+    my_indents.push(0);
 }
 
 java_lexical_analyzer::~java_lexical_analyzer()
@@ -697,6 +700,103 @@ loc_t java_lexical_analyzer::get_column_number(loc_t position)
     return result;
 }
 
+void java_lexical_analyzer::calculate_indentation()
+{
+    const datum_type* ptr(my_ptr); // cache
+
+    if(my_boll)
+    {
+        std::size_t indent = 0;
+
+        do
+        {
+            datum_type la_codepoint = peek();
+
+            if(la_codepoint != L' ') // consider only spaces as indentation
+            {
+                break;
+            }
+
+            indent++;
+        }
+        while(my_ptr < my_end_content);
+
+        bool newline = false;
+
+        if(*my_ptr == L'\n' || (*my_ptr == L'\r' && peek() == L'\n'))
+        {
+            newline = true;
+        }
+
+        bool empty_line = false;
+
+        if(indent == 0 && newline)
+        {
+            empty_line = true;
+        }
+
+        if(!empty_line && my_eoll)
+        {
+            if(indent == my_indents.top())
+            {
+                // same indent, continue
+            }
+            else if(indent > my_indents.top())
+            {
+                my_pending_indents++;
+                my_indents.push(indent);
+            }
+            else // if(indent < my_indents[my_indent])
+            {
+                while(!my_indents.empty() && indent < my_indents.top())
+                {
+                    my_indents.pop();
+                    my_pending_indents--;
+                }
+            }
+
+            if(indent != my_indents.top())
+            {
+                //?? error indent/dedent
+                my_token.type = token_type::traits::type::unknown;
+            }
+        }
+
+        my_boll = false;
+        my_eoll = false;
+    }
+
+    if(my_pending_indents != 0)
+    {
+        //    line3
+        //        line4 <-- returns DEDENT DEDENT
+        //line5
+        if(my_pending_indents < 0)
+        {
+            my_pending_indents++;
+            my_token.type = token_type::traits::type::dedent;
+        }
+        else
+        {
+            my_pending_indents--;
+            my_token.type = token_type::traits::type::indent;
+        }
+
+        //my_token.offset = std::ptrdiff_t(my_ptr_lexeme - my_start_content);
+
+        //my_token.length = 0;
+        //my_token.literal.clear();
+
+        my_token.flags.modify_flags(token_type::flags::synthetic, token_type::flags::genuine);
+
+        rewind(); // correct ptr
+    }
+    else
+    {
+        my_ptr = ptr; // restore and continue
+    }
+}
+
 #ifdef _WINDOWS_
 #   pragma warning( disable : 4102 )
 #endif
@@ -704,6 +804,13 @@ void java_lexical_analyzer::next_lexeme_impl()
 {
     if(my_ptr < my_end_content)
     {
+        calculate_indentation();
+
+        if(my_token.type == token_type::traits::type::indent || my_token.type == token_type::traits::type::dedent)
+        {
+            return;//??
+        }
+
         datum_type codepoint = advance();
 
         if(text::is_java_identifier_start(codepoint))
@@ -7558,6 +7665,8 @@ _exit_num:
 
                 case L'\n':
                     my_token.type = token_type::traits::type::eol;
+                    my_boll = true; //??
+                    my_eoll = true; //??
                     break;
 
                 case L'\r':
@@ -7566,6 +7675,8 @@ _exit_num:
                         advance();
                     }
                     my_token.type = token_type::traits::type::eol;
+                    my_boll = true; //??
+                    my_eoll = true; //??
                     break;
 
                 #define ADVANCE_CHAR_LITERAL(FUNC)                                                                                          \

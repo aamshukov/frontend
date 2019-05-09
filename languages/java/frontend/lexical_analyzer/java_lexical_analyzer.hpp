@@ -20,6 +20,8 @@ class java_lexical_analyzer : public lexical_analyzer<token<java_token_traits>>
         using line_map_type = std::unique_ptr<loc_t[]>;
         using tab_map_type = std::vector<bool>;
 
+        using indents_type = std::stack<std::size_t>;
+
     private:
         bool                    my_unicode;         // true if the last obtained codepoint from unicode-escape
         uint8_t                 my_unicode_length;
@@ -32,6 +34,12 @@ class java_lexical_analyzer : public lexical_analyzer<token<java_token_traits>>
 
         tab_map_type            my_tab_map;         // tab positions
         uint8_t                 my_tab_size;        // tab size, default is 4
+
+                                                    // off-side rule support, Peter Landin
+        std::int32_t            my_pending_indents; // > 0 indents, < 0 dedents, python
+        indents_type            my_indents;         // stack of indents, theoretically unlimited
+        bool                    my_boll;            // true if at the begining of a new logical line
+        bool                    my_eoll;            // true if at the end of a new logical line, default implementation assumes each physical eol is logical eol
 
     private:
         static void             build_fsa_from_re(const string_type& re,
@@ -48,6 +56,8 @@ class java_lexical_analyzer : public lexical_analyzer<token<java_token_traits>>
 
         void                    build_line_map();
         loc_t                   find_line_number(loc_t position);
+
+        void                    calculate_indentation();
 
     protected:
         virtual void            next_lexeme_impl() override;
