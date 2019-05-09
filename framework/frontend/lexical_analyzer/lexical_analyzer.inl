@@ -130,7 +130,6 @@ inline void lexical_analyzer<Token>::epilog()
 
     my_token.literal.assign(my_ptr_lexeme, my_token.length);
 
-
     //??
     if(my_boll && my_token.type == token_type::traits::type::ws)
     {

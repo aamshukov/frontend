@@ -18,12 +18,12 @@ struct java_token_traits : public token_traits
         type,
         uint32_t,
         unknown = 0,
-        epsilon,
-        eol, // LF, CR, CR LF
-        eos,
-        ws,
-        indent,
-        dedent,
+        epsilon = 5,
+        ws,     //  6
+        eol,    //  7
+        eos,    //  8
+        indent, //  9, literal = '    '
+        dedent, // 10, literal = '    '
 
         binary_integer_lit,
         octal_integer_lit,
