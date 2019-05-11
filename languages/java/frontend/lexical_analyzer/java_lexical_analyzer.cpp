@@ -702,44 +702,28 @@ loc_t java_lexical_analyzer::get_column_number(loc_t position)
 
 void java_lexical_analyzer::calculate_indentation()
 {
-    const datum_type* ptr(my_ptr); // cache
+    const datum_type* ptr(my_ptr);
 
     if(my_boll)
     {
         std::size_t indent = 0;
 
-        do
+        while(my_ptr < my_end_content && *my_ptr++ == L' ') // consider only spaces as indentation
         {
-            datum_type la_codepoint = peek();
-
-            if(la_codepoint != L' ') // consider only spaces as indentation
-            {
-                break;
-            }
-
             indent++;
         }
-        while(my_ptr < my_end_content);
 
-        bool newline = false;
+        my_ptr--; // correct ptr
 
-        if(*my_ptr == L'\n' || (*my_ptr == L'\r' && peek() == L'\n'))
-        {
-            newline = true;
-        }
+        bool newline = *my_ptr == L'\n' || (*my_ptr == L'\r' && *(my_ptr + 1) == L'\n');
 
-        bool empty_line = false;
-
-        if(indent == 0 && newline)
-        {
-            empty_line = true;
-        }
-
-        if(!empty_line && my_eoll)
+        if(!(indent == 0 && newline)/* empty line */ && my_eoll)
         {
             if(indent == my_indents.top())
             {
-                // same indent, continue
+                // same indent, restart from the begining of the line
+                // splits to two parts  '             ' and 'line5'
+                my_ptr = ptr;
             }
             else if(indent > my_indents.top())
             {
@@ -759,6 +743,7 @@ void java_lexical_analyzer::calculate_indentation()
             {
                 //?? error indent/dedent
                 my_token.type = token_type::traits::type::unknown;
+                my_pending_indents = 0;
             }
         }
 
@@ -768,9 +753,16 @@ void java_lexical_analyzer::calculate_indentation()
 
     if(my_pending_indents != 0)
     {
-        //    line3
-        //        line4 <-- returns DEDENT DEDENT
-        //line5
+        // def
+        //     line 1
+        //   
+        //     line2
+        //         line3
+        //             line4
+        //             line5 <-- returns DEDENT DEDENT
+        //     line6
+        //     line7
+        // end
         if(my_pending_indents < 0)
         {
             my_pending_indents++;
@@ -782,18 +774,7 @@ void java_lexical_analyzer::calculate_indentation()
             my_token.type = token_type::traits::type::indent;
         }
 
-        //my_token.offset = std::ptrdiff_t(my_ptr_lexeme - my_start_content);
-
-        //my_token.length = 0;
-        //my_token.literal.clear();
-
         my_token.flags.modify_flags(token_type::flags::synthetic, token_type::flags::genuine);
-
-        rewind(); // correct ptr
-    }
-    else
-    {
-        my_ptr = ptr; // restore and continue
     }
 }
 
