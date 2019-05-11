@@ -759,9 +759,9 @@ void java_lexical_analyzer::calculate_indentation()
         //     line2
         //         line3
         //             line4
-        //             line5 <-- returns DEDENT DEDENT
+        //             line5 <-- DEDENT DEDENT
         //     line6
-        //     line7
+        //     line7 <-- DEDENT
         // end
         if(my_pending_indents < 0)
         {
