@@ -64,11 +64,12 @@
 #include <windows.h>
 #include <strsafe.h>
 
+#undef min
+#undef max
+
 #include <unicode/uchar.h>
 #include <unicode/unistr.h>
 #include <unicode/ustdio.h>
-
-#undef max
 
 #define COMPANY uilab
 

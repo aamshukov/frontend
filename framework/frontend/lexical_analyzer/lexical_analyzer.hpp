@@ -54,6 +54,8 @@ class lexical_analyzer : private noncopyable
         const content_type&         content() const;
         content_type&               content();
 
+        datum_type                  current() const;
+
         const token_type&           token();
 
         bool                        is_eol() const;
@@ -82,6 +84,12 @@ template <typename Token>
 inline typename lexical_analyzer<Token>::content_type& lexical_analyzer<Token>::content()
 {
     return const_cast<content_type&>(static_cast<const lexical_analyzer&>(*this).content());
+}
+
+template <typename Token>
+inline typename lexical_analyzer<Token>::datum_type typename lexical_analyzer<Token>::current() const
+{
+    return *my_ptr;
 }
 
 template <typename Token>

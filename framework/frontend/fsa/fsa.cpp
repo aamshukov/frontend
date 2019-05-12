@@ -146,7 +146,7 @@ bool fsa::add_final_state(const state_type& state, operation_status& status)
         }
         else
         {
-            OPERATION_FAILED(status::custom_code::error, L"Adding final FSA state: state '%s' already exists.", (*state).label().c_str())
+            //??OPERATION_FAILED(status::custom_code::error, L"Adding final FSA state: state '%s' already exists.", (*state).label().c_str())
         }
     }
     catch(const std::exception& ex)

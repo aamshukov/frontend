@@ -143,7 +143,7 @@ inline typename fsa_transition::predicate_type const& fsa_transition::empty_pred
 
 inline string_type const& fsa_transition::epsilon_predicate()
 {
-    static string_type result(L"e");
+    static string_type result(L"ε");
     return result;
 }
 

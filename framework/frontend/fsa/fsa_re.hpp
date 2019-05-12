@@ -50,9 +50,7 @@ class fsa_re : private noncopyable
             }
         };
 
-        //using leaves_type = std::vector<tree_type>;
         using leaves_type = std::multimap<tree_type, std::size_t, tree_key_comparator>;
-        //using leaves_type = std::multimap<tree_type, std::set<std::size_t>, tree_key_comparator>;
 
     private:
         static datum_type   get_codepoint(const datum_type*& p_src);

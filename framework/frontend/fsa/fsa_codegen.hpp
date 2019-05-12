@@ -229,7 +229,7 @@ void fsa_codegen::generate(const typename fsa_codegen::fsa_type& fsa, const stri
         code += L"_exit_" + label_prefix + L":";
         code += new_line;
         code += indent3;
-        code += L"my_ptr--;";
+        code += L"my_ptr--;"; //??
         code += new_line;
 
         UFILE* ufile(u_fopen_u(reinterpret_cast<const UChar*>(file_name.c_str()), "wb", NULL, "UTF-8"));

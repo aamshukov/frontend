@@ -152,6 +152,10 @@ void java_lexical_analyzer::build_numeric_literals(const string_type& file_name,
     fsa_algorithm::minimize_dfa(dfa, mindfa);
 
     fsa_codegen::generate<token_type>(mindfa, file_name, label_prefix);
+
+    fsa_visualization::generate_graphviz_file(nfa, string_type(LR"(d:\tmp\FSA\nfa.dot)"));            //??
+    fsa_visualization::generate_graphviz_file(dfa, string_type(LR"(d:\tmp\FSA\dfa.dot)"));
+    fsa_visualization::generate_graphviz_file(mindfa, string_type(LR"(d:\tmp\FSA\mindfa.dot)"));
 }
 
 void java_lexical_analyzer::build_identifiers_and_keywords(const string_type& file_name, const string_type& label_prefix)
@@ -411,9 +415,9 @@ void java_lexical_analyzer::build_identifiers_and_keywords(const string_type& fi
 
     fsa_codegen::generate<token_type>(mindfa, file_name, label_prefix);
 
-    //fsa_visualization::generate_graphviz_file(nfa, string_type(LR"(d:\tmp\FSA\nfa.dot)"));            //??
-    //fsa_visualization::generate_graphviz_file(dfa, string_type(LR"(d:\tmp\FSA\dfa.dot)"));
-    //fsa_visualization::generate_graphviz_file(mindfa, string_type(LR"(d:\tmp\FSA\mindfa.dot)"));
+    fsa_visualization::generate_graphviz_file(nfa, string_type(LR"(d:\tmp\FSA\nfa.dot)"));            //??
+    fsa_visualization::generate_graphviz_file(dfa, string_type(LR"(d:\tmp\FSA\dfa.dot)"));
+    fsa_visualization::generate_graphviz_file(mindfa, string_type(LR"(d:\tmp\FSA\mindfa.dot)"));
 }
 
 typename java_lexical_analyzer::datum_type java_lexical_analyzer::consume_unicode_escape(bool check_for_surrogates)
@@ -523,19 +527,16 @@ typename java_lexical_analyzer::datum_type java_lexical_analyzer::advance()
                 else
                 {
                     my_unicode_backslash_count++;
-                    result = *my_ptr;
                 }
             }
             else
             {
                 my_unicode_backslash_count++;
-                result = *my_ptr;
             }
         }
         else
         {
             my_unicode_backslash_count = 0;
-            result = *my_ptr;
         }
 
         if(my_unicode)
@@ -544,6 +545,8 @@ typename java_lexical_analyzer::datum_type java_lexical_analyzer::advance()
         }
 
         my_ptr++; // advance to the begining of the next lexeme
+
+        result = *my_ptr;
     }
 
     return result;
@@ -630,40 +633,43 @@ loc_t java_lexical_analyzer::find_line_number(loc_t position)
 {
     loc_t result = 0;
 
-    if(position == my_cached_line_position)
+    if(my_line_map_size > 0)
     {
-        result = my_cached_line;
-    }
-    else
-    {
-        my_cached_line_position = position;
-
-        loc_t low = 0;
-        loc_t high = my_line_map_size - 1;
-
-        while(low <= high)
+        if(position == my_cached_line_position)
         {
-            loc_t mid = (low + high) >> 1;
-            loc_t val = my_line_map[mid];
-
-            if(val < position)
-            {
-                low = mid + 1;
-            }
-            else if(val > position)
-            {
-                high = mid - 1;
-            }
-            else
-            {
-                result = my_cached_line = mid + 1;
-                goto done;
-            }
+            result = my_cached_line;
         }
+        else
+        {
+            my_cached_line_position = position;
 
-        result = my_cached_line = low;
+            loc_t low = 0;
+            loc_t high = my_line_map_size - 1;
+
+            while(low <= high)
+            {
+                loc_t mid = (low + high) >> 1;
+                loc_t val = my_line_map[mid];
+
+                if(val < position)
+                {
+                    low = mid + 1;
+                }
+                else if(val > position)
+                {
+                    high = mid - 1;
+                }
+                else
+                {
+                    result = my_cached_line = mid + 1;
+                    goto done;
+                }
+            }
+
+            result = my_cached_line = low;
 done:
-        ;
+            ;
+        }
     }
 
     return result;
@@ -680,22 +686,25 @@ loc_t java_lexical_analyzer::get_column_number(loc_t position)
 {
     loc_t result = 0;
 
-    loc_t offset = my_line_map[find_line_number(position) - 1]; // 1 is the first line
-    loc_t column = 0;
-
-    for(loc_t k = offset; k < position; k++)
+    if(my_line_map_size > 0)
     {
-        if(my_tab_map[k])
-        {
-            column = ((column / my_tab_size) * my_tab_size) + my_tab_size;
-        }
-        else
-        {
-            column++;
-        }
-    }
+        loc_t offset = my_line_map[find_line_number(position) - 1]; // 1 is the first line
+        loc_t column = 0;
 
-    result = column + 1; // 1 is the first column
+        for(loc_t k = offset; k < position; k++)
+        {
+            if(my_tab_map[k])
+            {
+                column = ((column / my_tab_size) * my_tab_size) + my_tab_size;
+            }
+            else
+            {
+                column++;
+            }
+        }
+
+        result = column + 1; // 1 is the first column
+    }
 
     return result;
 }
@@ -742,8 +751,9 @@ void java_lexical_analyzer::calculate_indentation()
             if(indent != my_indents.top())
             {
                 //?? error indent/dedent
-                my_token.type = token_type::traits::type::unknown;
+                my_ptr = ptr;
                 my_pending_indents = 0;
+                my_token.type = token_type::traits::type::unknown;
             }
         }
 
@@ -789,10 +799,10 @@ void java_lexical_analyzer::next_lexeme_impl()
 
         if(my_token.type == token_type::traits::type::indent || my_token.type == token_type::traits::type::dedent)
         {
-            return;//??
+            return;
         }
 
-        datum_type codepoint = advance();
+        datum_type codepoint = current();
 
         if(text::is_java_identifier_start(codepoint))
         {
@@ -800,9 +810,6 @@ void java_lexical_analyzer::next_lexeme_impl()
             // !!! -- generated code -- !!!
 
 
-
-
-            
             
 _q_idkws_0:
             if(my_ptr >= my_end_content)
@@ -4715,7 +4722,15 @@ _q_idkws_244:
 _eos_idkws:
             my_token.type = token_type::traits::type::eos;
 _exit_idkws:
-            my_ptr--;
+            //my_ptr--;
+
+
+
+
+
+            
+            
+            
 
 
 
@@ -4744,6 +4759,7 @@ _exit_idkws:
 
 
             
+            
 _q_num_0:
             if(my_ptr >= my_end_content)
                 goto _eos_num;
@@ -4755,52 +4771,52 @@ _q_num_0:
             else if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_21;
+                goto _q_num_19;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_20;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_20;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_20;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_20;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_20;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_20;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_20;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_20;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_20;
             }
             goto _exit_num;
 _q_num_1:
@@ -4809,52 +4825,52 @@ _q_num_1:
             if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             goto _exit_num;
 _q_num_2:
@@ -4914,112 +4930,18 @@ _q_num_2:
 _q_num_3:
             if(my_ptr >= my_end_content)
                 goto _eos_num;
-            if(codepoint == L'.')
-            {
-                codepoint = advance();
-                goto _q_num_26;
-            }
-            else if(codepoint == L'0')
-            {
-                codepoint = advance();
-                goto _q_num_3;
-            }
-            else if(codepoint == L'1')
-            {
-                codepoint = advance();
-                goto _q_num_3;
-            }
-            else if(codepoint == L'2')
-            {
-                codepoint = advance();
-                goto _q_num_3;
-            }
-            else if(codepoint == L'3')
-            {
-                codepoint = advance();
-                goto _q_num_3;
-            }
-            else if(codepoint == L'4')
-            {
-                codepoint = advance();
-                goto _q_num_3;
-            }
-            else if(codepoint == L'5')
-            {
-                codepoint = advance();
-                goto _q_num_3;
-            }
-            else if(codepoint == L'6')
-            {
-                codepoint = advance();
-                goto _q_num_3;
-            }
-            else if(codepoint == L'7')
-            {
-                codepoint = advance();
-                goto _q_num_3;
-            }
-            else if(codepoint == L'8')
-            {
-                codepoint = advance();
-                goto _q_num_3;
-            }
-            else if(codepoint == L'9')
-            {
-                codepoint = advance();
-                goto _q_num_3;
-            }
-            else if(codepoint == L'D')
-            {
-                codepoint = advance();
-                goto _q_num_27;
-            }
-            else if(codepoint == L'E')
-            {
-                codepoint = advance();
-                goto _q_num_5;
-            }
-            else if(codepoint == L'F')
-            {
-                codepoint = advance();
-                goto _q_num_28;
-            }
-            else if(codepoint == L'_')
-            {
-                codepoint = advance();
-                goto _q_num_11;
-            }
-            else if(codepoint == L'd')
-            {
-                codepoint = advance();
-                goto _q_num_29;
-            }
-            else if(codepoint == L'e')
-            {
-                codepoint = advance();
-                goto _q_num_5;
-            }
-            else if(codepoint == L'f')
-            {
-                codepoint = advance();
-                goto _q_num_30;
-            }
-            goto _exit_num;
-_q_num_4:
-            if(my_ptr >= my_end_content)
-                goto _eos_num;
             if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_39;
+                goto _q_num_47;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_39;
+                goto _q_num_47;
             }
             goto _exit_num;
-_q_num_5:
+_q_num_4:
             if(my_ptr >= my_end_content)
                 goto _eos_num;
             if(codepoint == L'+')
@@ -5083,123 +5005,122 @@ _q_num_5:
                 goto _q_num_35;
             }
             goto _exit_num;
-_q_num_6:
+_q_num_5:
             if(my_ptr >= my_end_content)
                 goto _eos_num;
-            if(codepoint == L'.')
+            if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_12;
-            }
-            else if(codepoint == L'0')
-            {
-                codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_41;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_41;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_41;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_41;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_41;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_41;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_41;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_41;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_14;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_14;
             }
-            else if(codepoint == L'A')
+            else if(codepoint == L'_')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_5;
             }
-            else if(codepoint == L'B')
+            goto _exit_num;
+_q_num_6:
+            if(my_ptr >= my_end_content)
+                goto _eos_num;
+            if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_20;
             }
-            else if(codepoint == L'C')
+            else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_20;
             }
-            else if(codepoint == L'D')
+            else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_20;
             }
-            else if(codepoint == L'E')
+            else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_20;
             }
-            else if(codepoint == L'F')
+            else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_20;
             }
-            else if(codepoint == L'a')
+            else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_20;
             }
-            else if(codepoint == L'b')
+            else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_20;
             }
-            else if(codepoint == L'c')
+            else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_20;
             }
-            else if(codepoint == L'd')
+            else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_20;
             }
-            else if(codepoint == L'e')
+            else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_20;
             }
-            else if(codepoint == L'f')
+            else if(codepoint == L'_')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_6;
             }
             goto _exit_num;
 _q_num_7:
@@ -5208,52 +5129,52 @@ _q_num_7:
             if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_21;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_21;
             }
             else if(codepoint == L'_')
             {
@@ -5267,52 +5188,52 @@ _q_num_8:
             if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_24;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_24;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_24;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_24;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_24;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_24;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_24;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_24;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_24;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_22;
+                goto _q_num_24;
             }
             else if(codepoint == L'_')
             {
@@ -5326,52 +5247,52 @@ _q_num_9:
             if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'_')
             {
@@ -5444,52 +5365,52 @@ _q_num_11:
             if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_40;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_40;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_40;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_40;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_40;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_40;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_40;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_40;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_26;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_26;
             }
             else if(codepoint == L'_')
             {
@@ -5503,260 +5424,285 @@ _q_num_12:
             if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'A')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'B')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'C')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'D')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'E')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'F')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
+            }
+            else if(codepoint == L'P')
+            {
+                codepoint = advance();
+                goto _q_num_13;
+            }
+            else if(codepoint == L'_')
+            {
+                codepoint = advance();
+                goto _q_num_12;
             }
             else if(codepoint == L'a')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'b')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'c')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'd')
             {
                 codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'e')
-            {
-                codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
             else if(codepoint == L'f')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_12;
             }
-            goto _exit_num;
-_q_num_13:
-            if(my_ptr >= my_end_content)
-                goto _eos_num;
-            if(codepoint == L'0')
-            {
-                codepoint = advance();
-                goto _q_num_39;
-            }
-            else if(codepoint == L'1')
-            {
-                codepoint = advance();
-                goto _q_num_39;
-            }
-            else if(codepoint == L'_')
+            else if(codepoint == L'p')
             {
                 codepoint = advance();
                 goto _q_num_13;
             }
             goto _exit_num;
-_q_num_14:
+_q_num_13:
             if(my_ptr >= my_end_content)
                 goto _eos_num;
-            if(codepoint == L'0')
+            if(codepoint == L'+')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_16;
+            }
+            else if(codepoint == L'-')
+            {
+                codepoint = advance();
+                goto _q_num_16;
+            }
+            else if(codepoint == L'0')
+            {
+                codepoint = advance();
+                goto _q_num_50;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
-            else if(codepoint == L'A')
+            goto _exit_num;
+_q_num_14:
+            if(my_ptr >= my_end_content)
+                goto _eos_num;
+            if(codepoint == L'+')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_2;
             }
-            else if(codepoint == L'B')
+            else if(codepoint == L'-')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_2;
             }
-            else if(codepoint == L'C')
+            else if(codepoint == L'.')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_25;
+            }
+            else if(codepoint == L'0')
+            {
+                codepoint = advance();
+                goto _q_num_26;
+            }
+            else if(codepoint == L'1')
+            {
+                codepoint = advance();
+                goto _q_num_26;
+            }
+            else if(codepoint == L'2')
+            {
+                codepoint = advance();
+                goto _q_num_26;
+            }
+            else if(codepoint == L'3')
+            {
+                codepoint = advance();
+                goto _q_num_26;
+            }
+            else if(codepoint == L'4')
+            {
+                codepoint = advance();
+                goto _q_num_26;
+            }
+            else if(codepoint == L'5')
+            {
+                codepoint = advance();
+                goto _q_num_26;
+            }
+            else if(codepoint == L'6')
+            {
+                codepoint = advance();
+                goto _q_num_26;
+            }
+            else if(codepoint == L'7')
+            {
+                codepoint = advance();
+                goto _q_num_26;
+            }
+            else if(codepoint == L'8')
+            {
+                codepoint = advance();
+                goto _q_num_26;
+            }
+            else if(codepoint == L'9')
+            {
+                codepoint = advance();
+                goto _q_num_26;
             }
             else if(codepoint == L'D')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_27;
             }
             else if(codepoint == L'E')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_4;
             }
             else if(codepoint == L'F')
             {
                 codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'P')
-            {
-                codepoint = advance();
-                goto _q_num_16;
+                goto _q_num_28;
             }
             else if(codepoint == L'_')
             {
                 codepoint = advance();
-                goto _q_num_18;
-            }
-            else if(codepoint == L'a')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'b')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'c')
-            {
-                codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_17;
             }
             else if(codepoint == L'd')
             {
                 codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'e')
-            {
-                codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_29;
             }
             else if(codepoint == L'f')
             {
                 codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'p')
-            {
-                codepoint = advance();
-                goto _q_num_16;
+                goto _q_num_30;
             }
             goto _exit_num;
 _q_num_15:
@@ -5765,186 +5711,71 @@ _q_num_15:
             if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_47;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_47;
             }
-            else if(codepoint == L'2')
+            else if(codepoint == L'_')
             {
                 codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'3')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'4')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'5')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'6')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'7')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'8')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'9')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'A')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'B')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'C')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'D')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'E')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'F')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'P')
-            {
-                codepoint = advance();
-                goto _q_num_16;
-            }
-            else if(codepoint == L'a')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'b')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'c')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'd')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'e')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'f')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'p')
-            {
-                codepoint = advance();
-                goto _q_num_16;
+                goto _q_num_15;
             }
             goto _exit_num;
 _q_num_16:
             if(my_ptr >= my_end_content)
                 goto _eos_num;
-            if(codepoint == L'+')
+            if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_19;
-            }
-            else if(codepoint == L'-')
-            {
-                codepoint = advance();
-                goto _q_num_19;
-            }
-            else if(codepoint == L'0')
-            {
-                codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             goto _exit_num;
 _q_num_17:
@@ -5953,117 +5784,57 @@ _q_num_17:
             if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_14;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_14;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_14;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_14;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_14;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_14;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_14;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_14;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_14;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_42;
-            }
-            else if(codepoint == L'A')
-            {
-                codepoint = advance();
-                goto _q_num_42;
-            }
-            else if(codepoint == L'B')
-            {
-                codepoint = advance();
-                goto _q_num_42;
-            }
-            else if(codepoint == L'C')
-            {
-                codepoint = advance();
-                goto _q_num_42;
-            }
-            else if(codepoint == L'D')
-            {
-                codepoint = advance();
-                goto _q_num_42;
-            }
-            else if(codepoint == L'E')
-            {
-                codepoint = advance();
-                goto _q_num_42;
-            }
-            else if(codepoint == L'F')
-            {
-                codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_14;
             }
             else if(codepoint == L'_')
             {
                 codepoint = advance();
                 goto _q_num_17;
-            }
-            else if(codepoint == L'a')
-            {
-                codepoint = advance();
-                goto _q_num_42;
-            }
-            else if(codepoint == L'b')
-            {
-                codepoint = advance();
-                goto _q_num_42;
-            }
-            else if(codepoint == L'c')
-            {
-                codepoint = advance();
-                goto _q_num_42;
-            }
-            else if(codepoint == L'd')
-            {
-                codepoint = advance();
-                goto _q_num_42;
-            }
-            else if(codepoint == L'e')
-            {
-                codepoint = advance();
-                goto _q_num_42;
-            }
-            else if(codepoint == L'f')
-            {
-                codepoint = advance();
-                goto _q_num_42;
             }
             goto _exit_num;
 _q_num_18:
@@ -6072,230 +5843,299 @@ _q_num_18:
             if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'A')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'B')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'C')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'D')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'E')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'F')
-            {
-                codepoint = advance();
-                goto _q_num_14;
+                goto _q_num_50;
             }
             else if(codepoint == L'_')
             {
                 codepoint = advance();
                 goto _q_num_18;
             }
-            else if(codepoint == L'a')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'b')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'c')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'd')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'e')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
-            else if(codepoint == L'f')
-            {
-                codepoint = advance();
-                goto _q_num_14;
-            }
             goto _exit_num;
 _q_num_19:
+            // final state - [decimal_integer_lit]
+            my_token.type = token_type::traits::type::decimal_integer_lit;
             if(my_ptr >= my_end_content)
-                goto _eos_num;
-            if(codepoint == L'0')
+                goto _exit_num;
+            if(codepoint == L'+')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_2;
+            }
+            else if(codepoint == L'-')
+            {
+                codepoint = advance();
+                goto _q_num_2;
+            }
+            else if(codepoint == L'.')
+            {
+                codepoint = advance();
+                goto _q_num_25;
+            }
+            else if(codepoint == L'0')
+            {
+                codepoint = advance();
+                goto _q_num_40;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_40;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_40;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_40;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_40;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_40;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_40;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_40;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_26;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_26;
             }
-            goto _exit_num;
-_q_num_20:
-            if(my_ptr >= my_end_content)
-                goto _eos_num;
-            if(codepoint == L'0')
+            else if(codepoint == L'B')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_3;
             }
-            else if(codepoint == L'1')
+            else if(codepoint == L'D')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_27;
             }
-            else if(codepoint == L'2')
+            else if(codepoint == L'E')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_4;
             }
-            else if(codepoint == L'3')
+            else if(codepoint == L'F')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_28;
             }
-            else if(codepoint == L'4')
+            else if(codepoint == L'L')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_22;
             }
-            else if(codepoint == L'5')
+            else if(codepoint == L'X')
             {
                 codepoint = advance();
-                goto _q_num_45;
-            }
-            else if(codepoint == L'6')
-            {
-                codepoint = advance();
-                goto _q_num_45;
-            }
-            else if(codepoint == L'7')
-            {
-                codepoint = advance();
-                goto _q_num_45;
-            }
-            else if(codepoint == L'8')
-            {
-                codepoint = advance();
-                goto _q_num_45;
-            }
-            else if(codepoint == L'9')
-            {
-                codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_44;
             }
             else if(codepoint == L'_')
             {
                 codepoint = advance();
-                goto _q_num_20;
+                goto _q_num_5;
+            }
+            else if(codepoint == L'b')
+            {
+                codepoint = advance();
+                goto _q_num_3;
+            }
+            else if(codepoint == L'd')
+            {
+                codepoint = advance();
+                goto _q_num_29;
+            }
+            else if(codepoint == L'f')
+            {
+                codepoint = advance();
+                goto _q_num_30;
+            }
+            else if(codepoint == L'l')
+            {
+                codepoint = advance();
+                goto _q_num_23;
+            }
+            else if(codepoint == L'x')
+            {
+                codepoint = advance();
+                goto _q_num_44;
+            }
+            goto _exit_num;
+_q_num_20:
+            // final state - [decimal_integer_lit]
+            my_token.type = token_type::traits::type::decimal_integer_lit;
+            if(my_ptr >= my_end_content)
+                goto _exit_num;
+            if(codepoint == L'+')
+            {
+                codepoint = advance();
+                goto _q_num_2;
+            }
+            else if(codepoint == L'-')
+            {
+                codepoint = advance();
+                goto _q_num_2;
+            }
+            else if(codepoint == L'.')
+            {
+                codepoint = advance();
+                goto _q_num_25;
+            }
+            else if(codepoint == L'0')
+            {
+                codepoint = advance();
+                goto _q_num_21;
+            }
+            else if(codepoint == L'1')
+            {
+                codepoint = advance();
+                goto _q_num_21;
+            }
+            else if(codepoint == L'2')
+            {
+                codepoint = advance();
+                goto _q_num_21;
+            }
+            else if(codepoint == L'3')
+            {
+                codepoint = advance();
+                goto _q_num_21;
+            }
+            else if(codepoint == L'4')
+            {
+                codepoint = advance();
+                goto _q_num_21;
+            }
+            else if(codepoint == L'5')
+            {
+                codepoint = advance();
+                goto _q_num_21;
+            }
+            else if(codepoint == L'6')
+            {
+                codepoint = advance();
+                goto _q_num_21;
+            }
+            else if(codepoint == L'7')
+            {
+                codepoint = advance();
+                goto _q_num_21;
+            }
+            else if(codepoint == L'8')
+            {
+                codepoint = advance();
+                goto _q_num_21;
+            }
+            else if(codepoint == L'9')
+            {
+                codepoint = advance();
+                goto _q_num_21;
+            }
+            else if(codepoint == L'D')
+            {
+                codepoint = advance();
+                goto _q_num_27;
+            }
+            else if(codepoint == L'E')
+            {
+                codepoint = advance();
+                goto _q_num_4;
+            }
+            else if(codepoint == L'F')
+            {
+                codepoint = advance();
+                goto _q_num_28;
+            }
+            else if(codepoint == L'L')
+            {
+                codepoint = advance();
+                goto _q_num_22;
+            }
+            else if(codepoint == L'_')
+            {
+                codepoint = advance();
+                goto _q_num_6;
+            }
+            else if(codepoint == L'd')
+            {
+                codepoint = advance();
+                goto _q_num_29;
+            }
+            else if(codepoint == L'f')
+            {
+                codepoint = advance();
+                goto _q_num_30;
+            }
+            else if(codepoint == L'l')
+            {
+                codepoint = advance();
+                goto _q_num_23;
             }
             goto _exit_num;
 _q_num_21:
@@ -6303,232 +6143,116 @@ _q_num_21:
             my_token.type = token_type::traits::type::decimal_integer_lit;
             if(my_ptr >= my_end_content)
                 goto _exit_num;
-            if(codepoint == L'.')
+            if(codepoint == L'+')
             {
                 codepoint = advance();
-                goto _q_num_26;
+                goto _q_num_2;
+            }
+            else if(codepoint == L'-')
+            {
+                codepoint = advance();
+                goto _q_num_2;
+            }
+            else if(codepoint == L'.')
+            {
+                codepoint = advance();
+                goto _q_num_25;
             }
             else if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_21;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_21;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_3;
-            }
-            else if(codepoint == L'B')
-            {
-                codepoint = advance();
-                goto _q_num_4;
+                goto _q_num_21;
             }
             else if(codepoint == L'D')
             {
                 codepoint = advance();
-                goto _q_num_27;
+                goto _q_num_36;
             }
             else if(codepoint == L'E')
             {
                 codepoint = advance();
-                goto _q_num_5;
+                goto _q_num_4;
             }
             else if(codepoint == L'F')
             {
                 codepoint = advance();
-                goto _q_num_28;
+                goto _q_num_37;
             }
             else if(codepoint == L'L')
             {
                 codepoint = advance();
-                goto _q_num_23;
-            }
-            else if(codepoint == L'X')
-            {
-                codepoint = advance();
-                goto _q_num_6;
+                goto _q_num_22;
             }
             else if(codepoint == L'_')
             {
                 codepoint = advance();
                 goto _q_num_7;
             }
-            else if(codepoint == L'b')
-            {
-                codepoint = advance();
-                goto _q_num_4;
-            }
             else if(codepoint == L'd')
             {
                 codepoint = advance();
-                goto _q_num_29;
-            }
-            else if(codepoint == L'e')
-            {
-                codepoint = advance();
-                goto _q_num_5;
+                goto _q_num_38;
             }
             else if(codepoint == L'f')
             {
                 codepoint = advance();
-                goto _q_num_30;
+                goto _q_num_39;
             }
             else if(codepoint == L'l')
             {
                 codepoint = advance();
-                goto _q_num_24;
-            }
-            else if(codepoint == L'x')
-            {
-                codepoint = advance();
-                goto _q_num_6;
+                goto _q_num_23;
             }
             goto _exit_num;
 _q_num_22:
             // final state - [decimal_integer_lit]
             my_token.type = token_type::traits::type::decimal_integer_lit;
-            if(my_ptr >= my_end_content)
-                goto _exit_num;
-            if(codepoint == L'.')
-            {
-                codepoint = advance();
-                goto _q_num_26;
-            }
-            else if(codepoint == L'0')
-            {
-                codepoint = advance();
-                goto _q_num_22;
-            }
-            else if(codepoint == L'1')
-            {
-                codepoint = advance();
-                goto _q_num_22;
-            }
-            else if(codepoint == L'2')
-            {
-                codepoint = advance();
-                goto _q_num_22;
-            }
-            else if(codepoint == L'3')
-            {
-                codepoint = advance();
-                goto _q_num_22;
-            }
-            else if(codepoint == L'4')
-            {
-                codepoint = advance();
-                goto _q_num_22;
-            }
-            else if(codepoint == L'5')
-            {
-                codepoint = advance();
-                goto _q_num_22;
-            }
-            else if(codepoint == L'6')
-            {
-                codepoint = advance();
-                goto _q_num_22;
-            }
-            else if(codepoint == L'7')
-            {
-                codepoint = advance();
-                goto _q_num_22;
-            }
-            else if(codepoint == L'8')
-            {
-                codepoint = advance();
-                goto _q_num_22;
-            }
-            else if(codepoint == L'9')
-            {
-                codepoint = advance();
-                goto _q_num_22;
-            }
-            else if(codepoint == L'D')
-            {
-                codepoint = advance();
-                goto _q_num_27;
-            }
-            else if(codepoint == L'E')
-            {
-                codepoint = advance();
-                goto _q_num_5;
-            }
-            else if(codepoint == L'F')
-            {
-                codepoint = advance();
-                goto _q_num_28;
-            }
-            else if(codepoint == L'L')
-            {
-                codepoint = advance();
-                goto _q_num_23;
-            }
-            else if(codepoint == L'_')
-            {
-                codepoint = advance();
-                goto _q_num_8;
-            }
-            else if(codepoint == L'd')
-            {
-                codepoint = advance();
-                goto _q_num_29;
-            }
-            else if(codepoint == L'e')
-            {
-                codepoint = advance();
-                goto _q_num_5;
-            }
-            else if(codepoint == L'f')
-            {
-                codepoint = advance();
-                goto _q_num_30;
-            }
-            else if(codepoint == L'l')
-            {
-                codepoint = advance();
-                goto _q_num_24;
-            }
+            advance();
             goto _exit_num;
 _q_num_23:
             // final state - [decimal_integer_lit]
@@ -6536,64 +6260,69 @@ _q_num_23:
             advance();
             goto _exit_num;
 _q_num_24:
-            // final state - [decimal_integer_lit]
-            my_token.type = token_type::traits::type::decimal_integer_lit;
-            advance();
-            goto _exit_num;
-_q_num_25:
             // final state - [decimal_floating_lit]
             my_token.type = token_type::traits::type::decimal_floating_lit;
             if(my_ptr >= my_end_content)
                 goto _exit_num;
-            if(codepoint == L'0')
+            if(codepoint == L'+')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_2;
+            }
+            else if(codepoint == L'-')
+            {
+                codepoint = advance();
+                goto _q_num_2;
+            }
+            else if(codepoint == L'0')
+            {
+                codepoint = advance();
+                goto _q_num_24;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_24;
             }
             else if(codepoint == L'D')
             {
@@ -6603,7 +6332,7 @@ _q_num_25:
             else if(codepoint == L'E')
             {
                 codepoint = advance();
-                goto _q_num_5;
+                goto _q_num_4;
             }
             else if(codepoint == L'F')
             {
@@ -6613,17 +6342,103 @@ _q_num_25:
             else if(codepoint == L'_')
             {
                 codepoint = advance();
-                goto _q_num_9;
+                goto _q_num_8;
             }
             else if(codepoint == L'd')
             {
                 codepoint = advance();
                 goto _q_num_33;
             }
-            else if(codepoint == L'e')
+            else if(codepoint == L'f')
             {
                 codepoint = advance();
-                goto _q_num_5;
+                goto _q_num_34;
+            }
+            goto _exit_num;
+_q_num_25:
+            // final state - [decimal_floating_lit]
+            my_token.type = token_type::traits::type::decimal_floating_lit;
+            if(my_ptr >= my_end_content)
+                goto _exit_num;
+            if(codepoint == L'+')
+            {
+                codepoint = advance();
+                goto _q_num_2;
+            }
+            else if(codepoint == L'-')
+            {
+                codepoint = advance();
+                goto _q_num_2;
+            }
+            else if(codepoint == L'0')
+            {
+                codepoint = advance();
+                goto _q_num_24;
+            }
+            else if(codepoint == L'1')
+            {
+                codepoint = advance();
+                goto _q_num_24;
+            }
+            else if(codepoint == L'2')
+            {
+                codepoint = advance();
+                goto _q_num_24;
+            }
+            else if(codepoint == L'3')
+            {
+                codepoint = advance();
+                goto _q_num_24;
+            }
+            else if(codepoint == L'4')
+            {
+                codepoint = advance();
+                goto _q_num_24;
+            }
+            else if(codepoint == L'5')
+            {
+                codepoint = advance();
+                goto _q_num_24;
+            }
+            else if(codepoint == L'6')
+            {
+                codepoint = advance();
+                goto _q_num_24;
+            }
+            else if(codepoint == L'7')
+            {
+                codepoint = advance();
+                goto _q_num_24;
+            }
+            else if(codepoint == L'8')
+            {
+                codepoint = advance();
+                goto _q_num_24;
+            }
+            else if(codepoint == L'9')
+            {
+                codepoint = advance();
+                goto _q_num_24;
+            }
+            else if(codepoint == L'D')
+            {
+                codepoint = advance();
+                goto _q_num_31;
+            }
+            else if(codepoint == L'E')
+            {
+                codepoint = advance();
+                goto _q_num_4;
+            }
+            else if(codepoint == L'F')
+            {
+                codepoint = advance();
+                goto _q_num_32;
+            }
+            else if(codepoint == L'd')
+            {
+                codepoint = advance();
+                goto _q_num_33;
             }
             else if(codepoint == L'f')
             {
@@ -6636,85 +6451,100 @@ _q_num_26:
             my_token.type = token_type::traits::type::decimal_floating_lit;
             if(my_ptr >= my_end_content)
                 goto _exit_num;
-            if(codepoint == L'0')
+            if(codepoint == L'+')
+            {
+                codepoint = advance();
+                goto _q_num_2;
+            }
+            else if(codepoint == L'-')
+            {
+                codepoint = advance();
+                goto _q_num_2;
+            }
+            else if(codepoint == L'.')
             {
                 codepoint = advance();
                 goto _q_num_25;
+            }
+            else if(codepoint == L'0')
+            {
+                codepoint = advance();
+                goto _q_num_26;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_25;
+                goto _q_num_26;
             }
             else if(codepoint == L'D')
             {
                 codepoint = advance();
-                goto _q_num_31;
+                goto _q_num_36;
             }
             else if(codepoint == L'E')
             {
                 codepoint = advance();
-                goto _q_num_5;
+                goto _q_num_4;
             }
             else if(codepoint == L'F')
             {
                 codepoint = advance();
-                goto _q_num_32;
+                goto _q_num_37;
+            }
+            else if(codepoint == L'_')
+            {
+                codepoint = advance();
+                goto _q_num_9;
             }
             else if(codepoint == L'd')
             {
                 codepoint = advance();
-                goto _q_num_33;
-            }
-            else if(codepoint == L'e')
-            {
-                codepoint = advance();
-                goto _q_num_5;
+                goto _q_num_38;
             }
             else if(codepoint == L'f')
             {
                 codepoint = advance();
-                goto _q_num_34;
+                goto _q_num_39;
             }
             goto _exit_num;
 _q_num_27:
@@ -6839,64 +6669,205 @@ _q_num_35:
             }
             goto _exit_num;
 _q_num_36:
+            // final state - [decimal_floating_lit]
+            my_token.type = token_type::traits::type::decimal_floating_lit;
+            advance();
+            goto _exit_num;
+_q_num_37:
+            // final state - [decimal_floating_lit]
+            my_token.type = token_type::traits::type::decimal_floating_lit;
+            advance();
+            goto _exit_num;
+_q_num_38:
+            // final state - [decimal_floating_lit]
+            my_token.type = token_type::traits::type::decimal_floating_lit;
+            advance();
+            goto _exit_num;
+_q_num_39:
+            // final state - [decimal_floating_lit]
+            my_token.type = token_type::traits::type::decimal_floating_lit;
+            advance();
+            goto _exit_num;
+_q_num_40:
             // final state - [octal_integer_lit]
             my_token.type = token_type::traits::type::octal_integer_lit;
             if(my_ptr >= my_end_content)
                 goto _exit_num;
-            if(codepoint == L'.')
+            if(codepoint == L'+')
             {
                 codepoint = advance();
-                goto _q_num_26;
+                goto _q_num_2;
+            }
+            else if(codepoint == L'-')
+            {
+                codepoint = advance();
+                goto _q_num_2;
+            }
+            else if(codepoint == L'.')
+            {
+                codepoint = advance();
+                goto _q_num_25;
             }
             else if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_40;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_40;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_40;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_40;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_40;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_40;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_40;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_36;
+                goto _q_num_40;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_26;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_3;
+                goto _q_num_26;
+            }
+            else if(codepoint == L'D')
+            {
+                codepoint = advance();
+                goto _q_num_36;
+            }
+            else if(codepoint == L'E')
+            {
+                codepoint = advance();
+                goto _q_num_4;
+            }
+            else if(codepoint == L'F')
+            {
+                codepoint = advance();
+                goto _q_num_37;
+            }
+            else if(codepoint == L'L')
+            {
+                codepoint = advance();
+                goto _q_num_42;
+            }
+            else if(codepoint == L'_')
+            {
+                codepoint = advance();
+                goto _q_num_11;
+            }
+            else if(codepoint == L'd')
+            {
+                codepoint = advance();
+                goto _q_num_38;
+            }
+            else if(codepoint == L'f')
+            {
+                codepoint = advance();
+                goto _q_num_39;
+            }
+            else if(codepoint == L'l')
+            {
+                codepoint = advance();
+                goto _q_num_43;
+            }
+            goto _exit_num;
+_q_num_41:
+            // final state - [octal_integer_lit]
+            my_token.type = token_type::traits::type::octal_integer_lit;
+            if(my_ptr >= my_end_content)
+                goto _exit_num;
+            if(codepoint == L'+')
+            {
+                codepoint = advance();
+                goto _q_num_2;
+            }
+            else if(codepoint == L'-')
+            {
+                codepoint = advance();
+                goto _q_num_2;
+            }
+            else if(codepoint == L'.')
+            {
+                codepoint = advance();
+                goto _q_num_25;
+            }
+            else if(codepoint == L'0')
+            {
+                codepoint = advance();
+                goto _q_num_40;
+            }
+            else if(codepoint == L'1')
+            {
+                codepoint = advance();
+                goto _q_num_40;
+            }
+            else if(codepoint == L'2')
+            {
+                codepoint = advance();
+                goto _q_num_40;
+            }
+            else if(codepoint == L'3')
+            {
+                codepoint = advance();
+                goto _q_num_40;
+            }
+            else if(codepoint == L'4')
+            {
+                codepoint = advance();
+                goto _q_num_40;
+            }
+            else if(codepoint == L'5')
+            {
+                codepoint = advance();
+                goto _q_num_40;
+            }
+            else if(codepoint == L'6')
+            {
+                codepoint = advance();
+                goto _q_num_40;
+            }
+            else if(codepoint == L'7')
+            {
+                codepoint = advance();
+                goto _q_num_40;
+            }
+            else if(codepoint == L'8')
+            {
+                codepoint = advance();
+                goto _q_num_26;
+            }
+            else if(codepoint == L'9')
+            {
+                codepoint = advance();
+                goto _q_num_26;
             }
             else if(codepoint == L'D')
             {
@@ -6906,7 +6877,7 @@ _q_num_36:
             else if(codepoint == L'E')
             {
                 codepoint = advance();
-                goto _q_num_5;
+                goto _q_num_4;
             }
             else if(codepoint == L'F')
             {
@@ -6916,22 +6887,17 @@ _q_num_36:
             else if(codepoint == L'L')
             {
                 codepoint = advance();
-                goto _q_num_37;
+                goto _q_num_42;
             }
             else if(codepoint == L'_')
             {
                 codepoint = advance();
-                goto _q_num_7;
+                goto _q_num_5;
             }
             else if(codepoint == L'd')
             {
                 codepoint = advance();
                 goto _q_num_29;
-            }
-            else if(codepoint == L'e')
-            {
-                codepoint = advance();
-                goto _q_num_5;
             }
             else if(codepoint == L'f')
             {
@@ -6941,61 +6907,20 @@ _q_num_36:
             else if(codepoint == L'l')
             {
                 codepoint = advance();
-                goto _q_num_38;
+                goto _q_num_43;
             }
-            goto _exit_num;
-_q_num_37:
-            // final state - [octal_integer_lit]
-            my_token.type = token_type::traits::type::octal_integer_lit;
-            advance();
-            goto _exit_num;
-_q_num_38:
-            // final state - [octal_integer_lit]
-            my_token.type = token_type::traits::type::octal_integer_lit;
-            advance();
-            goto _exit_num;
-_q_num_39:
-            // final state - [binary_integer_lit]
-            my_token.type = token_type::traits::type::binary_integer_lit;
-            if(my_ptr >= my_end_content)
-                goto _exit_num;
-            if(codepoint == L'0')
-            {
-                codepoint = advance();
-                goto _q_num_39;
-            }
-            else if(codepoint == L'1')
-            {
-                codepoint = advance();
-                goto _q_num_39;
-            }
-            else if(codepoint == L'L')
-            {
-                codepoint = advance();
-                goto _q_num_40;
-            }
-            else if(codepoint == L'_')
-            {
-                codepoint = advance();
-                goto _q_num_13;
-            }
-            else if(codepoint == L'l')
-            {
-                codepoint = advance();
-                goto _q_num_41;
-            }
-            goto _exit_num;
-_q_num_40:
-            // final state - [binary_integer_lit]
-            my_token.type = token_type::traits::type::binary_integer_lit;
-            advance();
-            goto _exit_num;
-_q_num_41:
-            // final state - [binary_integer_lit]
-            my_token.type = token_type::traits::type::binary_integer_lit;
-            advance();
             goto _exit_num;
 _q_num_42:
+            // final state - [octal_integer_lit]
+            my_token.type = token_type::traits::type::octal_integer_lit;
+            advance();
+            goto _exit_num;
+_q_num_43:
+            // final state - [octal_integer_lit]
+            my_token.type = token_type::traits::type::octal_integer_lit;
+            advance();
+            goto _exit_num;
+_q_num_44:
             // final state - [hexadecimal_integer_lit]
             my_token.type = token_type::traits::type::hexadecimal_integer_lit;
             if(my_ptr >= my_end_content)
@@ -7003,155 +6928,191 @@ _q_num_42:
             if(codepoint == L'.')
             {
                 codepoint = advance();
-                goto _q_num_15;
+                goto _q_num_12;
             }
             else if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'A')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'B')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'C')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'D')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'E')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'F')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'L')
             {
                 codepoint = advance();
-                goto _q_num_43;
+                goto _q_num_45;
             }
             else if(codepoint == L'P')
             {
                 codepoint = advance();
-                goto _q_num_16;
+                goto _q_num_13;
             }
             else if(codepoint == L'_')
             {
                 codepoint = advance();
-                goto _q_num_17;
+                goto _q_num_44;
             }
             else if(codepoint == L'a')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'b')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'c')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'd')
             {
                 codepoint = advance();
-                goto _q_num_42;
-            }
-            else if(codepoint == L'e')
-            {
-                codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'f')
             {
                 codepoint = advance();
-                goto _q_num_42;
+                goto _q_num_44;
             }
             else if(codepoint == L'l')
             {
                 codepoint = advance();
-                goto _q_num_44;
+                goto _q_num_46;
             }
             else if(codepoint == L'p')
             {
                 codepoint = advance();
-                goto _q_num_16;
+                goto _q_num_13;
             }
             goto _exit_num;
-_q_num_43:
-            // final state - [hexadecimal_integer_lit]
-            my_token.type = token_type::traits::type::hexadecimal_integer_lit;
-            advance();
-            goto _exit_num;
-_q_num_44:
-            // final state - [hexadecimal_integer_lit]
-            my_token.type = token_type::traits::type::hexadecimal_integer_lit;
-            advance();
-            goto _exit_num;
 _q_num_45:
+            // final state - [hexadecimal_integer_lit]
+            my_token.type = token_type::traits::type::hexadecimal_integer_lit;
+            advance();
+            goto _exit_num;
+_q_num_46:
+            // final state - [hexadecimal_integer_lit]
+            my_token.type = token_type::traits::type::hexadecimal_integer_lit;
+            advance();
+            goto _exit_num;
+_q_num_47:
+            // final state - [binary_integer_lit]
+            my_token.type = token_type::traits::type::binary_integer_lit;
+            if(my_ptr >= my_end_content)
+                goto _exit_num;
+            if(codepoint == L'0')
+            {
+                codepoint = advance();
+                goto _q_num_47;
+            }
+            else if(codepoint == L'1')
+            {
+                codepoint = advance();
+                goto _q_num_47;
+            }
+            else if(codepoint == L'L')
+            {
+                codepoint = advance();
+                goto _q_num_48;
+            }
+            else if(codepoint == L'_')
+            {
+                codepoint = advance();
+                goto _q_num_15;
+            }
+            else if(codepoint == L'l')
+            {
+                codepoint = advance();
+                goto _q_num_49;
+            }
+            goto _exit_num;
+_q_num_48:
+            // final state - [binary_integer_lit]
+            my_token.type = token_type::traits::type::binary_integer_lit;
+            advance();
+            goto _exit_num;
+_q_num_49:
+            // final state - [binary_integer_lit]
+            my_token.type = token_type::traits::type::binary_integer_lit;
+            advance();
+            goto _exit_num;
+_q_num_50:
             // final state - [hexadecimal_floating_lit]
             my_token.type = token_type::traits::type::hexadecimal_floating_lit;
             if(my_ptr >= my_end_content)
@@ -7159,95 +7120,95 @@ _q_num_45:
             if(codepoint == L'0')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'1')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'2')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'3')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'4')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'5')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'6')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'7')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'8')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'9')
             {
                 codepoint = advance();
-                goto _q_num_45;
+                goto _q_num_50;
             }
             else if(codepoint == L'D')
             {
                 codepoint = advance();
-                goto _q_num_46;
+                goto _q_num_51;
             }
             else if(codepoint == L'F')
             {
                 codepoint = advance();
-                goto _q_num_47;
+                goto _q_num_52;
             }
             else if(codepoint == L'_')
             {
                 codepoint = advance();
-                goto _q_num_20;
+                goto _q_num_18;
             }
             else if(codepoint == L'd')
             {
                 codepoint = advance();
-                goto _q_num_48;
+                goto _q_num_53;
             }
             else if(codepoint == L'f')
             {
                 codepoint = advance();
-                goto _q_num_49;
+                goto _q_num_54;
             }
             goto _exit_num;
-_q_num_46:
+_q_num_51:
             // final state - [hexadecimal_floating_lit]
             my_token.type = token_type::traits::type::hexadecimal_floating_lit;
             advance();
             goto _exit_num;
-_q_num_47:
+_q_num_52:
             // final state - [hexadecimal_floating_lit]
             my_token.type = token_type::traits::type::hexadecimal_floating_lit;
             advance();
             goto _exit_num;
-_q_num_48:
+_q_num_53:
             // final state - [hexadecimal_floating_lit]
             my_token.type = token_type::traits::type::hexadecimal_floating_lit;
             advance();
             goto _exit_num;
-_q_num_49:
+_q_num_54:
             // final state - [hexadecimal_floating_lit]
             my_token.type = token_type::traits::type::hexadecimal_floating_lit;
             advance();
@@ -7255,7 +7216,8 @@ _q_num_49:
 _eos_num:
             my_token.type = token_type::traits::type::eos;
 _exit_num:
-            my_ptr--;
+            //my_ptr--;
+
 
 
 
@@ -7284,179 +7246,197 @@ _exit_num:
             {
                 case L'(':
                     my_token.type = token_type::traits::type::left_paren_sep;
+                    advance();
                     break;
 
                 case L')':
                     my_token.type = token_type::traits::type::right_paren_sep;
+                    advance();
                     break;
 
                 case L'{':
                     my_token.type = token_type::traits::type::left_brace_sep;
+                    advance();
                     break;
 
                 case L'}':
                     my_token.type = token_type::traits::type::right_brace_sep;
+                    advance();
                     break;
 
                 case L'[':
                     my_token.type = token_type::traits::type::left_bracket_sep;
+                    advance();
                     break;
 
                 case L']':
                     my_token.type = token_type::traits::type::righ_bracket_sep;
+                    advance();
                     break;
 
                 case L';':
                     my_token.type = token_type::traits::type::semicolon_sep;
+                    advance();
                     break;
 
                 case L',':
                     my_token.type = token_type::traits::type::comma_sep;
+                    advance();
                     break;
 
                 case L'.':
                 {
                     // .  ...  or fraction part
-                    datum_type la_codepoint = peek();
+                    codepoint = advance();
 
-                    if(la_codepoint == L'.')
+                    if(codepoint == L'.')
                     {
-                        la_codepoint = advance();
+                        codepoint = advance();
 
-                        if(la_codepoint == L'.')
+                        if(codepoint == L'.')
                         {
-                            advance();
                             my_token.type = token_type::traits::type::dots_sep;
+                            advance();
                         }
                         else
                         {
                             log_error(L"Invalid ellipsis '...', missing '.'.");
                         }
                     }
-                    else if(text::is_digit(la_codepoint))
+                    else if(text::is_digit(codepoint))
                     {
                         // fraction part
-                        goto _q_num_3;
+                        goto _q_num_25;
                     }
                     else
                     {
                         my_token.type = token_type::traits::type::dot_sep;
                     }
+
                     break;
                 }
                 case L'@':
                     my_token.type = token_type::traits::type::at_sep;
+                    advance();
                     break;
 
                 case L':':
                     // : ::
-                    if(peek() == L':')
+                    codepoint = advance();
+
+                    if(codepoint == L':')
                     {
-                        advance();
                         my_token.type = token_type::traits::type::colons_sep;
+                        advance();
                     }
                     else
                     {
                         my_token.type = token_type::traits::type::colon_sep;
                     }
+
                     break;
 
                 case L'+':
                 {
                     // + += ++
-                    datum_type la_codepoint = peek();
+                    codepoint = advance();
 
-                    if(la_codepoint == L'=')
+                    if(codepoint == L'=')
                     {
-                        advance();
                         my_token.type = token_type::traits::type::addition_assignment_op;
-                    }
-                    else if(la_codepoint == L'+')
-                    {
                         advance();
+                    }
+                    else if(codepoint == L'+')
+                    {
                         my_token.type = token_type::traits::type::increment_op;
+                        advance();
                     }
                     else
                     {
                         my_token.type = token_type::traits::type::addition_op;
                     }
+
                     break;
                 }
                 case L'-':
                 {
                     // - -= -- ->
-                    datum_type la_codepoint = peek();
+                    codepoint = advance();
 
-                    if(la_codepoint == L'=')
+                    if(codepoint == L'=')
                     {
-                        advance();
                         my_token.type = token_type::traits::type::subtraction_assignment_op;
-                    }
-                    else if(la_codepoint == L'-')
-                    {
                         advance();
+                    }
+                    else if(codepoint == L'-')
+                    {
                         my_token.type = token_type::traits::type::decrement_op;
-                    }
-                    else if(la_codepoint == L'>')
-                    {
                         advance();
+                    }
+                    else if(codepoint == L'>')
+                    {
                         my_token.type = token_type::traits::type::lambda_op;
+                        advance();
                     }
                     else
                     {
                         my_token.type = token_type::traits::type::subtraction_op;
                     }
+
                     break;
                 }
                 case L'*':
                     // * *=
-                    if(peek() == L'=')
+                    codepoint = advance();
+
+                    if(codepoint == L'=')
                     {
-                        advance();
                         my_token.type = token_type::traits::type::multiplication_assignment_op;
+                        advance();
                     }
                     else
                     {
                         my_token.type = token_type::traits::type::multiplication_op;
                     }
+
                     break;
 
                 case L'/':
                 {
                     // /, /= or comments //,  /*
-                    datum_type la_codepoint = peek();
+                    codepoint = advance();
 
-                    if(la_codepoint == L'=')
+                    if(codepoint == L'=')
                     {
-                        advance();
                         my_token.type = token_type::traits::type::division_assignment_op;
+                        advance();
                     }
-                    else if(la_codepoint == L'/')
+                    else if(codepoint == L'/')
                     {
                         do
                         {
-                            la_codepoint = peek();
+                            codepoint = advance();
 
-                            if(la_codepoint == L'\r' || la_codepoint == L'\n')
+                            if(codepoint == L'\r' || codepoint == L'\n')
                             {
                                 break;
                             }
-
-                            advance();
                         }
                         while(my_ptr < my_end_content);
 
                         my_token.type = token_type::traits::type::singleline_comments;
                     }
-                    else if(la_codepoint == L'*')
+                    else if(codepoint == L'*')
                     {
                         do
                         {
                             codepoint = advance();
-                            la_codepoint = peek();
+
+                            datum_type la_codepoint = peek();
 
                             if((codepoint == L'*' && la_codepoint == L'/'))
                             {
+                                advance(); // consume *
                                 advance(); // consume /
                                 break;
                             }
@@ -7469,160 +7449,202 @@ _exit_num:
                     {
                         my_token.type = token_type::traits::type::division_op;
                     }
+
                     break;
                 }
                 case L'&':
                 {
                     // & && &=
-                    datum_type la_codepoint = peek();
+                    codepoint = advance();
 
-                    if(la_codepoint == L'&')
+                    if(codepoint == L'&')
                     {
-                        advance();
                         my_token.type = token_type::traits::type::logical_and_op;
-                    }
-                    else if(la_codepoint == L'=')
-                    {
                         advance();
+                    }
+                    else if(codepoint == L'=')
+                    {
                         my_token.type = token_type::traits::type::bitwise_assignment_op;
+                        advance();
                     }
                     else
                     {
                         my_token.type = token_type::traits::type::bitwise_and_op;
                     }
+
                     break;
                 }
                 case L'|':
                 {
                     // | || |=
-                    datum_type la_codepoint = peek();
+                    codepoint = advance();
 
-                    if(la_codepoint == L'|')
+                    if(codepoint == L'|')
                     {
-                        advance();
                         my_token.type = token_type::traits::type::logical_or_op;
-                    }
-                    else if(la_codepoint == L'=')
-                    {
                         advance();
+                    }
+                    else if(codepoint == L'=')
+                    {
                         my_token.type = token_type::traits::type::bitwise_or_assignment_op;
+                        advance();
                     }
                     else
                     {
                         my_token.type = token_type::traits::type::bitwise_or_op;
                     }
+
                     break;
                 }
                 case L'^':
                     // ^ ^=
-                    if(peek() == L'=')
+                    codepoint = advance();
+
+                    if(codepoint == L'=')
                     {
-                        advance();
                         my_token.type = token_type::traits::type::bitwise_xor_assignment_op;
+                        advance();
                     }
                     else
                     {
                         my_token.type = token_type::traits::type::bitwise_xor_op;
                     }
+
                     break;
 
                 case L'!':
                     // ! !=
-                    if(peek() == L'=')
+                    codepoint = advance();
+
+                    if(codepoint == L'=')
                     {
-                        advance();
                         my_token.type = token_type::traits::type::logical_not_assignment_op;
+                        advance();
                     }
                     else
                     {
                         my_token.type = token_type::traits::type::logical_not_op;
                     }
+
                     break;
 
                 case L'%':
                     // % %=
-                    if(peek() == L'=')
+                    codepoint = advance();
+
+                    if(codepoint == L'=')
                     {
-                        advance();
                         my_token.type = token_type::traits::type::module_assignment_op;
+                        advance();
                     }
                     else
                     {
                         my_token.type = token_type::traits::type::module_op;
                     }
+
                     break;
 
                 case L'=':
                     // = ==
-                    if(peek() == L'=')
+                    codepoint = advance();
+
+                    if(codepoint == L'=')
                     {
-                        advance();
                         my_token.type = token_type::traits::type::equality_op;
+                        advance();
                     }
                     else
                     {
                         my_token.type = token_type::traits::type::assignment_op;
                     }
+
                     break;
 
                 case L'~':
                     my_token.type = token_type::traits::type::bitwise_not_op;
+                    advance();
                     break;
 
                 case L'?':
                     my_token.type = token_type::traits::type::ternary_true_op;
+                    advance();
                     break;
 
                 case L'>':
                 {
-                    // > >=  > >  >>=  > > >  >>>=
-                    datum_type la_codepoint = peek();
+                    // > >=  > >  >> >>=  > > >  >>> >>>=
+                    codepoint = advance();
 
-                    if(la_codepoint == L'=')
+                    if(codepoint == L'=')
                     {
-                        advance();
                         my_token.type = token_type::traits::type::greater_than_equal_op;
+                        advance();
                     }
-                    else if(la_codepoint == L'>' && peek(2) == L'=')
+                    else if(codepoint == L'>')
                     {
-                        advance();
-                        advance();
-                        my_token.type = token_type::traits::type::signed_right_shift_assignment_op;
-                    }
-                    else if(la_codepoint == L'>' && peek(2) == L'>' && peek(3) == L'=')
-                    {
-                        advance();
-                        advance();
-                        advance();
-                        my_token.type = token_type::traits::type::unsigned_right_shift_assignment_op;
+                        codepoint = advance();
+
+                        if(codepoint == L'>')
+                        {
+                            codepoint = advance();
+
+                            if(codepoint == L'=')
+                            {
+                                my_token.type = token_type::traits::type::unsigned_right_shift_assignment_op;
+                                advance();
+                            }
+                            else
+                            {
+                                my_token.type = token_type::traits::type::unsigned_right_shift_op;
+                            }
+                        }
+                        else if(codepoint == L'=')
+                        {
+                            my_token.type = token_type::traits::type::signed_right_shift_assignment_op;
+                            advance();
+                        }
+                        else
+                        {
+                            my_token.type = token_type::traits::type::signed_right_shift_op;
+                        }
                     }
                     else
                     {
                         my_token.type = token_type::traits::type::greater_than_op;
                     }
+
                     break;
                 }
 
                 case L'<':
                 {
-                    // < <=  < <  <<=
-                    datum_type la_codepoint = peek();
+                    // < <=  < <  << <<=
+                    codepoint = advance();
 
-                    if(la_codepoint == L'=')
+                    if(codepoint == L'=')
                     {
-                        advance();
                         my_token.type = token_type::traits::type::less_than_equal_op;
+                        advance();
                     }
-                    else if(la_codepoint == L'<' && peek(2) == L'=')
+                    else if(codepoint == L'<')
                     {
-                        advance();
-                        advance();
-                        my_token.type = token_type::traits::type::left_shift_assignment_op;
+                        codepoint = advance();
+
+                        if(codepoint == L'=')
+                        {
+                            my_token.type = token_type::traits::type::left_shift_assignment_op;
+                            advance();
+                        }
+                        else
+                        {
+                            my_token.type = token_type::traits::type::left_shift_op;
+                        }
                     }
                     else
                     {
                         my_token.type = token_type::traits::type::less_than_op;
                     }
+
                     break;
                 }
                 case L' ':
@@ -7630,14 +7652,12 @@ _exit_num:
                 case L'\f':
                     do
                     {
-                        datum_type la_codepoint = peek();
+                        codepoint = advance();
 
-                        if(la_codepoint != L' ' && la_codepoint != L'\t' && la_codepoint != L'\f')
+                        if(codepoint != L' ' && codepoint != L'\t' && codepoint != L'\f')
                         {
                             break;
                         }
-
-                        advance();
                     }
                     while(my_ptr < my_end_content);
 
@@ -7645,19 +7665,28 @@ _exit_num:
                     break;
 
                 case L'\n':
+                    advance();
+
                     my_token.type = token_type::traits::type::eol;
+
                     my_boll = true; //??
                     my_eoll = true; //??
+
                     break;
 
                 case L'\r':
-                    if(peek() == L'\n')
+                    advance();
+
+                    if(current() == L'\n')
                     {
                         advance();
                     }
+
                     my_token.type = token_type::traits::type::eol;
+
                     my_boll = true; //??
                     my_eoll = true; //??
+
                     break;
 
                 #define ADVANCE_CHAR_LITERAL(FUNC)                                                                                          \
@@ -7783,12 +7812,14 @@ _exit_num:
                         if(!erroneous)
                         {
                             my_token.type = token_type::traits::type::char_lit;
+                            advance();
                         }
                         else
                         {
                             my_token.literal = text::invalid_codepoint;
                         }
                     }
+
                     break;
                 }
                 case L'"':
@@ -7817,9 +7848,11 @@ _exit_num:
 
                     if(!erroneous)
                     {
-                        my_token.literal = value;
                         my_token.type = token_type::traits::type::string_lit;
+                        my_token.literal = value;
+                        advance();
                     }
+
                     break;
                 }
                 default:
