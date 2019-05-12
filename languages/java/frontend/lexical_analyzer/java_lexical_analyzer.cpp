@@ -523,30 +523,36 @@ typename java_lexical_analyzer::datum_type java_lexical_analyzer::advance()
                         my_unicode = true;
                         my_unicode_length = static_cast<uint8_t>(std::ptrdiff_t(my_ptr - ptr));
                     }
+
+                    my_ptr++;
                 }
                 else
                 {
                     my_unicode_backslash_count++;
+                    result = *++my_ptr;
                 }
             }
             else
             {
                 my_unicode_backslash_count++;
+                result = *++my_ptr;
             }
         }
         else
         {
             my_unicode_backslash_count = 0;
+            result = *++my_ptr;
         }
 
         if(my_unicode)
         {
             //?? line-map?
         }
+    }
 
-        my_ptr++; // advance to the begining of the next lexeme
-
-        result = *my_ptr;
+    if(my_ptr > my_end_content)
+    {
+        my_ptr = my_end_content;
     }
 
     return result;
@@ -7690,7 +7696,7 @@ _exit_num:
                     break;
 
                 #define ADVANCE_CHAR_LITERAL(FUNC)                                                                                          \
-                    if(codepoint == L'\\')                                                                                                  \
+                    if(codepoint == L'\\' && *(my_ptr + 1) != L'u')                                                                         \
                     {                                                                                                                       \
                         codepoint = advance(); /* skip '\'*/                                                                                \
                                                                                                                                             \
@@ -7777,46 +7783,38 @@ _exit_num:
                     {
                         erroneous = true;
                         log_error(L"Character literal is empty, at location '%ld, %ld'.", CURRENT_LOCATION);
+
+                        advance();
                     }
                     else
                     {
                         if(codepoint == L'\r' || codepoint == L'\n')
                         {
                             erroneous = true;
-
                             log_error(L"Illegal end of line in character literal, at location '%ld, %ld'.", CURRENT_LOCATION);
-
-                            codepoint = peek();
-
-                            if(codepoint == L'\r' || codepoint == L'\n')
-                            {
-                                advance();
-                            }
                         }
                         else
                         {
                             ADVANCE_CHAR_LITERAL(my_token.literal =)
+
+                            codepoint = advance();
+
+                            if(my_unicode)
+                            {
+                                codepoint = advance();
+                            }
                         }
 
-                        codepoint = advance(); // advance to '
-
-                        if(codepoint != L'\'')
+                        if(!erroneous && codepoint != L'\'')
                         {
                             erroneous = true;
-
                             log_error(L"Unclosed character literal, too many charactaers, at location '%ld, %ld'.", CURRENT_LOCATION);
-
-                            rewind();
                         }
 
                         if(!erroneous)
                         {
                             my_token.type = token_type::traits::type::char_lit;
                             advance();
-                        }
-                        else
-                        {
-                            my_token.literal = text::invalid_codepoint;
                         }
                     }
 
@@ -7840,16 +7838,15 @@ _exit_num:
                     if(codepoint != L'\"')
                     {
                         erroneous = true;
-
                         log_error(L"Unclosed string literal, at location '%ld, %ld'.", CURRENT_LOCATION);
-
-                        rewind();
                     }
 
                     if(!erroneous)
                     {
                         my_token.type = token_type::traits::type::string_lit;
+
                         my_token.literal = value;
+
                         advance();
                     }
 
@@ -7857,6 +7854,7 @@ _exit_num:
                 }
                 default:
                 {
+                    advance();
                     log_error(L"Invalid character '%s' at location '%ld, %ld'.", text::codepoint_to_string(codepoint).c_str(), CURRENT_LOCATION);
                     break;
                 }

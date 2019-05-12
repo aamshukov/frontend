@@ -59,7 +59,7 @@ struct enumerate_wrapper
 template <typename T>
 constexpr auto enumerate(T& c)
 {
-    return enumerate_wrapper(c);
+    return enumerate_wrapper<T>(c);
 }
 
 END_NAMESPACE
