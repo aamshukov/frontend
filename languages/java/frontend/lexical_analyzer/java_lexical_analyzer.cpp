@@ -609,7 +609,7 @@ void java_lexical_analyzer::build_line_map()
         {
             if(*ptr == L'\r' || *ptr == L'\n')
             {
-                if(*ptr == L'\r' && *(ptr + 1) == L'\n')
+                if((*ptr == L'\r' && *(ptr + 1) == L'\n') || (*ptr == L'\n' && *(ptr + 1) == L'\r'))
                 {
                     ptr += 2;
                 }
@@ -730,7 +730,7 @@ void java_lexical_analyzer::calculate_indentation()
 
         my_ptr--; // correct ptr
 
-        bool newline = *my_ptr == L'\n' || (*my_ptr == L'\r' && *(my_ptr + 1) == L'\n');
+        bool newline = *my_ptr == L'\n' || (*my_ptr == L'\r' && *(my_ptr + 1) == L'\n') || (*my_ptr == L'\n' && *(my_ptr + 1) == L'\r');
 
         if(!(indent == 0 && newline)/* empty line */ && my_eoll)
         {
@@ -7672,6 +7672,11 @@ _exit_num:
 
                 case L'\n':
                     advance();
+
+                    if(current() == L'\r')
+                    {
+                        advance();
+                    }
 
                     my_token.type = token_type::traits::type::eol;
 
