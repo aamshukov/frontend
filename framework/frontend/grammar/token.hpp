@@ -84,7 +84,14 @@ struct token
         
         token(token&& other)
         {
-            accept(other);
+            type = other.type;
+
+            offset = other.offset;
+            length = other.length;
+
+            literal = std::move(other.literal);
+
+            flags = other.flags;
         }
 
         const token& operator = (const token& other)
@@ -95,7 +102,15 @@ struct token
 
         token& operator = (token&& other)
         {
-            accept(other);
+            type = other.type;
+
+            offset = other.offset;
+            length = other.length;
+
+            literal = std::move(other.literal);
+
+            flags = other.flags;
+
             return *this;
         }
 

@@ -29,6 +29,8 @@ void lexical_analyzer<Token>::next_lexeme()
 {
     if(!is_eos())
     {
+        my_prev_token = std::move(my_token);
+
         if(!my_tokens.empty())
         {
             my_token = std::move(my_tokens.front());

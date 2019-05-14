@@ -32,6 +32,8 @@ class lexical_analyzer : private noncopyable
         token_type                  my_token;           // current lexeme
         tokens_type                 my_tokens;          // current and lookahead lexemes
 
+        token_type                  my_prev_token;      // previous lexeme
+
         const datum_type*           my_ptr;             // current position in content
         const datum_type*           my_ptr_lexeme;      // begining position of lexeme in content
 
