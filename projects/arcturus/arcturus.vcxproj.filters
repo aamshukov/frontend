@@ -3,4 +3,15 @@
   <ItemGroup>
     <ClCompile Include="arcturus.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Filter Include="trees">
+      <UniqueIdentifier>{1659b0be-5065-4a3d-8fa9-862adcb7eae1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="trees\arcturus_tree.hpp">
+      <Filter>trees</Filter>
+    </ClInclude>
+    <ClInclude Include="arcturus.hpp" />
+  </ItemGroup>
 </Project>
