@@ -32,5 +32,8 @@
     <Text Include="..\..\languages\arcturus\docs\arcturus-grammar.txt">
       <Filter>docs</Filter>
     </Text>
+    <Text Include="..\..\languages\arcturus\docs\arcturus-grammar.dev.txt">
+      <Filter>docs</Filter>
+    </Text>
   </ItemGroup>
 </Project>

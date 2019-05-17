@@ -30,6 +30,7 @@
     <ClInclude Include="..\..\framework\core\command_line.hpp" />
     <ClInclude Include="..\..\framework\core\configurator.hpp" />
     <ClInclude Include="..\..\framework\core\content.hpp" />
+    <ClInclude Include="..\..\framework\core\context.hpp" />
     <ClInclude Include="..\..\framework\core\counter.hpp" />
     <ClInclude Include="..\..\framework\core\dag.hpp" />
     <ClInclude Include="..\..\framework\core\data_provider.hpp" />

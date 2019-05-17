@@ -15,6 +15,13 @@ USINGNAMESPACE(backend)
 template <typename Token>
 class controller : private noncopyable
 {
+    //??
+    //lexer
+    //parser
+    //ir
+    //optimization
+    //generator
+
 };
 
 END_NAMESPACE

@@ -31,6 +31,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Text Include="..\..\languages\arcturus\docs\arcturus-grammar.dev.txt" />
     <Text Include="..\..\languages\arcturus\docs\arcturus-grammar.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
