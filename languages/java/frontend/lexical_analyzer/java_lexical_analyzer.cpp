@@ -7707,11 +7707,17 @@ _exit_num:
                                                                                                                                             \
                         switch(codepoint)                                                                                                   \
                         {                                                                                                                   \
+                            case L'a':                                                                                                      \
+                                FUNC 0x07;                                                                                                  \
+                                break;                                                                                                      \
                             case L'b':                                                                                                      \
                                 FUNC 0x08;                                                                                                  \
                                 break;                                                                                                      \
                             case L't':                                                                                                      \
                                 FUNC 0x09;                                                                                                  \
+                                break;                                                                                                      \
+                            case L'v':                                                                                                      \
+                                FUNC 0x0B;                                                                                                  \
                                 break;                                                                                                      \
                             case L'n':                                                                                                      \
                                 FUNC 0x0A;                                                                                                  \

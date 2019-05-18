@@ -1,101 +1,224 @@
-primary-expression          : literal
-                            | fully-qualified-name
-                            | '('! expression ')'!
-                            ;
+// lexical
+// -------
 
-expression                  : assignement-expression
-                            | conditional-expression
-                            ;
+comments                            : '#' anything
+                                    | '//' anything
+                                    ;
 
-assignment-expression       : unary-expression '='^ expression
-                            ;
+universal-character-name            : '\u' hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit
+                                    | '\U' hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit
+                                    ;
 
-conditional-expression      : conditional-or-expression
-                            | conditional-or-expression '?'^ expression ':'^ conditional-or-expression
-                            ;
+escaped-character-name              : simple-escaped-character-name
+                                    | octal-escaped-character-name
+                                    | hexadecimal-escaped-character-name
+                                    ;
 
-conditional-or-expression   : conditional-and-expression
-                            | conditional-or-expression '||'^ conditional-and-expression
-                            ;
+simple-escaped-character-name       : '\'' '\"' '\\' '\a' '\b' '\f' '\n' '\r' '\t' '\v'
+                                    ;
 
-conditional-and-expression  : inclusive-or-expression
-                            | conditional-and-expression '&&'^ inclusive-or-expression
-                            ;
+octal-escaped-character-name        : '\' octal-digit
+                                    | '\' octal-digit octal-digit
+                                    | '\' octal-digit octal-digit octal-digit
+                                    ;
 
-inclusive-or-expression     : exclusive-or-expression
-                            | inclusive-or-expression '|'^ exclusive-or-expression
-                            ;
+hexadecimal-escaped-character-name  : '\x' hexadecimal-digit
+                                    | '\x' hexadecimal-digit hexadecimal-digit
+                                    | '\x' hexadecimal-digit hexadecimal-digit hexadecimal-digit
+                                    | '\x' hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit
+                                    ;
 
-exclusive-or-expression     : and-expression
-                            | exclusive-or-expression '^'^ and-expression
-                            ;
+identifier                          : identifier-start-character identifier-part-characters-opt
+                                    ;
 
-and-expression              : equality-expression
-                            | and-expression '&'^ equality-expression
-                            ;
+identifier-start-character          : letter-character
+                                    | underscore-character
+                                    ;
 
-equality-expression         : relational-expression
-                            | equality-expression '=='^ relational-expression
-                            | equality-expression '!='^ relational-expression
-                            ;
+letter-character                    : A Unicode character of classes Lu, Ll, Lt, Lm, Lo, or Nl
+                                    | A universal-character-name representing a character of classes Lu, Ll, Lt, Lm, Lo, or Nl
+                                    ;
 
-relational-expression       : shift-expression
-                            | relational-expression '<'^ shift-expression
-                            | relational-expression '>'^ shift-expression
-                            | relational-expression '<='^ shift-expression
-                            | relational-expression '>='^ shift-expression
-                            ;
+underscore-characters-opt           : underscore-characters
+                                    | e(psilon)
+                                    ;
 
-shift-expression            : additive-expression
-                            | shift-expression '<<'^ additive-expression
-                            | shift-expression '>>'^ additive-expression
-                            ;
+underscore-characters               : underscore-character
+                                    | underscore-characters underscore-character
+                                    ;
 
-additive-expression         : multiplicative-expression
-                            | additive-expression '+'^ multiplicative-expression
-                            | additive-expression '-'^ multiplicative-expression
-                            ;
+underscore-character                : _ (the underscore character U+005F)
+                                    | A unicode-escape-sequence representing the character U+005F
+                                    ;
 
-multiplicative-expression   : unary-expression
-                            | multiplicative-expression '*'^ unary-expression
-                            | multiplicative-expression '/'^ unary-expression
-                            ;
+identifier-part-characters          : identifier-part-character
+                                    | identifier-part-characters identifier-part-character
+                                    ;
 
-unary-expression            : primary-expression
-                            | '+'^ unary-expression
-                            | '-'^ unary-expression
-                            | '!'^ unary-expression
-                            | '~'^ unary-expression
-                            ;
+identifier-part-character           : letter-character
+                                    | decimal-digit-character
+                                    | connecting-character
+                                    | combining-character
+                                    | formatting-character
+                                    ;
+
+letter-character                    : A Unicode character of classes Lu, Ll, Lt, Lm, Lo, or Nl
+                                    | A unicode-escape-sequence representing a character of classes Lu, Ll, Lt, Lm, Lo, or Nl
+                                    ;
+
+combining-character                 : A Unicode character of classes Mn or Mc
+                                    | A unicode-escape-sequence representing a character of classes Mn or Mc
+                                    ;
+
+decimal-digit-character             : A Unicode character of the class Nd
+                                    | A unicode-escape-sequence representing a character of the class Nd
+                                    ;
+
+connecting-character                : A Unicode character of the class Pc
+                                    | A unicode-escape-sequence representing a character of the class Pc
+                                    ;
+
+formatting-character                : A Unicode character of the class Cf
+                                    | A unicode-escape-sequence representing a character of the class Cf
+                                    ;
+
+fully-qualified-name                : fully-qualified-name '.' identifier
+                                    | identifier
+                                    ;
+
+literal                             : integer-number-literal
+                                    | real-number-literal
+                                    | string-literal
+                                    | boolean-literal
+                                    ;
+
+integer-number-literal              : binary-number-literal
+                                    | octal-number-literal
+                                    | decimal-number-literal
+                                    | hexadecimal-number-literal
+                                    ;
+
+binary-number-literal               : '0b' binary-digit
+                                    | '0B' binary-digit
+                                    | binary-literal underscore-characters-opt binary-digit
+                                    ;
+
+binary-digit                        : '0' '1'
+                                    ;
+
+octal-number-literal                : '0'
+                                    | octal-number-literal underscore-characters-opt octal-digit
+                                    ;
+
+octal-digit                         : '0' '1' '2' '3' '4' '5' '6' '7'
+                                    ;
+
+decimal-number-literal              : nonzero-decimal-digit
+                                    | decimal-number-literal underscore-characters-opt decimal-digit
+                                    ;
+
+nonzero-decimal-digit               : '1' '2' '3' '4' '5' '6' '7' '8' '9'
+                                    ;
+
+decimal-digits-opt                  : decimal-digits
+                                    | e(psilon)
+                                    ;
+
+decimal-digits                      : decimal-digit
+                                    | decimal-digits underscore-characters-opt decimal-digit
+                                    ;
+
+decimal-digit                       : '0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+                                    ;
+
+hexadecimal-number-literal          : '0x' hexadecimal-digits
+                                    | '0X' hexadecimal-digits
+                                    ;
+
+hexadecimal-digits-opt              : hexadecimal-digits
+                                    | e(psilon)
+                                    ;
+
+hexadecimal-digits                  : hexadecimal-digit
+                                    | hexadecimal-digits underscore-characters-opt hexadecimal-digit
+                                    ;
+
+hexa-decimal-digit                  : '0' '1' '2' '3' '4' '5' '6' '7' '8' '9' 'a' 'b' 'c' 'd' 'e' 'f' 'A' 'B' 'C' 'D' 'E' 'F'
+                                    ;
+
+real-number-literal                 : decimal-real-number-literal
+                                    | hexadecimal-real-number-literal
+                                    ;
+
+decimal-real-number-literal         : decimal-digits-opt '.' decimal-digits exponent-part-opt
+                                    | decimal-digits '.' exponent-part-opt
+                                    | decimal-digits exponent-part
+                                    ;
+
+exponent-part-opt                   : exponent-part
+                                    | e(psilon)
+                                    ;
+
+exponent-part                       : 'e' sign-opt decimal-digits
+                                    | 'E' sign-opt decimal-digits
+                                    ;
+
+hexadecimal-real-number-literal     : '0x' hexadecimal-decimal-digits-opt '.' hexadecimal-decimal-digits binary-exponent-part-opt
+                                    | '0X' hexadecimal-decimal-digits-opt '.' hexadecimal-decimal-digits binary-exponent-part-opt
+                                    | '0x' hexadecimal-decimal-digits '.' binary-exponent-part-opt
+                                    | '0X' hexadecimal-decimal-digits '.' binary-exponent-part-opt
+                                    | '0x' hexadecimal-decimal-digits binary-exponent-part
+                                    | '0X' hexadecimal-decimal-digits binary-exponent-part
+                                    ;
+
+binary-exponent-part-opt            : binary-exponent-part
+                                    | e(psilon)
+                                    ;
+
+binary-exponent-part                : 'p' sign-opt decimal-digits
+                                    | 'P' sign-opt decimal-digits
+                                    ;
+
+sign-opt                            : '+'
+                                    | '-'
+                                    | e(psilon)
+                                    ;
+
+string-literal                      : ''' string-characters-opt '''
+                                    | '"' string-characters-opt '"'
+                                    | r''' string-characters-opt '''
+                                    | r'"' string-characters-opt '"'
+
+string-characters-opt               : string-characters
+                                    | e(psilon)
+                                    ;
+
+string-characters                   : string-character
+                                    | string-characters string-character
+                                    ;
+
+string-character                    : identifier-part-character
+                                    | escaped-character-name
+                                    | universal-character-name
+                                    ;
+
+boolean-literal                     : 'true'
+                                    | 'false'
+                                    ;
+
+keyword                             : 'let' 'integer' 'real' 'boolean' 'true' 'false' 'type' 'function'
+                                    ;
+
+punctuator                          : ':' '..' '...' ',' '{' '}' '[' ']' '(' ')'
+                                    ;
+
+operator                            : '+' '-' '*' '/' '>>' '<<' '=' '==' '!=' '<' '<=' '>' '>=' '&' '&&' '|' '||' '^'
+                                    ;
 
 
-statement                   : expression-statement
-                            | compound-statement
-                            | selection-statement
-                            ;
-
-expression-statement        : expression-opt
-                            ;
-
-expression-opt              : expression
-                            | e(psilon)
-                            ;
-
-compound-statement          : statements
-                            ;
-
-statements                  : statement
-                            | statements statement
-                            ;
 
 
-fully-qualified-name        : fully-qualified-name '.' identifier
-                            | identifier
-                            ;
 
-literal                     : integer-literal
-                            | character-literal
-                            | floating-literal
-                            | string-literal
-                            | boolean-literal
-                            ;
+// syntax
+// ------
+
