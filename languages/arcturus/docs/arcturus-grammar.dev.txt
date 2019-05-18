@@ -179,11 +179,11 @@ template <uint16 SHORT_TEXT_SIZE = 64> struct status
 
 
 scalars:
-    a = 0
-    b = 10
-    c = 0x10
-    d = 4.5
-    f = 'abc'
+    let a = 0
+    let b = 10
+    let c = 0x10
+    let d = 4.5
+    let f = 'abc'
     g = true/false
     integer
     real
@@ -194,7 +194,8 @@ arrays:
    a(2)             - raw unchecked array
    b[-2:3]          - checked ranged-based array
    b[-2:3, 0:10]    - checked ranged-based array, multidimensional
-   c[-2:3]          - checked ranged-based array
+   b[-2..3, 0..10]
+   c[-2:3] c[-2..3] - checked ranged-based array
    c(-2:3, 0:10)    - raw unchecked ranged-based array, multidimensional
    d[2,c]           - checked array, column based, aka FORTRAN
    d(2,c)           - raw unchecked array, column based, aka FORTRAN
@@ -205,5 +206,100 @@ arrays:
 
 type byte = 0..255
 type sbyte = -127..127
+
+
+type user
+    name = ''
+    age = 50
+    weight = 78.9
+
+
+define createUser name: string, age: integer, weight: real, kids: user[]
+define createUser(name: string,
+                  age: integer,
+                  weight: real,
+                  kids: user[])
+    user result { name, age, weight, kids }
+    user result { name = name, age = age, weight = weight, kids = kids[1:3] }
+
+    const pi = 3.14
+
+    let a = 0
+    let a: integer
+    let b = 10
+    let b: integer
+    let c = 0x10
+    let d = 4.5
+    let d: real
+    let f = 'abc'
+    let g = true
+    let b[-2:3, 0:10]
+    let d[2,r]
+    let d(2,c)
+
+    let d0 = d[0]
+    let d1 = d[1]
+
+    let b11 = b(1, 1)
+
+    let l = len(d)
+
+    define foo a: integer, b: integer
+        define bar a: integer, b: integer
+            return a + b
+        return bar a, b
+
+    let fooFunc = foo
+    let r = fooFunc(10, 5)
+
+
+    return result
+
+
+define foo name: string, *, **
+define foo (name: string,
+            *,
+            **)
+
+
+declaration             : scalar-declaration
+                        | array-declaration
+                        ;
+
+declaration-let-clause  : 'let' identifier dimensions-opt '='
+                        | 'let' identifier dimensions-opt ':' 
+                        ;
+
+let a = 0
+let a : integer
+
+let b [-2..3, 0..10] : integer
+let b [-2..3, 0..10] = [ 0, 1, 2, 3, 4, 5 ]
+
+
+scalar-declaration  : 'let' identifier '=' primary-expression
+                    | 'let' identifier ':' type-identifier | type-declaration | function-declaration
+                    ;
+
+array-declaration   : 'let' identifier '[' dimensions-opt ']' '=' initialization-array-list
+                    | 'let' identifier '[' dimensions-opt ']' ':' type-identifier
+                    ;
+
+dimensions-opt      : dimensions
+                    | e(psilon)
+                    ;
+
+dimensions          : dimension
+                    | dimensions ',' dimension
+                    ;
+
+dimension           : sign-opt integer ':' sign-opt integer
+                    | sign-opt integer '..' sign-opt integer
+                    ;
+
+sign-opt            : '+'
+                    | '-'
+                    | e(psilon)
+                    ;
 
 
