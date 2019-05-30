@@ -188,6 +188,7 @@ string-literal                      : ''' string-characters-opt '''
                                     | '"' string-characters-opt '"'
                                     | r''' string-characters-opt '''
                                     | r'"' string-characters-opt '"'
+                                    ;
 
 string-characters-opt               : string-characters
                                     | e(psilon)
@@ -213,6 +214,29 @@ punctuator                          : ':' '..' '...' ',' '{' '}' '[' ']' '(' ')'
                                     ;
 
 operator                            : '+' '-' '*' '/' '>>' '<<' '=' '==' '!=' '<' '<=' '>' '>=' '&' '&&' '|' '||' '^'
+                                    ;
+
+whitespace-characters               : whitespace-character
+                                    | whitespace-characters whitespace-character
+                                    ;
+
+whitespace-character                : any character with unicode class Zs
+                                    | horizontal tab character (U+0009)
+                                    | vertical tab character (U+000B)
+                                    | form feed character (U+000C)
+                                    ;
+
+end-of-line                         : \u000D                \r
+                                    | \u000A                \n
+                                    | \u000D \u000A         \r\n
+                                    | \u000A \u000D         \n\r
+                                    | \u2028
+                                    | \u2029
+                                    | end-of-file
+                                    ;
+
+end-of-file                         : \u0000
+                                    | \u001A
                                     ;
 
 
