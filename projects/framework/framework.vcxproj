@@ -86,6 +86,12 @@
     <ClInclude Include="..\..\framework\frontend\parser\parser_tree.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\parser_visualization.hpp" />
     <ClInclude Include="..\..\framework\frontend\semantics\semantics.hpp" />
+    <ClInclude Include="..\..\framework\symtable\scope\scope.hpp" />
+    <ClInclude Include="..\..\framework\symtable\scope\scope_block.hpp" />
+    <ClInclude Include="..\..\framework\symtable\scope\scope_function.hpp" />
+    <ClInclude Include="..\..\framework\symtable\scope\scope_namespace.hpp" />
+    <ClInclude Include="..\..\framework\symtable\scope\scope_parameter.hpp" />
+    <ClInclude Include="..\..\framework\symtable\scope\scope_structure.hpp" />
     <ClInclude Include="..\..\framework\symtable\symbol_table.hpp" />
     <ClInclude Include="..\..\framework\symtable\symbol_table_record.hpp" />
   </ItemGroup>

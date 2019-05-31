@@ -208,6 +208,24 @@
     <ClInclude Include="..\..\framework\core\context.hpp">
       <Filter>core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\symtable\scope\scope_namespace.hpp">
+      <Filter>symtable\scope</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\symtable\scope\scope_structure.hpp">
+      <Filter>symtable\scope</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\symtable\scope\scope.hpp">
+      <Filter>symtable\scope</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\symtable\scope\scope_function.hpp">
+      <Filter>symtable\scope</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\symtable\scope\scope_parameter.hpp">
+      <Filter>symtable\scope</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\symtable\scope\scope_block.hpp">
+      <Filter>symtable\scope</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="backend">
@@ -266,6 +284,9 @@
     </Filter>
     <Filter Include="symtable">
       <UniqueIdentifier>{2a72f62e-cd1b-4f0c-b493-edf005b33872}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="symtable\scope">
+      <UniqueIdentifier>{5878d3b6-8119-46dc-b042-84c978163a7d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -45,6 +45,13 @@
 #include <frontend/grammar/grammar_algorithm.hpp>
 #include <frontend/grammar/grammar_visualization.hpp>
 
+#include <symtable/scope/scope.hpp>
+#include <symtable/scope/scope_namespace.hpp>
+#include <symtable/scope/scope_structure.hpp>
+#include <symtable/scope/scope_function.hpp>
+#include <symtable/scope/scope_parameter.hpp>
+#include <symtable/scope/scope_block.hpp>
+
 #include <symtable/symbol_table_record.hpp>
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
