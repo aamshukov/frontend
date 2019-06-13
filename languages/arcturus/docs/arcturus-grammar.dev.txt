@@ -212,6 +212,7 @@ boolean-literal                     : 'true'
                                     ;
 
 keyword                             : 'let' 'integer' 'real' 'boolean' 'true' 'false' 'type' 'function' 'continue' 'break' 'return' 'yield'
+                                    | 'weak'-- automatic reference counting (ARC)
                                     ;
 
 punctuator                          : ':' '..' '...' ',' '{' '}' '[' ']' '(' ')'
