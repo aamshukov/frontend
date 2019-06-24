@@ -115,6 +115,10 @@ class fsa_re : private noncopyable
                                       const string_type& escape_predicate,
                                       fsa_type& result_fsa,
                                       operation_status& status);
+
+        static bool         fsa_to_re_kleene(const fsa_type& fsa, std::basic_string<datum_type>& re);
+        static bool         fsa_to_re_state_elimination(const fsa_type& fsa, std::basic_string<datum_type>& re);
+        static bool         fsa_to_re_arden(const fsa_type& fsa, std::basic_string<datum_type>& re);
 };
 
 END_NAMESPACE

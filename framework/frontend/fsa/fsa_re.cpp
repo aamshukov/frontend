@@ -1545,4 +1545,38 @@ void fsa_re::print_fsa_followpos(const typename fsa_re::followpos_type& followpo
     }
 }
 
+bool fsa_re::fsa_to_re_kleene(const fsa_type& fsa, std::basic_string<datum_type>& re)
+{
+    //??
+    fsa;
+    re;
+
+    // transitive closure method
+    bool result = true;
+
+    return result;
+}
+
+bool fsa_re::fsa_to_re_state_elimination(const fsa_type& fsa, std::basic_string<datum_type>& re)
+{
+    //??
+    fsa;
+    re;
+
+    bool result = true;
+
+    return result;
+}
+
+bool fsa_re::fsa_to_re_arden(const fsa_type& fsa, std::basic_string<datum_type>& re)
+{
+    //??
+    fsa;
+    re;
+
+    bool result = true;
+
+    return result;
+}
+
 END_NAMESPACE
