@@ -21,9 +21,6 @@ template<typename T>
 class visitor<T>
 {
     public:
-        using visitable_type = T;
-
-    public:
         virtual void visit(T& visitable) = 0;
 };
 
@@ -32,11 +29,9 @@ template<typename T, typename... Types>
 class visitor<T, Types...> : public visitor<Types...>
 {
     public:
-        using visitable_type = typename visitor<T>::visitable_type;
         using visitor<Types...>::visit;
 
-    public:
-        virtual void visit(visitable_type& visitable) = 0;
+        virtual void visit(T& visitable) = 0;
 };
 
 END_NAMESPACE

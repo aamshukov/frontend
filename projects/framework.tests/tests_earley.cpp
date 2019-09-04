@@ -263,19 +263,19 @@ void test_earley_parser()
 
     std::vector<input_element> inputs =
     {
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+a*(b-c)+(b-c)*d", LR"(d:\tmp\fsa\Expr.G_0_1)" },
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"(b-c)+(b-c)", LR"(d:\tmp\fsa\Expr.G_0_2)" },
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a*b+a*b", LR"(d:\tmp\fsa\Expr.G_0_3)" },
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+b*c", LR"(d:\tmp\fsa\Expr.G_0_4)" },
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+a", LR"(d:\tmp\fsa\Expr.G_0_5)" },
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"(a+b)+a+b*a/a/b/b/b*a+(a+b)", LR"(d:\tmp\fsa\Expr.G_0_6)" },
-        { LR"(D:\Projects\fe\grammars\Expr.G0.txt)", L"a+(a*b-(b-a)+b/a)+(b-a)", LR"(d:\tmp\fsa\Expr.G_0_7)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G0.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G_0_1)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G1.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G_1_1)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G2.txt)", L"a*(a+a)", LR"(d:\tmp\fsa\Earley.G_2_1)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G3.AYCOCK.HORSPOOL.txt)", L"a", LR"(d:\tmp\fsa\G3.AYCOCK.HORSPOOL)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G4.epsilon.txt)", L"aa", LR"(d:\tmp\fsa\G4.epsilon)" },
-        { LR"(D:\Projects\fe\grammars\Earley.G5.cycle.txt)", L"", LR"(d:\tmp\fsa\Earley.G5.cycle)" }
+        { LR"(D:\Projects\frontend\grammars\Expr.G0.txt)", L"a+a*(b-c)+(b-c)*d", LR"(d:\tmp\fsa\Expr.G_0_1)" },
+        { LR"(D:\Projects\frontend\grammars\Expr.G0.txt)", L"(b-c)+(b-c)", LR"(d:\tmp\fsa\Expr.G_0_2)" },
+        { LR"(D:\Projects\frontend\grammars\Expr.G0.txt)", L"a*b+a*b", LR"(d:\tmp\fsa\Expr.G_0_3)" },
+        { LR"(D:\Projects\frontend\grammars\Expr.G0.txt)", L"a+b*c", LR"(d:\tmp\fsa\Expr.G_0_4)" },
+        { LR"(D:\Projects\frontend\grammars\Expr.G0.txt)", L"a+a", LR"(d:\tmp\fsa\Expr.G_0_5)" },
+        { LR"(D:\Projects\frontend\grammars\Expr.G0.txt)", L"(a+b)+a+b*a/a/b/b/b*a+(a+b)", LR"(d:\tmp\fsa\Expr.G_0_6)" },
+        { LR"(D:\Projects\frontend\grammars\Expr.G0.txt)", L"a+(a*b-(b-a)+b/a)+(b-a)", LR"(d:\tmp\fsa\Expr.G_0_7)" },
+        { LR"(D:\Projects\frontend\grammars\Earley.G0.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G_0_1)" },
+        { LR"(D:\Projects\frontend\grammars\Earley.G1.txt)", L"n+n", LR"(d:\tmp\fsa\Earley.G_1_1)" },
+        { LR"(D:\Projects\frontend\grammars\Earley.G2.txt)", L"a*(a+a)", LR"(d:\tmp\fsa\Earley.G_2_1)" },
+        { LR"(D:\Projects\frontend\grammars\Earley.G3.AYCOCK.HORSPOOL.txt)", L"a", LR"(d:\tmp\fsa\G3.AYCOCK.HORSPOOL)" },
+        { LR"(D:\Projects\frontend\grammars\Earley.G4.epsilon.txt)", L"aa", LR"(d:\tmp\fsa\G4.epsilon)" },
+        { LR"(D:\Projects\frontend\grammars\Earley.G5.cycle.txt)", L"", LR"(d:\tmp\fsa\Earley.G5.cycle)" }
     };
 
     uint8_t k = 1;

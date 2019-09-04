@@ -16,10 +16,7 @@ template<typename... Types>
 class visitable
 {
     public:
-        using visitor_type = visitor<Types...>;
-
-    public:
-        virtual void accept(visitor_type& /*visitor*/) = 0;
+        virtual void accept(visitor<Types...>& /*visitor*/) = 0;
 };
 
 END_NAMESPACE

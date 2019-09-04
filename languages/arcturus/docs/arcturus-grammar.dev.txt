@@ -211,7 +211,8 @@ boolean-literal                     : 'true'
                                     | 'false'
                                     ;
 
-keyword                             : 'let' 'integer' 'real' 'boolean' 'true' 'false' 'type' 'function' 'continue' 'break' 'return' 'yield'
+keyword                             : 'let' 'const' 'integer' 'real' 'boolean' 'true' 'false' 'type' 'function' 'import' 'alias'(aka typename, using)
+                                    | 'if' 'else' 'for' 'do' 'while' 'goto' 'continue' 'break' 'return' 'yield' 'switch'(case, pattern matching)
                                     | 'weak'-- automatic reference counting (ARC)
                                     ;
 
