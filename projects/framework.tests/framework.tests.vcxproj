@@ -184,6 +184,7 @@
     <ClCompile Include="tests_lr.cpp" />
     <ClCompile Include="tests_operator_precedence.cpp" />
     <ClCompile Include="tests_recursive_descent.cpp" />
+    <ClCompile Include="test_visitor.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -61,11 +61,11 @@
 
 #include <filesystem>
 
-#include <windows.h>
-#include <strsafe.h>
-
-#undef min
-#undef max
+#ifdef _WIN32
+#   define NOMINMAX
+#   include <windows.h>
+#   include <strsafe.h>
+#endif
 
 #include <unicode/uchar.h>
 #include <unicode/unistr.h>

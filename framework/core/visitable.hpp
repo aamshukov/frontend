@@ -12,7 +12,7 @@
 
 BEGIN_NAMESPACE(core)
 
-template<typename... Types>
+template <typename... Types>
 class visitable
 {
     public:

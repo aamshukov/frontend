@@ -33,7 +33,7 @@ struct parser_tree : public tree, public visitable<parser_tree<Token, TreeTraits
 
     void accept(visitor_type& visitor) override
     {
-        visitor.visit(static_cast<parser_tree<token_type, tree_traits_type>&>(*this));
+        visitor.visit(*this);
     }
 };
 

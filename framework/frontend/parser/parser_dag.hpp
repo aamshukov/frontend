@@ -33,7 +33,7 @@ struct parser_dag : public dag, public visitable<parser_dag<Token, TreeTraits>>
 
     void accept(visitor_type& visitor) override
     {
-        visitor.visit(static_cast<parser_dag<token_type, tree_traits_type>&>(*this));
+        visitor.visit(*this);
     }
 };
 

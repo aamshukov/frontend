@@ -281,6 +281,8 @@ void test_earley_parser();
 
 void test_re_dfa();
 
+void test_visitor();
+
 extern "C" double CombineA(int a, int b, int c, int d, int e, double f);
 extern "C" void _start();
 
@@ -378,6 +380,7 @@ int main()
     //test_re_to_nfa_to_dfa();
 //    test_re_dfa();
 
+    test_visitor();
     test_earley_parser();
 
     //test_sets();

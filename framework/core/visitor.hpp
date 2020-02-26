@@ -13,11 +13,11 @@
 BEGIN_NAMESPACE(core)
 
 // template declaration
-template<typename... Types>
+template <typename... Types>
 class visitor;
 
 // specialization for single type    
-template<typename T>
+template <typename T>
 class visitor<T>
 {
     public:
@@ -25,11 +25,11 @@ class visitor<T>
 };
 
 // specialization for multiple types
-template<typename T, typename... Types>
+template <typename T, typename... Types>
 class visitor<T, Types...> : public visitor<Types...>
 {
     public:
-        using visitor<Types...>::visit;
+        using visitor<Types...>::visit; // promote the function(s) from the base class
 
         virtual void visit(T& visitable) = 0;
 };
