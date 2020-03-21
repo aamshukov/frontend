@@ -4,15 +4,8 @@
 #include <core/pch.hpp>
 #include <core/noncopyable.hpp>
 
-#include <core/enum.hpp>
-#include <core/enumerate.hpp>
-#include <core/flags.hpp>
-#include <core/counter.hpp>
-
 #include <core/factory.hpp>
 #include <core/singleton.hpp>
-
-#include <core/domain_helper.hpp>
 
 #include <core/status.hpp>
 #include <core/diagnostics.hpp>
@@ -20,6 +13,13 @@
 
 #include <core/text.hpp>
 #include <core/unicode.hpp>
+
+#include <core/enum.hpp>
+#include <core/enumerate.hpp>
+#include <core/flags.hpp>
+#include <core/counter.hpp>
+
+#include <core/domain_helper.hpp>
 
 #include <core/data_provider.hpp>
 #include <core/file_data_provider.hpp>
