@@ -80,6 +80,7 @@
     <ClInclude Include="..\..\framework\frontend\parser\operator_precedence\precedence_algorithm.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\operator_precedence\precedence_parser.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\operator_precedence\precedence_visualization.hpp" />
+    <ClInclude Include="..\..\framework\frontend\parser\packrat\packrat_parser.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\parser.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\parser_algorithm.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\parser_dag.hpp" />
@@ -150,6 +151,7 @@
     <None Include="..\..\framework\frontend\parser\ll\ll_parser.inl" />
     <None Include="..\..\framework\frontend\parser\lr\lr_parser.inl" />
     <None Include="..\..\framework\frontend\parser\operator_precedence\precedence_parser.inl" />
+    <None Include="..\..\framework\frontend\parser\packrat\packrat_parser.inl" />
     <None Include="..\..\framework\frontend\parser\parser.inl" />
     <None Include="..\..\framework\frontend\parser\parser_visualization.inl" />
     <None Include="..\..\framework\frontend\semantics\semantics.inl" />

@@ -275,6 +275,8 @@ void test_operator_precedence();
 void test_eff();
 void test_lr_table();
 
+void test_packrat();
+
 void test_sets();
 
 void test_earley_parser();
@@ -388,6 +390,8 @@ int main()
     //test_lr_table();
     //test_eff();
     //test_recursive_descent_0();
+
+    test_packrat();
 
     //test_operator_precedence();
 

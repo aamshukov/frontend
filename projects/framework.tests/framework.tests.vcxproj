@@ -183,6 +183,7 @@
     <ClCompile Include="tests_earley.cpp" />
     <ClCompile Include="tests_lr.cpp" />
     <ClCompile Include="tests_operator_precedence.cpp" />
+    <ClCompile Include="tests_packrat.cpp" />
     <ClCompile Include="tests_recursive_descent.cpp" />
     <ClCompile Include="test_visitor.cpp" />
   </ItemGroup>

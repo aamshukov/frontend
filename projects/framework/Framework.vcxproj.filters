@@ -226,6 +226,9 @@
     <ClInclude Include="..\..\framework\symtable\scope\scope_block.hpp">
       <Filter>symtable\scope</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\parser\packrat\packrat_parser.hpp">
+      <Filter>frontend\parser\packrat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="backend">
@@ -287,6 +290,9 @@
     </Filter>
     <Filter Include="symtable\scope">
       <UniqueIdentifier>{5878d3b6-8119-46dc-b042-84c978163a7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\parser\packrat">
+      <UniqueIdentifier>{5eaa719c-0c5c-4234-b031-343a26a8a140}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -417,6 +423,9 @@
     </None>
     <None Include="..\..\framework\symtable\symbol_table.inl">
       <Filter>symtable</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\parser\packrat\packrat_parser.inl">
+      <Filter>frontend\parser\packrat</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
