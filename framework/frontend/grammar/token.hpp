@@ -17,11 +17,11 @@ struct token_traits
         uint32_t,
         unknown = 0,
         epsilon = 5,
-        ws,     //  6
-        eol,    //  7
-        eos,    //  8
-        indent, //  9, literal = '    '
-        dedent, // 10, literal = '    '
+        ws,         //  6
+        eol,        //  7
+        eos,        //  8
+        indent,     //  9,  literal = '    '
+        dedent,     //  10, literal = '    '
 
         // the following one (1) entry MUST be the last entry in the enum
         size
@@ -51,7 +51,7 @@ struct token
     loc_t           offset;  // offset in context (absolute address)
     uint32_t        length;  // length of lexeme
 
-    codepoints_type literal; // string or char literal
+    codepoints_type literal; // string or char literal, numeric value
 
     flags_type      flags;
 

@@ -12,6 +12,7 @@ USINGNAMESPACE(core)
 template <typename Token, typename TreeTraits>
 class packrat_parser : private parser<Token, TreeTraits>
 {
+    //?? Memoization table --> key<position(my_ptr), rule(my_id)>  value<tree>
     public:
         using token_type = typename parser<Token, TreeTraits>::token_type;
         using tree_traits_type = typename parser<Token, TreeTraits>::tree_traits_type;

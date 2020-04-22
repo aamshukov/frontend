@@ -1,46 +1,119 @@
-// lexical
+﻿// lexical
 // -------
 
-comments                            : '#' any codepoint opt end-of-line
-                                    | '//' any codepoint opt end-of-line
+comments                            : oneline-comment
+                                    | multiline-comment
                                     ;
 
+oneline-comment                     : '#' unicode characters opt end-of-line
+                                    | '//' unicode characters opt end-of-line
+                                    ;
+
+multiline-comment-opt               : multiline-comment
+                                    | e(psilon)
+                                    ;
+
+multiline-comment                   : '/* unicode characters opt(except '*/' combination)  multiline-comment-opt  unicode characters opt(except '*/' combination) '*/'
+                                    ;
+
+
+
+whitespace-characters               : whitespace-character
+                                    | whitespace-characters whitespace-character
+                                    ;
+
+whitespace-character                : unicode character of class Zs
+                                    | horizontal tab character (U+0009)
+                                    | vertical tab character (U+000B)
+                                    | form feed character (U+000C)
+                                    ;
+
+end-of-line                         : \u000D                \r
+                                    | \u000A                \n
+                                    | \u000D \u000A         \r\n
+                                    | \u000A \u000D         \n\r
+                                    | \u0085
+                                    | \u2028
+                                    | \u2029
+                                    | end-of-file
+                                    ;
+
+end-of-file                         : \u0000
+                                    | \u001A
+                                    ;
+
+indent                              : '  '       2 spaces
+                                    | '    '     4 spaces
+                                    | '        ' 8 spaces
+                                    ;
+
+
+
+// code points
+// \u + 4 hex digits - unicode BMP
+// \U + 8 hex digits - unicode astral planes (full set)
 universal-character-name            : '\u' hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit
                                     | '\U' hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit
                                     ;
 
-escaped-character-name              : simple-escaped-character-name
-                                    | octal-escaped-character-name
-                                    | hexadecimal-escaped-character-name
+letter-character                    : unicode character of classes Lu, Ll, Lt, Lm, Lo, or Nl
+                                    | universal-character-name representing a character of classes Lu, Ll, Lt, Lm, Lo, or Nl
                                     ;
 
-simple-escaped-character-name       : '\'' '\"' '\\' '\a' '\b' '\f' '\n' '\r' '\t' '\v'
+decimal-digit_character             : unicode character of class Nd
+                                    | universal-character-name representing a character of class Nd
                                     ;
 
-octal-escaped-character-name        : '\' octal-digit
+connecting-character                : unicode character of class Pc
+                                    | universal-character-name representing a character of class Pc
+                                    ;
+
+combining-character                 : unicode character of classes Mn or Mc
+                                    | universal-character-name representing a character of classes Mn or Mc
+                                    ;
+
+formatting_character                : unicode character of class Cf
+                                    | universal-character-name representing a character of class Cf
+                                    ;
+
+binary-digit                        : '0' '1'
+                                    ;
+
+octal-digit                         : '0' '1' '2' '3' '4' '5' '6' '7'
+                                    ;
+
+nonzero-decimal-digit               : '1' '2' '3' '4' '5' '6' '7' '8' '9'
+                                    ;
+
+decimal-digit                       : '0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
+                                    ;
+
+hexa-decimal-digit                  : '0' '1' '2' '3' '4' '5' '6' '7' '8' '9' 'a' 'b' 'c' 'd' 'e' 'f' 'A' 'B' 'C' 'D' 'E' 'F'
+                                    ;
+
+
+
+escape-characters                   : simple-escape-character
+                                    | octal-escape-characters
+                                    | hexadecimal-escape-characters
+                                    ;
+
+simple-escape-character             : '\'' '\"' '\\' '\a' '\b' '\f' '\n' '\r' '\t' '\v'
+                                    ;
+
+octal-escape-characters             : '\' octal-digit
                                     | '\' octal-digit octal-digit
                                     | '\' octal-digit octal-digit octal-digit
                                     ;
 
-hexadecimal-escaped-character-name  : '\x' hexadecimal-digit
+hexadecimal-escape-characters       : '\x' hexadecimal-digit
                                     | '\x' hexadecimal-digit hexadecimal-digit
                                     | '\x' hexadecimal-digit hexadecimal-digit hexadecimal-digit
                                     | '\x' hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit
-                                    ;
-
-identifiers                         : identifier
-                                    | identifiers ',' identifier
-                                    ;
-
-identifier                          : identifier-start-character identifier-part-characters-opt
-                                    ;
-
-identifier-start-character          : letter-character
-                                    | underscore-character
-                                    ;
-
-letter-character                    : A Unicode character of classes Lu, Ll, Lt, Lm, Lo, or Nl
-                                    | A universal-character-name representing a character of classes Lu, Ll, Lt, Lm, Lo, or Nl
+                                    | '\x' hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit
+                                    | '\x' hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit
+                                    | '\x' hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit
+                                    | '\x' hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit hexadecimal-digit
                                     ;
 
 underscore-characters-opt           : underscore-characters
@@ -51,44 +124,12 @@ underscore-characters               : underscore-character
                                     | underscore-characters underscore-character
                                     ;
 
-underscore-character                : _ (the underscore character U+005F)
-                                    | A unicode-escape-sequence representing the character U+005F
+underscore-character                : '_' (the underscore character U+005F)
+                                    | universal-character-name representing the character U+005F
                                     ;
 
-identifier-part-characters          : identifier-part-character
-                                    | identifier-part-characters identifier-part-character
-                                    ;
 
-identifier-part-character           : letter-character
-                                    | decimal-digit-character
-                                    | connecting-character
-                                    | combining-character
-                                    | formatting-character
-                                    ;
 
-letter-character                    : A Unicode character of classes Lu, Ll, Lt, Lm, Lo, or Nl
-                                    | A unicode-escape-sequence representing a character of classes Lu, Ll, Lt, Lm, Lo, or Nl
-                                    ;
-
-combining-character                 : A Unicode character of classes Mn or Mc
-                                    | A unicode-escape-sequence representing a character of classes Mn or Mc
-                                    ;
-
-decimal-digit-character             : A Unicode character of the class Nd
-                                    | A unicode-escape-sequence representing a character of the class Nd
-                                    ;
-
-connecting-character                : A Unicode character of the class Pc
-                                    | A unicode-escape-sequence representing a character of the class Pc
-                                    ;
-
-formatting-character                : A Unicode character of the class Cf
-                                    | A unicode-escape-sequence representing a character of the class Cf
-                                    ;
-
-fully-qualified-name                : fully-qualified-name '.' identifier
-                                    | identifier
-                                    ;
 
 literal                             : integer-number-literal
                                     | real-number-literal
@@ -104,24 +145,15 @@ integer-number-literal              : binary-number-literal
 
 binary-number-literal               : '0b' binary-digit
                                     | '0B' binary-digit
-                                    | binary-literal underscore-characters-opt binary-digit
-                                    ;
-
-binary-digit                        : '0' '1'
+                                    | binary-number-literal underscore-characters-opt binary-digit
                                     ;
 
 octal-number-literal                : '0'
                                     | octal-number-literal underscore-characters-opt octal-digit
                                     ;
 
-octal-digit                         : '0' '1' '2' '3' '4' '5' '6' '7'
-                                    ;
-
 decimal-number-literal              : nonzero-decimal-digit
                                     | decimal-number-literal underscore-characters-opt decimal-digit
-                                    ;
-
-nonzero-decimal-digit               : '1' '2' '3' '4' '5' '6' '7' '8' '9'
                                     ;
 
 decimal-digits-opt                  : decimal-digits
@@ -130,9 +162,6 @@ decimal-digits-opt                  : decimal-digits
 
 decimal-digits                      : decimal-digit
                                     | decimal-digits underscore-characters-opt decimal-digit
-                                    ;
-
-decimal-digit                       : '0' '1' '2' '3' '4' '5' '6' '7' '8' '9'
                                     ;
 
 hexadecimal-number-literal          : '0x' hexadecimal-digits
@@ -145,9 +174,6 @@ hexadecimal-digits-opt              : hexadecimal-digits
 
 hexadecimal-digits                  : hexadecimal-digit
                                     | hexadecimal-digits underscore-characters-opt hexadecimal-digit
-                                    ;
-
-hexa-decimal-digit                  : '0' '1' '2' '3' '4' '5' '6' '7' '8' '9' 'a' 'b' 'c' 'd' 'e' 'f' 'A' 'B' 'C' 'D' 'E' 'F'
                                     ;
 
 real-number-literal                 : decimal-real-number-literal
@@ -188,10 +214,10 @@ sign-opt                            : '+'
                                     | e(psilon)
                                     ;
 
-string-literal                      : ''' string-characters-opt '''
-                                    | '"' string-characters-opt '"'
-                                    | r''' string-characters-opt '''
-                                    | r'"' string-characters-opt '"'
+string-literal                      : ''' string-characters-opt (except \' (U+0027), \\ (U+005C)) '''
+                                    | '"' string-characters-opt (except \" (U+0022), \\ (U+005C)) '"'
+                                    | r''' string-characters-opt (except \' (U+0027)) '''
+                                    | r'"' string-characters-opt (except \" (U+0022))'"'
                                     ;
 
 string-characters-opt               : string-characters
@@ -202,8 +228,8 @@ string-characters                   : string-character
                                     | string-characters string-character
                                     ;
 
-string-character                    : identifier-part-character
-                                    | escaped-character-name
+string-character                    : unicode character opt
+                                    | escape-characters
                                     | universal-character-name
                                     ;
 
@@ -211,51 +237,60 @@ boolean-literal                     : 'true'
                                     | 'false'
                                     ;
 
-keyword                             : 'let' 'const' 'integer' 'real' 'boolean' 'true' 'false' 'type' 'function' 'import' 'alias'(aka typename, using)
-                                    | 'if' 'else' 'for' 'do' 'while' 'goto' 'continue' 'break' 'return' 'yield' 'switch'(case, pattern matching)
-                                    | 'weak'-- automatic reference counting (ARC)
+
+
+identifiers                         : identifier
+                                    | identifiers ',' identifier
                                     ;
 
-punctuator                          : ':' '..' '...' ',' '{' '}' '[' ']' '(' ')'
+identifier                          : identifier-start-character identifier-part-characters-opt
                                     ;
 
-operator                            : '+' '-' '*' '/' '>>' '<<' '=' '==' '!=' '<' '<=' '>' '>=' '&' '&&' '|' '||' '^' 'is' 'as' 'and' 'or' 'not'
-                                    ;
-
-whitespace-characters               : whitespace-character
-                                    | whitespace-characters whitespace-character
-                                    ;
-
-whitespace-character                : any character with unicode class Zs
-                                    | horizontal tab character (U+0009)
-                                    | vertical tab character (U+000B)
-                                    | form feed character (U+000C)
-                                    ;
-
-end-of-line                         : \u000D                \r
-                                    | \u000A                \n
-                                    | \u000D \u000A         \r\n
-                                    | \u000A \u000D         \n\r
-                                    | \u2028
-                                    | \u2029
-                                    | end-of-file
-                                    ;
-
-new-line                            : end-of-line
-                                    ;
-
-end-of-file                         : \u0000
-                                    | \u001A
+identifier-start-character          : letter-character
+                                    | underscore-characters
                                     ;
 
 
+identifier-part-characters          : identifier-part-character
+                                    | identifier-part-characters identifier-part-character
+                                    ;
+
+identifier-part-character           : letter-character
+                                    | decimal-digit-character
+                                    | connecting-character
+                                    | combining-character
+                                    | formatting-character
+                                    ;
+
+fully-qualified-name                : identifier
+                                    | fully-qualified-name '.' identifier
+                                    ;
+
+
+
+keyword                             : 'const' 'byte' 'integer' 'real' 'string' 'boolean' 'true' 'false'
+                                    | 'struct'
+                                    | 'if' 'else' 'for' 'continue' 'break' 'return'
+                                    | 'import' 'namespace'
+                                    | 'is' 'as' 'and' 'or' 'not' 'in'
+                                    ;
+
+punctuator                          : ':' '..' '...' ',' '{' '}' '[' ']' '(' ')' '->'
+                                    ;
+
+operator                            : '+' '-' '*' '/' '>>' '<<' '=' '==' '!=' '<' '<=' '>' '>=' '&' '&&' '|' '||' '^'
+                                    | 'is' 'as' 'and' 'or' 'not' 'in'
+                                    ;
+
+assignment-operator                 : '=' '*=' '/=' '%=' '+=' '-=' '>>=' '<<=' '&=' '^=' '|='
+                                    ;
 
 
 
 // syntax
 // ------
 
-translation-unit                    : declarations-opt
+compilation-unit                    : declarations-opt
                                     ;
 
 declarations-opt                    : declarations
@@ -266,135 +301,34 @@ declarations                        : declaration
                                     | declarations declaration
                                     ;
 
-declaration                         : use-declaration
+declaration                         : import-declaration
                                     | type-declaration
                                     | function-definition
                                     ;
 
-use-declaration                     : 'use' fully-qualified-name end-of-line
+
+
+import-declaration                  : 'import' fully-qualified-name end-of-line
                                     ;
 
-type-declaration                    : range-declaration
-                                    | struct-declaration
-                                    | typedef-declaration
+
+
+type-declaration                    : struct-declaration
                                     ;
 
-range-declaration                   : 'type' identifier ':' numeric-type '..' numeric-type
+struct-declaration                  : identifier type-parameters-opt : 'struct' end-of-line struct-members-opt
                                     ;
 
-struct-declaration                  : 'type' identifier type-parameters-opt end-of-line struct-members
+struct-members-opt                  : struct-members
+                                    | e(psilon)
                                     ;
 
 struct-members                      : struct-member
                                     | struct-members struct-member
                                     ;
 
-struct-member                       : ident identifier ':' type modifiers-opt '=' expression end-of-line
-                                    | ident identifier ':' type modifiers-opt end-of-line
-                                    | ident identifier '=' expression end-of-line
-                                    ;
-
-typedef-declaration                 : 'type' identifier ':' type
-                                    ;
-
-function-definition                 : 'function' identifier type-parameters-opt '(' function-parameters-opt ')' function-return-type-opt end-of-line function-body
-                                    | 'let' identifier ':' 'function' type-parameters-opt '(' function-parameters-opt ')' function-return-type-opt end-of-line function-body
-
-                                      function foo <T=real, U> (a = 1.3, b: integer, c: T, d: U) : integer, real, T, U
-                                      let foo : function <T=real, U> (a = 1.3, b: integer, c: T, d: U) : integer, real, T, U
-
-                                    ;
-
-function-parameters-opt             : function-parameters
-                                    | e(psilon)
-                                    ;
-
-function-parameters                 : function-parameter
-                                    | function-parameters ',' function-parameter
-                                    ;
-
-function-parameter                  : scalar-function-parameter
-                                    | array-function-parameter
-                                    ;
-
-scalar-function-parameter           : identifier ':' type modifiers-opt '=' expression    // pi : real const = 3.14   ----- default const param
-                                    | identifier ':' type modifiers-opt                   // pi : real const          ----- const param
-                                    | identifier '=' expression                           // pi = 3.14                ----- mutable, real, inferred param
-                                    ;
-
-array-function-parameter            : identifier dimensions ':' type modifiers-opt '=' array-initialization-expression    // a [-2..2, 0..2  ] : integer const = [1, 2, 3, 4, 5; 0, 1, 2]
-                                    | identifier dimensions ':' type modifiers-opt                                        // a [-2..2, 0..2,c] : integer const
-                                    | identifier dimensions '=' array-initialization-expression                           // a [-2..2, 0..2,r] = [1, 2, 3, 4, 5; 0, 1, 2]
-                                    ;
-
-function-return-type-opt            : function-return-types
-                                    | e(psilon)
-                                    ;
-
-function-return-types               : types
-                                    | function-return-types ',' types
-                                    ;
-
-function-body                       : variable-declarations
-                                    | statements
-                                    ;
-
-lambda-definition                   : 'lambda' type-parameters-opt '(' function-parameters-opt ')' '=>' '(' lambda-statements-opt ') function-return-type-opt
-                                    | 'lambda' type-parameters-opt function-parameter '=>' '(' lambda-statements-opt ') function-return-type-opt
-                                    | 'lambda' type-parameters-opt function-parameter '=>' expression
-
-                                      lambda <T=real, U> (a = 1.3, b: integer, c: T) -> (let a = 0, let b = a + 1)
-                                      function vote(candidate: string, callback: (result: string) => any)
-                                    ;
-
-lambda-statements-opt               : lambda-statements
-                                    | e(psilon)
-                                    ;
-
-lambda-statements                   : lambda-statement
-                                    | lambda-statements ',' lambda-statement
-                                    ;
-
-lambda-statement                    : statement
-                                    ;
-
-variable-declarations               : indent variable-declaration end-of-line
-                                    | variable-declarations indent variable-declaration end-of-line
-                                    ;
-
-variable-declaration                : scalar-declaration
-                                    | array-declaration
-                                    ;
-
-scalar-declaration                  : 'let' identifier ':' type modifiers-opt '=' expression    // let pi : real const = 3.14   ----- const
-                                    | 'let' identifier ':' type modifiers-opt                   // let pi : real const          ----- readonly --- pi = 3.14
-                                    | 'let' identifier '=' expression                           // let pi = 3.14                ----- mutable, real, inferred
-                                    ;
-
-array-declaration                   : 'let' identifier dimensions ':' type modifiers-opt '=' array-initialization-expression    // let a [-2..2, 0..2  ] : integer const = [1, 2, 3, 4, 5; 0, 1, 2]
-                                    | 'let' identifier dimensions ':' type modifiers-opt                                        // let a [-2..2, 0..2,c] : integer const
-                                    | 'let' identifier dimensions '=' array-initialization-expression                           // let a [-2..2, 0..2,r] = [1, 2, 3, 4, 5; 0, 1, 2]
-                                    ;
-
-dimensions-definition               : '[' dimensions-opt array-layout-opt ']'
-                                    | '(' dimensions-opt array-layout-opt ')'
-                                    ;
-
-dimensions-opt                      : dimensions
-                                    | e(psilon)
-                                    ;
-
-dimensions                          : dimension
-                                    | dimensions ',' dimension
-                                    ;
-
-dimension                           : sign-opt integer-number-literal
-                                    | sign-opt integer-number-literal '..' sign-opt integer-number-literal
-                                    ;
-
-array-layout-opt                    : ',' 'c'
-                                    | ',' 'r'
-                                    | e(psilon)
+struct-member                       : indent identifier ':' integral-type modifiers-opt array-declaration-opt end-of-line
+                                    | indent identifier ':' integral-type modifiers-opt array-declaration-opt '=' primary-expression end-of-line
                                     ;
 
 modifiers-opt                       : modifiers
@@ -408,185 +342,231 @@ modifiers                           : modifier
 modifier                            : const-modifier
                                     ;
 
-const-modifier                      : 'const' 'constant'??
+const-modifier                      : 'const'
                                     ;
 
-
-
-
-
-
-types                               : type
-                                    | types '|' type
-                                    ;
-
-type                                : builtin-type
-                                    | user-defined-type
-                                    ;
-
-builtin-type                        : numeric-type
-                                    | boolean-type
-                                    | string-type
-                                    ;
-
-numeric-type                        : integer-type
-                                    | real-type
-                                    ;
-
-integer-type                        : 'integer'
-                                    ;
-
-real-type                           : 'real'
-                                    ;
-
-boolean-type                        : 'boolean'
-                                    ;
-
-string-type                         : 'string'
-                                    ;
-
-user-defined-type                   : 'type' identifier type-parameters-opt
-                                    ;
-
-type-parameters-opt                 : type-parameters
+array-declaration-opt               : array-declaration
                                     | e(psilon)
                                     ;
 
-type-parameters                     : '<' template-parameters-list '>'
-                                    ;
-                                    
-type-parameter-list                 : type-parameter
-                                    | type-parameter-list type-parameter
+array-declaration                   : '[' array-dimensions ']'
+                                    | '(' array-dimensions ')'
                                     ;
 
-type-parameter                      : type type-default
+array-dimensions                    : array-dimension
+                                    | array-dimensions ';' array-dimension
                                     ;
 
-type-function-signature             : ??
+array-dimension                     : sign-opt decimal-number-literal
+                                    | sign-opt decimal-number-literal '..' sign-opt decimal-number-literal
+                                    ;
+
+
+
+function-definition                 : identifier type-parameters-opt '(' function-parameters-opt ')' function-return-type-opt end-of-line function-body
+                                    ;
+
+function-parameters-opt             : function-parameters
+                                    | e(psilon)
+                                    ;
+
+function-parameters                 : function-parameter
+                                    | function-parameters ',' function-parameter
+                                    ;
+
+function-parameter                  : identifier ':' integral-type modifiers-opt array-declaration-opt
+                                    | identifier ':' integral-type modifiers-opt array-declaration-opt '=' primary-expression
+                                    ;
+
+function-return-type-opt            : function-return-type
+                                    | e(psilon)
+                                    ;
+
+function-return-type                : '->' integral-type
+                                    | '->' fully-qualified-name
+                                    ;
+
+function-body                       : variable-declarations
+                                    | statements
+                                    ;
+
+
+
+statements                          : statement
+                                    | statements statement
+                                    ;
+
+statement                           : declaration-statement
+                                    | expression-statement
+                                    | selection-statement
+                                    | iteration-statement
+                                    ;
+
+
+declaration-statement               : variable-declaration
+                                    ;
+
+variable-declaration                : indent identifier ':' integral-type modifiers-opt array-declaration-opt end-of-line
+                                    | indent identifier ':' integral-type modifiers-opt array-declaration-opt '=' primary-expression end-of-line
+                                    ;
+
+expression-statement                : indent expression end-of-line
+                                    ;
+
+selection-statement                 : indent 'if' boolean-expression end-of-line statements
+                                    | indent 'if' boolean-expression end-of-line statements 'else' end-of-line statements
+                                    ;
+
+iteration-statement                 : indent 'for' expressions 'in' expression end-of-line statements
+                                    ;
+
+
+
+expressions                         : expression
+                                    | expressions ',' expression
+                                    ;
+
+expression                          : assignment-expression
+                                    ;
+
+boolean-expression                  : expression
+                                    ;
+
+assignment-expression               : conditional-expression
+                                    | logical-or-expression assignment-operator assignment-expression
+                                    ;
+
+conditional-expression              : logical-or-expression
+                                    | logical-or-expression '?' expression ':' logical-or-expression
+                                    ;
+
+logical-or-expression               : logical-and-expression
+                                    | logical-or-expression '||' logical-and-expression
+                                    | logical-or-expression 'or' logical-and-expression
+                                    ;
+
+logical-and-expression              : inclusive-or-expression
+                                    | logical-and-expression '&&' inclusive-or-expression
+                                    | logical-and-expression 'and' inclusive-or-expression
+                                    ;
+
+inclusive-or-expression             : exclusive-or-expression
+                                    | inclusive-or-expression '|' exclusive-or-expression
+                                    ;
+
+exclusive-or-expression             : and-expression
+                                    | exclusive-or-expression '^' and-expression
+                                    ;
+
+and-expression                      : equality-expression
+                                    | and-expression '&' equality-expression
+                                    ;
+
+equality-expression                 : relational-expression
+                                    | equality-expression '==' relational-expression
+                                    | equality-expression '!=' relational-expression
+                                    ;
+
+relational-expression               : relational-expression '<' shift-expression
+                                    | relational-expression '>' shift-expression
+                                    | relational-expression '<=' shift-expression
+                                    | relational-expression '>=' shift-expression
+                                    | relational_expression 'is' type
+                                    | relational_expression 'as' type
+                                    ;
+
+shift-expression                    : additive-expression
+                                    | shift-expression '<<' additive-expression
+                                    | shift-expression '>>' additive-expression
+                                    ;
+
+additive-expression                 : multiplicative-expression
+                                    | additive-expression '+' multiplicative-expression
+                                    | additive-expression '-' multiplicative-expression
+                                    ;
+
+multiplicative-expression           : unary-expression
+                                    | multiplicative-expression '*' unary-expression
+                                    | multiplicative-expression '/' unary-expression
+                                    | multiplicative-expression '%' unary-expression
+                                    ;
+
+unary-expression                    : primary-expression
+                                    | '+' unary-expression
+                                    | '-' unary-expression
+                                    | '!' unary-expression
+                                    | '~' unary-expression
+                                    | 'not' unary-expression
+                                    ;
+
+primary-expression                  : literal
+                                    | fully-qualified-name type-arguments-opt
+                                    | '(' expression ')'
+                                    | primary-expression '(' arguments-opt ')'
+                                    ;
+
+arguments-opt                       : arguments
+                                    | e(psilon)
+                                    ;
+
+arguments                           : argument
+                                    | arguments ',' argument
+                                    ;
+
+argument                            : argument-name-opt expression
+                                    ;
+
+argument-name-opt                   : argument-name
+                                    | e(psilon)
+                                    ;
+
+argument-name                       : identifier ':'
+                                    ;
+
+
+
+type                                : integral-type
+                                    | fully-qualified-name type-arguments-opt
+                                    ;
+
+integral-type-opt                   : integral-type
+                                    | e(psilon)
+                                    ;
+
+integral-type                       : 'byte'
+                                    | 'integer'
+                                    | 'real'
+                                    | 'string'
+                                    | 'boolean'
+                                    ;
+
+type-parameters-opt                 : '<' type-parameters '>'
+                                    | e(psilon)
+                                    ;
+
+type-parameters                     : type-parameter
+                                    | type-parameters ',' type-parameter
+                                    ;
+
+type-parameter                      : identifier
+                                    | identifier '=' literal
+                                    | identifier '=' fully-qualified-name type-arguments-opt
+                                    ;
+
+type-arguments-opt                  : '<' type-arguments '>'
+                                    | e(psilon)
+                                    ;
+
+type-arguments                      : type-argument
+                                    | type-arguments ',' type-argument
+                                    ;
+
+type-argument                       : type
+                                    ;
 
 
 
 
-
-
-
-
-
-
-
-
-
-primary-expression              : literal
-                                | fully-qualified-name template-arguments-opt
-                                | '('! expression ')'!
-                                ;
-
-template-arguments-opt          : template-arguments
-                                | e(psilon)
-                                ;
-
-template-arguments              : template-argument // type-parameter??
-                                | template-arguments template-argument
-                                ;
-
-template-argument               : type
-                                ;
-
-
-
-
-
-expression                      : conditional-expression
-                                | assignement-expression
-                                ;
-
-assignment-expression           : unary-expression '=' expression
-                                ;
-
-conditional-expression          : conditional-or-expression
-                                | conditional-or-expression '?' expression ':' conditional-or-expression
-                                ;
-
-conditional-or-expression       : conditional-and-expression
-                                | conditional-or-expression '||' conditional-and-expression
-                                | conditional-or-expression 'or' conditional-and-expression
-                                ;
-
-conditional-and-expression      : inclusive-or-expression
-                                | conditional-and-expression '&&' inclusive-or-expression
-                                | conditional-and-expression 'and' inclusive-or-expression
-                                ;
-
-inclusive-or-expression         : exclusive-or-expression
-                                | inclusive-or-expression '|' exclusive-or-expression
-                                ;
-
-exclusive-or-expression         : and-expression
-                                | exclusive-or-expression '^' and-expression
-                                ;
-
-and-expression                  : equality-expression
-                                | identity-expression
-                                | and-expression '&' equality-expression
-                                ;
-
-equality-expression             : relational-expression
-                                | equality-expression '==' relational-expression
-                                | equality-expression 'eq' relational-expression
-                                | equality-expression '!=' relational-expression
-                                | equality-expression 'ne' relational-expression
-                                ;
-
-identity-expression             : shift-expression 'is' shift-expression
-                                ;
-
-relational-expression           : shift-expression
-                                | relational-expression '<' shift-expression
-                                | relational-expression 'lt' shift-expression
-                                | relational-expression '>' shift-expression
-                                | relational-expression 'gt' shift-expression
-                                | relational-expression '<=' shift-expression
-                                | relational-expression 'le' shift-expression
-                                | relational-expression '>=' shift-expression
-                                | relational-expression 'ge' shift-expression
-                                ;
-
-shift-expression                : additive-expression
-                                | shift-expression '<<' additive-expression
-                                | shift-expression '>>' additive-expression
-                                ;
-
-additive-expression             : multiplicative-expression
-                                | additive-expression '+' multiplicative-expression
-                                | additive-expression '-' multiplicative-expression
-                                ;
-
-multiplicative-expression       : unary-expression
-                                | multiplicative-expression '*' unary-expression
-                                | multiplicative-expression '/' unary-expression
-                                ;
-
-unary-expression                : primary-expression
-                                | '+' unary-expression
-                                | '-' unary-expression
-                                | '!' unary-expression
-                                | '~' unary-expression
-                                | 'not' unary-expression
-                                ;
-
-
-
-array-initialization-expression : '[' array-initialization ']'
-                                | '(' array-initialization ')'
-                                ;
-
-array-initialization            : 
-
-
-slice-expression            : '[' slice-access   ']'
-                            ;
-
-slice-access        : 
 
 
 
@@ -1007,4 +987,272 @@ function concatenate(...) string
 
 
 let point = Point { x: 1.0, y: 2.5 };
+
+
+
+
+
+
+package(physical) - spans files - distribution unit
+    modules
+        file1
+        ...
+        fileN
+
+namespace(logical) - spans packages
+
+
+import/using/refer/include
+# // /* /*nested*/ */
+{ Comment 1 (* comment 2 *) }  
+(* Comment 1 { comment 2 } *)  
+{ comment 1 // Comment 2 }  
+(* comment 1 // Comment 2 *)  
+// comment 1 (* comment 2 *)  
+// comment 1 { comment 2 }
+
+
+
+struct/record/data/type (inheritance?)
+nested functions
+yield
+integer/real
+
+
+
+scalars:
+    byte
+    number
+        integer real
+
+    let k:  integer =  { 0 }
+    let PI: real const = { 3.14155 }
+    let i:  integer const = { 123 }
+    let j:  real = { 23.43 }
+
+    x,y,z: real = { 1.2 } - initialization, all have the same value
+    sinX, cosX = math.Sincos(x) - deconstruction because of absent of ':'
+
+
+
+array:
+    row/column access (default)
+    column/row access
+    [] - checked(default)
+    () - unchecked
+
+    let bts: bytes                             - dynamic array (always checked)
+    let bts: bytes [1..5]                      - fixed array
+    let bts: bytes [1..5] = { 3,4,5,6 }        - fixed initialized array, row based
+    let bts: bytes column [1..5] = { 3,4,5,6 } - fixed initialized array, column based
+
+    let aa: integer [1..5] = 3,4,5,6     - default row
+    let aa: integer [1..5] = { 3,4,5,6 } - default row (can be split on next lines)
+    let aa: integer const [1..5] = ( 3,4,5,6 ) - default row (can be split on next lines)
+
+    let aa: integer row [1..5] = { 3,4,5,6 }
+    let ss: string  column, [1..5] = { '3','4','5','6' }
+    let bb: integer [1..5; -1..8; 0..4] = { 3,4; 2,3,3; 5,6,6 }   - 3 dimensional
+
+    let aa: integer row (1..5) { 3,4,5,6 } - uncheked
+    let ss: string  column (1..5) { '3','4','5','6' } - uncheked
+
+
+
+Examples of type definitions:
+    (White, Red, Yellow, Green, Blue, Brown, Black)
+    range 1 .. 72
+    array(1 .. 10) of Integer
+Examples of type declarations:
+    type Color is (White, Red, Yellow, Green, Blue, Brown, Black);
+    type Column is range 1 .. 72;
+    type Table is array(1 .. 10) of Integer;
+
+Examples of subtype declarations:
+    subtype Rainbow is Color range Red .. Blue; -- see 3.2.1
+    subtype Red_Blue is Rainbow;
+    subtype Int is Integer;
+    subtype Small_Int is Integer range -10 .. 10;
+    subtype Up_To_K is Column range 1 .. K; -- see 3.2.1
+    subtype Square is Matrix(1 .. 10, 1 .. 10); -- see 3.6
+    subtype Male is Person(Sex => M); -- see 3.10.1
+    subtype Binop_Ref is not null Binop_Ptr; -- see
+
+Examples of variable declarations:
+    Count, Sum : Integer;
+    Size : Integer range 0 .. 10_000 := 0;
+    Sorted : Boolean := False;
+    Color_Table : array(1 .. Max) of Color;
+    Option : Bit_Vector(1 .. 10) := (others => True);
+    Hello : aliased String := "Hi, world.";
+    θ, φ : Float range -π .. +π;
+
+Examples of enumeration types and subtypes:
+    type Day is (Mon, Tue, Wed, Thu, Fri, Sat, Sun);
+    type Suit is (Clubs, Diamonds, Hearts, Spades);
+    type Gender is (M, F);
+    type Level is (Low, Medium, Urgent);
+    type Color is (White, Red, Yellow, Green, Blue, Brown, Black);
+    type Light is (Red, Amber, Green); -- Red and Green are overloaded
+    type Hexa is ('A', 'B', 'C', 'D', 'E', 'F');
+    type Mixed is ('A', 'B', '*', B, None, '?', '%');
+    subtype Weekday is Day range Mon .. Fri;
+    subtype Major is Suit range Hearts .. Spades;
+    subtype Rainbow is Color range Red .. Blue; -- the Color Red, not the Light
+
+Examples of integer types and subtypes:
+    type Page_Num is range 1 .. 2_000;
+    type Line_Size is range 1 .. Max_Line_Size;
+    subtype Small_Int is Integer range -10 .. 10;
+    subtype Column_Ptr is Line_Size range 1 .. 10;
+    subtype Buffer_Size is Integer range 0 .. Max;
+    type Byte is mod 256; -- an unsigned byte
+    type Hash_Index is mod 97; -- modulus is prime
+
+
+
+
+Examples of case statements:
+case Sensor is
+    when Elevation => Record_Elevation(Sensor_Value);
+    when Azimuth => Record_Azimuth (Sensor_Value);
+    when Distance => Record_Distance (Sensor_Value);
+    when others => null;
+end case;
+case Today is
+    when Mon => Compute_Initial_Balance;
+    when Fri => Compute_Closing_Balance;
+    when Tue .. Thu => Generate_Report(Today);
+    when Sat .. Sun => null;
+end case;
+case Bin_Number(Count) is
+    when 1 => Update_Bin(1);
+    when 2 => Update_Bin(2);
+    when 3 | 4 =>
+        Empty_Bin(1);
+        Empty_Bin(2);
+    when others => raise Error;
+end case;
+
+
+
+
+pattern matching, case/when, switch C# 8
+
+
+
+
+
+
+generics/template
+
+struct/record - might be extended
+union/tuple/variant - cannot be extended
+
+
+
+enum numbers : string
+{
+    odin = "1", dva = "2"
+}
+Direction = ( North, East, South, West )
+EnumType = (one, two, three, forty := 40,fortyone)
+
+
+Subrange types of enumeration types can also be defined:
+Type  
+  Days = (monday,tuesday,wednesday,thursday,friday,  
+          saturday,sunday);  
+  WorkDays = monday .. friday;  
+  WeekEnd = Saturday .. Sunday;
+
+
+
+struct A
+   ...
+
+
+with A:
+   code has access to A instance ...
+
+
+A<T1, T2> : struct
+{
+    f: T1  - default(T1)
+    s: T2  - default(T2)
+}
+
+struct B<T1, T2, T3> : A<T1, T2>
+{
+    f: T1 - default(T1)
+    s: T2 - default(T2)
+    t: T3 - default(T3)
+}
+
+a: A<integer, real> { f = 2, s = 4.5 }
+
+
+namespace uilab.arktur.fe
+
+
+boolean, true, false
+
+
+if condition1:
+
+else if condition2:
+
+else:
+
+
+
+for condition:
+    break
+    continue
+    goto
+
+
+for char in chars:
+
+
+print : function, params(template: string = '{0}', message: string, ...), return(int32, status)
+
+
+function:
+foo(n: integer { 8 },
+    name: string { 'arktur' },
+    real: amount,
+    d: B<integer, real, string> { s = 3.2, t = "text", f = 8 })
+
+
+
+
+
+
+nested function:
+outer(n: integer {10}) -> integer/real/void(can be omitted)
+    def inner(k: integer) -> integer
+        return k + n
+    return inner(5)
+
+
+closure
+outer(n: integer) -> integer/real/void(can be omitted)
+    def inner(k: integer) -> integer
+        return k + n
+    return inner
+
+
+
+function(n: integer)
+    block:
+        ...
+    block:
+        ...
+
+
+strings: always represented as unicode codepoint - 32 bits
+    "path 'c:\\tmp\\arktur\\file.txt'"  'path "c:\\tmp\\arktur\\file.txt"'
+   r"path 'c:\tmp\arktur\file.txt'"    r'path "c:\tmp\arktur\file.txt"'
+    "path {path}", where {path} is substitued by variable 'path'
 

@@ -276,6 +276,7 @@ void test_eff();
 void test_lr_table();
 
 void test_packrat();
+void test_recursive_descent_with_backtracking();
 
 void test_sets();
 
@@ -341,8 +342,8 @@ enum class color
 
 int main()
 {
-    1+2;
-    
+    test_recursive_descent_with_backtracking();
+
     auto enumname = name_impl<color>();
     auto range = std::make_integer_sequence<int, 6>{};
     auto names = strings_impl<color>(range);

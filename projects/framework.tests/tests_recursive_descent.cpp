@@ -89,72 +89,12 @@ USINGNAMESPACE(core)
 USINGNAMESPACE(symtable)
 USINGNAMESPACE(frontend)
 
-struct rd_token_traits : public token_traits
-{
-    DECLARE_ENUM
-    (
-        type,
-        uint32_t,
-        unknown = 0,
-        epsilon = 5,
-        eol,
-        eos,
-        indent,
-        dedent,
-
-        a,
-        b,
-        c,
-
-        // the following one (1) entry MUST be the last entry in the enum
-        size
-    )
-};
-
-class rd_lexical_analyzer : public lexical_analyzer<token<rd_token_traits>>
-{
-    protected:
-        virtual void next_lexeme_impl() override
-        {
-            my_token.type = token_type::traits::type::eos;
-        }
-
-    public:
-        rd_lexical_analyzer(const content_type& content) : lexical_analyzer(content)
-        {
-        }
-};
-
-struct rd_tree_traits
-{
-    DECLARE_ENUM
-    (
-        kind,
-        uint32_t,
-        unknown = 0,
-
-        // the following one (1) entry MUST be the last entry in the enum
-        size
-    )
-};
-
-class rd_parser : recursive_descent_parser<token<rd_token_traits>, rd_tree_traits>
-{
-    public:
-        rd_parser(const lexical_analyzer_type& lexical_analyzer) : recursive_descent_parser<token<rd_token_traits>, rd_tree_traits>(lexical_analyzer)
-        {
-        }
-
-        void parse() override
-        {
-        }
-};
 
 void test_recursive_descent_0()
 {
     grammar gr;
 
-    gr.load(LR"(D:\Projects\fe\grammars\LL.G5.TAL.txt)");
+    gr.load(LR"(D:\Projects\frontend\grammars\LL.G5.TAL.txt)");
 
     uint8_t k = 3;
 
@@ -189,4 +129,96 @@ exit(0);
     //auto rd(factory::create<rd_parser>(le));
 
     //(*rd).parse();
+}
+
+
+struct rd_token_traits : public token_traits
+{
+    DECLARE_ENUM
+    (
+        type,
+        uint32_t,
+        unknown = 0,
+        epsilon = 5,
+        ws,         //  6
+        eol,        //  7
+        eos,        //  8
+        indent,     //  9,  literal = '    '
+        dedent,     //  10, literal = '    '
+
+        a,
+        b,
+        c,
+
+        // the following one (1) entry MUST be the last entry in the enum
+        size
+    )
+};
+
+class rd_lexical_analyzer : public lexical_analyzer<token<rd_token_traits>>
+{
+    using token_type = uilab::frontend::token<rd_token_traits>;
+
+    protected:
+        virtual void next_lexeme_impl() override
+        {
+            static std::pair<char, token_type::token_type> lexemes[1] =
+            {
+                std::make_pair('a', rd_token_traits::type::a)
+            };
+
+            static int index = 0;
+
+            my_token.type = lexemes[index++].second;
+        }
+
+    public:
+        rd_lexical_analyzer(const content_type& content) : lexical_analyzer(content)
+        {
+        }
+};
+
+struct rd_tree_traits
+{
+    DECLARE_ENUM
+    (
+        kind,
+        uint32_t,
+        unknown = 0,
+
+        // the following one (1) entry MUST be the last entry in the enum
+        size
+    )
+};
+
+class rd_parser : recursive_descent_parser<token<rd_token_traits>, rd_tree_traits>
+{
+    public:
+        rd_parser(const lexical_analyzer_type& lexical_analyzer) : recursive_descent_parser<token<rd_token_traits>, rd_tree_traits>(lexical_analyzer)
+        {
+        }
+
+        void parse() override
+        {
+        }
+};
+
+
+void test_recursive_descent_with_backtracking()
+{
+    string_type file_name((char_type*)(LR"(D:\Projects\frontend\grammars\LL.G5.TAL.txt)"));
+
+    file_data_provider provider(file_name);
+
+    std::shared_ptr<content> content(std::make_shared<content>());
+
+    operation_status status;
+
+    bool rc = (*content).load(provider, status);
+
+    std::shared_ptr<rd_lexical_analyzer> lexer(std::make_shared<rd_lexical_analyzer>(content));
+
+    rd_parser parser(lexer);
+
+    parser.parse();
 }

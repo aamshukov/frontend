@@ -242,6 +242,7 @@
       <ExceptionHandling>Async</ExceptionHandling>
       <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <BrowseInformation>false</BrowseInformation>
+      <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

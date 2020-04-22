@@ -1,6 +1,8 @@
 //..............................
 // UI Lab Inc. Arthur Amshukov .
 //..............................
+// Recursive descent parser with backtracking
+//
 #ifndef __RECURSIVE_DESCENT_PARSER_H__
 #define __RECURSIVE_DESCENT_PARSER_H__
 

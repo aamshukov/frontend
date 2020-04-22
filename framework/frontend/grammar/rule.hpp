@@ -24,79 +24,79 @@ class rule
         using ast_operators_type = std::map<std::size_t, tree::flags_type>;
 
     private:
-        uint32_t            my_id; // enumerable type, will be cast to specific enum values
-        string_type         my_name;
+        uint32_t                    my_id; // enumerable type, will be cast to specific enum values
+        string_type                 my_name;
 
-        uint8_t             my_lhs_terminal_count;
-        uint8_t             my_lhs_nonterminal_count;
+        uint8_t                     my_lhs_terminal_count;
+        uint8_t                     my_lhs_nonterminal_count;
 
-        uint8_t             my_rhs_terminal_count;
-        uint8_t             my_rhs_nonterminal_count;
+        uint8_t                     my_rhs_terminal_count;
+        uint8_t                     my_rhs_nonterminal_count;
 
-        uint8_t             my_precedence;  // production either inherits the precedence number of the rightmost terminal in the RHS or has explicitly set it up
-        uint8_t             my_precedences; // context dependent precedence level of terminals for the rule (shift/reduce parsers)
+        uint8_t                     my_precedence;  // production either inherits the precedence number of the rightmost terminal in the RHS or has explicitly set it up
+        uint8_t                     my_precedences; // context dependent precedence level of terminals for the rule (shift/reduce parsers)
 
-        symbols_type        my_lhs;
-        symbols_type        my_rhs;
+        symbols_type                my_lhs;
+        symbols_type                my_rhs;
 
-        flags_type          my_flags;
+        flags_type                  my_flags;
 
-        ast_operators_type  my_ast_operators;
+        ast_operators_type          my_ast_operators; // indices of RHS
 
     public:
-                            rule(uint32_t id, const string_type& name);
+                                    rule(uint32_t id, const string_type& name);
 
-                            rule(const rule& other);
-                            rule(rule&& other);
+                                    rule(const rule& other);
+                                    rule(rule&& other);
 
-                           ~rule();
+                                   ~rule();
 
-        const rule&         operator = (const rule& other);
-        rule&               operator = (rule&& other);
+        const rule&                 operator = (const rule& other);
+        rule&                       operator = (rule&& other);
 
-        uint32_t            id() const;
-        uint32_t&           id();
+        uint32_t                    id() const;
+        uint32_t&                   id();
 
-        const string_type&  name() const;
-        string_type&        name();
+        const string_type&          name() const;
+        string_type&                name();
 
-        uint8_t             lhs_terminal_count() const;
-        uint8_t&            lhs_terminal_count();
+        uint8_t                     lhs_terminal_count() const;
+        uint8_t&                    lhs_terminal_count();
 
-        uint8_t             lhs_nonterminal_count() const;
-        uint8_t&            lhs_nonterminal_count();
+        uint8_t                     lhs_nonterminal_count() const;
+        uint8_t&                    lhs_nonterminal_count();
 
-        uint8_t             rhs_terminal_count() const;
-        uint8_t&            rhs_terminal_count();
+        uint8_t                     rhs_terminal_count() const;
+        uint8_t&                    rhs_terminal_count();
 
-        uint8_t             rhs_nonterminal_count() const;
-        uint8_t&            rhs_nonterminal_count();
+        uint8_t                     rhs_nonterminal_count() const;
+        uint8_t&                    rhs_nonterminal_count();
 
-        uint8_t             precedence() const;
-        uint8_t&            precedence();
+        uint8_t                     precedence() const;
+        uint8_t&                    precedence();
 
-        uint8_t             precedences() const;
-        uint8_t&            precedences();
+        uint8_t                     precedences() const;
+        uint8_t&                    precedences();
 
-        const symbols_type& lhs() const;
-        symbols_type&       lhs();
+        const symbols_type&         lhs() const;
+        symbols_type&               lhs();
 
-        const symbols_type& rhs() const;
-        symbols_type&       rhs();
+        const symbols_type&         rhs() const;
+        symbols_type&               rhs();
 
-        flags_type          flags() const;
-        flags_type&         flags();
+        flags_type                  flags() const;
+        flags_type&                 flags();
 
         const ast_operators_type&   ast_operators() const;
         ast_operators_type&         ast_operators();
 
-        bool                empty() const; // A -> λ
+        bool                        empty() const; // A -> λ
 
-        void                add_lhs_symbol(const symbol_type& sym);
-        void                add_rhs_symbol(const symbol_type& sym);
+        void                        add_lhs_symbol(const symbol_type& sym);
+        void                        add_rhs_symbol(const symbol_type& sym);
 
-        friend bool         operator == (const rule& rule1, const rule& rule2);
-        friend bool         operator != (const rule& rule1, const rule& rule2);
+        friend bool                 operator == (const rule& rule1, const rule& rule2);
+        friend bool                 operator != (const rule& rule1, const rule& rule2);
 };
 
 inline uint32_t rule::id() const

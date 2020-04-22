@@ -1685,7 +1685,7 @@ void grammar_algorithm::build_follow1_set(grammar& gr)
 
 void grammar_algorithm::build_la_set(grammar& gr, uint8_t k)
 {
-    // Sudkump 2nd ed., p.501
+    // Sudkump 2nd ed., p.495
     // LAk(A) = TRUNCk(FIRSTk(A) ∪ FOLLOWk(A))
     log_info(L"Building lookahead set for nonterminals with k = %d ...", k);
 
@@ -1726,7 +1726,7 @@ void grammar_algorithm::build_la_set(const typename grammar_algorithm::rule_type
                                      uint8_t k,
                                      typename grammar_algorithm::sets_type& result)
 {
-    // Sudkump 2nd ed., p.501
+    // Sudkump 2nd ed., p.495
     // LAk(A -> w) = TRUNCk(FIRSTk(w) ∪ FOLLOWk(A))
     log_info(L"Building strong-LL(k) lookahead set for %s with k = %d ...", grammar_visualization::decorate_rule(rule).c_str(), k);
 
@@ -1773,7 +1773,7 @@ void grammar_algorithm::build_la_set(const typename grammar_algorithm::symbols_t
                                      uint8_t k,
                                      typename grammar_algorithm::sets_type& result)
 {
-    // Sudkump 2nd ed., p.507
+    // Sudkump 2nd ed., p.495
     // The lookahead set of the sentential form uAv is defined by LAk(uAv) = FlRSTk(Av).
     log_info(L"Building LL(k) lookahead set for k = %d.", k);
 

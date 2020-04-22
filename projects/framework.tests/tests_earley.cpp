@@ -193,8 +193,10 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>, my_ear
         tree_type handle_start(const item_type& item) override
         {
             auto result(factory::create<parser_tree<token_type, my_earley_tree_traits>>());
+
             (*result).symbol = ((*(*item).rule).lhs()[0]);
             (*result).record = factory::create<symbol_table_record<token_type>>();
+
             return result;
         }
 
@@ -210,6 +212,7 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>, my_ear
             if(node != nullptr && (*rule).rhs()[position] == symbol)
             {
                 auto it = (*rule).ast_operators().find(position);
+
                 if(it != (*rule).ast_operators().end())
                 {
                     (*result).flags = (*it).second;
