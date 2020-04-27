@@ -68,6 +68,7 @@
     <ClInclude Include="..\..\framework\frontend\grammar\symbol.hpp" />
     <ClInclude Include="..\..\framework\frontend\grammar\token.hpp" />
     <ClInclude Include="..\..\framework\frontend\lexical_analyzer\lexical_analyzer.hpp" />
+    <ClInclude Include="..\..\framework\frontend\lexical_analyzer\lexical_content.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\backtracking\recursive_descent_parser.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\earley\earley_parser.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\earley\earley_visualization.hpp" />
@@ -127,6 +128,7 @@
     <ClCompile Include="..\..\framework\frontend\grammar\grammar_visualization.cpp" />
     <ClCompile Include="..\..\framework\frontend\grammar\rule.cpp" />
     <ClCompile Include="..\..\framework\frontend\grammar\symbol.cpp" />
+    <ClCompile Include="..\..\framework\frontend\lexical_analyzer\lexical_content.cpp" />
     <ClCompile Include="..\..\framework\frontend\parser\ll\ll_algorithm.cpp" />
     <ClCompile Include="..\..\framework\frontend\parser\ll\ll_visualization.cpp" />
     <ClCompile Include="..\..\framework\frontend\parser\lr\lr_algorithm.cpp" />

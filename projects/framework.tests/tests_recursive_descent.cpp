@@ -58,6 +58,7 @@
 #include <frontend/fsa/fsa_codegen.hpp>
 #include <frontend/fsa/fsa_visualization.hpp>
 
+#include <frontend/lexical_analyzer/lexical_content.hpp>
 #include <frontend/lexical_analyzer/lexical_analyzer.hpp>
 #include <frontend/lexical_analyzer/lexical_analyzer.inl>
 
@@ -210,7 +211,7 @@ void test_recursive_descent_with_backtracking()
 
     file_data_provider provider(file_name);
 
-    std::shared_ptr<content> content(std::make_shared<content>());
+    std::shared_ptr<lexical_content> content(std::make_shared<lexical_content>(file_name));
 
     operation_status status;
 

@@ -229,6 +229,9 @@
     <ClInclude Include="..\..\framework\frontend\parser\packrat\packrat_parser.hpp">
       <Filter>frontend\parser\packrat</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\lexical_analyzer\lexical_content.hpp">
+      <Filter>frontend\lexical_analyzer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="backend">
@@ -382,6 +385,9 @@
     </ClCompile>
     <ClCompile Include="..\..\framework\core\string_data_provider.cpp">
       <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\lexical_analyzer\lexical_content.cpp">
+      <Filter>frontend\lexical_analyzer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

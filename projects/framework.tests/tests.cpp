@@ -58,6 +58,7 @@
 #include <frontend/fsa/fsa_codegen.hpp>
 #include <frontend/fsa/fsa_visualization.hpp>
 
+#include <frontend/lexical_analyzer/lexical_content.hpp>
 #include <frontend/lexical_analyzer/lexical_analyzer.hpp>
 #include <frontend/lexical_analyzer/lexical_analyzer.inl>
 
@@ -604,7 +605,7 @@ int main()
 
         file_data_provider provider(file_name);
 
-        content content;
+        content content(L"id");
 
         bool rc = content.load(provider, status);
 

@@ -107,7 +107,7 @@ using char_type = wchar_t;
 using string_type = std::basic_string<char_type>;
 using cp_type = uint32_t; // code point
 using offset_type = long; // fseek, etc.
-using loc_t = uint64_t;   // position, locus, location ...
+using loc_type = uint64_t;   // position, locus, location ...
 
 END_NAMESPACE
 

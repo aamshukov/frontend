@@ -13,7 +13,7 @@ template <typename Token>
 class lexical_analyzer : private noncopyable
 {
     public:
-        using content_type = std::shared_ptr<content>;
+        using content_type = std::shared_ptr<lexical_content>;
 
         using datum_type = text::datum_type;
         using codepoints_type = std::basic_string<datum_type>;
@@ -156,7 +156,9 @@ inline void lexical_analyzer<Token>::rewind_to_snapshot()
 
 END_NAMESPACE
 
-#define CURRENT_LOCATION get_line_number(std::ptrdiff_t(std::ptrdiff_t(my_ptr - my_start_content) - std::ptrdiff_t(my_ptr - my_ptr_lexeme))), get_column_number(std::ptrdiff_t(std::ptrdiff_t(my_ptr - my_start_content) - std::ptrdiff_t(my_ptr - my_ptr_lexeme)))
+#define CURRENT_LOCATION                                                                                                                \
+    (*my_content).get_line_number(std::ptrdiff_t(std::ptrdiff_t(my_ptr - my_start_content) - std::ptrdiff_t(my_ptr - my_ptr_lexeme))),  \
+    (*my_content).get_column_number(std::ptrdiff_t(std::ptrdiff_t(my_ptr - my_start_content) - std::ptrdiff_t(my_ptr - my_ptr_lexeme)))
 
 #include <frontend\lexical_analyzer\lexical_analyzer.inl>
 

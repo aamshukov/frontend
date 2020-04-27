@@ -48,7 +48,7 @@ struct token
 
     token_type      type;    // type of lexeme
 
-    loc_t           offset;  // offset in context (absolute address)
+    loc_type        offset;  // offset in context (absolute address)
     uint32_t        length;  // length of lexeme
 
     codepoints_type literal; // string or char literal, numeric value

@@ -29,6 +29,7 @@
 #include <frontend\fsa\fsa_codegen.hpp>
 #include <frontend\fsa\fsa_visualization.hpp>
 
+#include <frontend\lexical_analyzer\lexical_content.hpp>
 #include <frontend\lexical_analyzer\lexical_analyzer.hpp>
 
 #include <java\frontend\grammar\java_token.hpp>
@@ -44,10 +45,10 @@ java_lexical_analyzer::java_lexical_analyzer(const content_type& content, uint8_
                        my_unicode(false),
                        my_unicode_length(0),
                        my_unicode_backslash_count(0),
-                       my_line_map_size(0),
-                       my_cached_line(-1),
-                       my_cached_line_position(-1),
-                       my_tab_size(tab_size),
+                       //my_line_map_size(0),
+                       //my_cached_line(-1),
+                       //my_cached_line_position(-1),
+                       //my_tab_size(tab_size),
                        my_pending_indents(0),
                        my_boll(true),
                        my_eoll(false)
@@ -61,17 +62,19 @@ java_lexical_analyzer::~java_lexical_analyzer()
 
 bool java_lexical_analyzer::create(const string_type& file_name, lexical_analyzer_type& result_lexical_analyzer, operation_status& status, uint8_t tab_size)
 {
-    auto content(factory::create<uilab::core::content>()); //??
-
     file_data_provider provider(file_name);
+
+    auto content(factory::create<uilab::core::lexical_content>(file_name)); //??
 
     bool result = (*content).load(provider, status);
 
     if(result)
     {
+        (*content).build_line_map();
+        
         auto lexer(factory::create<java_lexical_analyzer>(content, tab_size));
 
-        (*lexer).build_line_map();
+        //(*lexer).build_line_map();
 
         result_lexical_analyzer.swap(lexer);
     }
@@ -588,132 +591,132 @@ void java_lexical_analyzer::rewind()
     }
 }
 
-// OpenJDK 9+ for more details ...
-void java_lexical_analyzer::build_line_map()
-{
-    const datum_type* ptr(my_ptr);
-    const datum_type* start_content(my_start_content);
-    const datum_type* end_content(my_end_content);
-
-    my_tab_map.resize((*my_content).count());
-
-    uint32_t k = 0;
-
-    line_map_type line_map(std::make_unique<loc_t[]>((*my_content).count()));
-
-    while(ptr < end_content)
-    {
-        line_map[k++] = std::ptrdiff_t(ptr - start_content);
-
-        do
-        {
-            if(*ptr == L'\r' || *ptr == L'\n')
-            {
-                if((*ptr == L'\r' && *(ptr + 1) == L'\n') || (*ptr == L'\n' && *(ptr + 1) == L'\r'))
-                {
-                    ptr += 2;
-                }
-                else
-                {
-                    ptr++;
-                }
-
-                break;
-            }
-            else if(*ptr == L'\t')
-            {
-                my_tab_map[std::ptrdiff_t(ptr - start_content)] = true;
-            }
-        }
-        while(++ptr < end_content);
-    }
-
-    my_line_map = std::make_unique<loc_t[]>(k);
-    my_line_map_size = k;
-
-    memcpy(my_line_map.get(), line_map.get(), k * sizeof(loc_t));
-}
-
-// OpenJDK 9+ for more details ...
-loc_t java_lexical_analyzer::find_line_number(loc_t position)
-{
-    loc_t result = 0;
-
-    if(my_line_map_size > 0)
-    {
-        if(position == my_cached_line_position)
-        {
-            result = my_cached_line;
-        }
-        else
-        {
-            my_cached_line_position = position;
-
-            loc_t low = 0;
-            loc_t high = my_line_map_size - 1;
-
-            while(low <= high)
-            {
-                loc_t mid = (low + high) >> 1;
-                loc_t val = my_line_map[mid];
-
-                if(val < position)
-                {
-                    low = mid + 1;
-                }
-                else if(val > position)
-                {
-                    high = mid - 1;
-                }
-                else
-                {
-                    result = my_cached_line = mid + 1;
-                    goto done;
-                }
-            }
-
-            result = my_cached_line = low;
-done:
-            ;
-        }
-    }
-
-    return result;
-}
-
-// OpenJDK 9+ for more details ...
-loc_t java_lexical_analyzer::get_line_number(loc_t position)
-{
-    return find_line_number(position);
-}
-
-// OpenJDK 9+ for more details ...
-loc_t java_lexical_analyzer::get_column_number(loc_t position)
-{
-    loc_t result = 0;
-
-    if(my_line_map_size > 0)
-    {
-        loc_t offset = my_line_map[find_line_number(position) - 1]; // 1 is the first line
-        loc_t column = 0;
-
-        for(loc_t k = offset; k < position; k++)
-        {
-            if(my_tab_map[k])
-            {
-                column = ((column / my_tab_size) * my_tab_size) + my_tab_size;
-            }
-            else
-            {
-                column++;
-            }
-        }
-
-        result = column + 1; // 1 is the first column
-    }
-
-    return result;
-}
+//// OpenJDK 9+ for more details ...
+//void java_lexical_analyzer::build_line_map()
+//{
+//    const datum_type* ptr(my_ptr);
+//    const datum_type* start_content(my_start_content);
+//    const datum_type* end_content(my_end_content);
+//
+//    my_tab_map.resize((*my_content).count());
+//
+//    uint32_t k = 0;
+//
+//    line_map_type line_map(std::make_unique<loc_type[]>((*my_content).count()));
+//
+//    while(ptr < end_content)
+//    {
+//        line_map[k++] = std::ptrdiff_t(ptr - start_content);
+//
+//        do
+//        {
+//            if(*ptr == L'\r' || *ptr == L'\n')
+//            {
+//                if((*ptr == L'\r' && *(ptr + 1) == L'\n') || (*ptr == L'\n' && *(ptr + 1) == L'\r'))
+//                {
+//                    ptr += 2;
+//                }
+//                else
+//                {
+//                    ptr++;
+//                }
+//
+//                break;
+//            }
+//            else if(*ptr == L'\t')
+//            {
+//                my_tab_map[std::ptrdiff_t(ptr - start_content)] = true;
+//            }
+//        }
+//        while(++ptr < end_content);
+//    }
+//
+//    my_line_map = std::make_unique<loc_type[]>(k);
+//    my_line_map_size = k;
+//
+//    memcpy(my_line_map.get(), line_map.get(), k * sizeof(loc_type));
+//}
+//
+//// OpenJDK 9+ for more details ...
+//loc_type java_lexical_analyzer::find_line_number(loc_type position)
+//{
+//    loc_type result = 0;
+//
+//    if(my_line_map_size > 0)
+//    {
+//        if(position == my_cached_line_position)
+//        {
+//            result = my_cached_line;
+//        }
+//        else
+//        {
+//            my_cached_line_position = position;
+//
+//            loc_type low = 0;
+//            loc_type high = my_line_map_size - 1;
+//
+//            while(low <= high)
+//            {
+//                loc_type mid = (low + high) >> 1;
+//                loc_type val = my_line_map[mid];
+//
+//                if(val < position)
+//                {
+//                    low = mid + 1;
+//                }
+//                else if(val > position)
+//                {
+//                    high = mid - 1;
+//                }
+//                else
+//                {
+//                    result = my_cached_line = mid + 1;
+//                    goto done;
+//                }
+//            }
+//
+//            result = my_cached_line = low;
+//done:
+//            ;
+//        }
+//    }
+//
+//    return result;
+//}
+//
+//// OpenJDK 9+ for more details ...
+//loc_type java_lexical_analyzer::get_line_number(loc_type position)
+//{
+//    return find_line_number(position);
+//}
+//
+//// OpenJDK 9+ for more details ...
+//loc_type java_lexical_analyzer::get_column_number(loc_type position)
+//{
+//    loc_type result = 0;
+//
+//    if(my_line_map_size > 0)
+//    {
+//        loc_type offset = my_line_map[find_line_number(position) - 1]; // 1 is the first line
+//        loc_type column = 0;
+//
+//        for(loc_type k = offset; k < position; k++)
+//        {
+//            if(my_tab_map[k])
+//            {
+//                column = ((column / my_tab_size) * my_tab_size) + my_tab_size;
+//            }
+//            else
+//            {
+//                column++;
+//            }
+//        }
+//
+//        result = column + 1; // 1 is the first column
+//    }
+//
+//    return result;
+//}
 
 void java_lexical_analyzer::calculate_indentation()
 {

@@ -17,7 +17,7 @@ class java_lexical_analyzer : public lexical_analyzer<token<java_token_traits>>
         using fsa_type = fsa::fsa_type;
         using lexical_analyzer_type = std::shared_ptr<java_lexical_analyzer>;
 
-        using line_map_type = std::unique_ptr<loc_t[]>;
+        using line_map_type = std::unique_ptr<loc_type[]>;
         using tab_map_type = std::vector<bool>;
 
         using indents_type = std::stack<std::size_t>;
@@ -27,13 +27,13 @@ class java_lexical_analyzer : public lexical_analyzer<token<java_token_traits>>
         uint8_t                 my_unicode_length;
         uint32_t                my_unicode_backslash_count;
 
-        line_map_type           my_line_map;        // start position of each line
-        uint32_t                my_line_map_size;
-        loc_t                   my_cached_line;
-        loc_t                   my_cached_line_position;
+        //line_map_type           my_line_map;        // start position of each line
+        //uint32_t                my_line_map_size;
+        //loc_type                my_cached_line;
+        //loc_type                my_cached_line_position;
 
-        tab_map_type            my_tab_map;         // tab positions
-        uint8_t                 my_tab_size;        // tab size, default is 4
+        //tab_map_type            my_tab_map;         // tab positions
+        //uint8_t                 my_tab_size;        // tab size, default is 4
 
                                                     // off-side rule support, Peter Landin
         std::int32_t            my_pending_indents; // > 0 indents, < 0 dedents, python
@@ -54,8 +54,8 @@ class java_lexical_analyzer : public lexical_analyzer<token<java_token_traits>>
         datum_type              peek(uint16_t k = 1);
         void                    rewind();
 
-        void                    build_line_map();
-        loc_t                   find_line_number(loc_t position);
+        //void                    build_line_map();
+        //loc_type                find_line_number(loc_type position);
 
         void                    calculate_indentation();
 
@@ -75,8 +75,8 @@ class java_lexical_analyzer : public lexical_analyzer<token<java_token_traits>>
                                        operation_status& status,
                                        uint8_t tab_size = 4);
 
-        loc_t                   get_line_number(loc_t position);
-        loc_t                   get_column_number(loc_t position);
+        //loc_type                get_line_number(loc_type position);
+        //loc_type                get_column_number(loc_type position);
 };
 
 END_NAMESPACE

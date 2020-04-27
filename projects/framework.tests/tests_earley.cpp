@@ -58,6 +58,7 @@
 #include <frontend/fsa/fsa_codegen.hpp>
 #include <frontend/fsa/fsa_visualization.hpp>
 
+#include <frontend/lexical_analyzer/lexical_content.hpp>
 #include <frontend/lexical_analyzer/lexical_analyzer.hpp>
 #include <frontend/lexical_analyzer/lexical_analyzer.inl>
 
@@ -299,7 +300,7 @@ void test_earley_parser()
 
         using content_type = lexical_analyzer<token<earley_token_traits>>::content_type;
 
-        content_type content(factory::create<content>());
+        content_type content(factory::create<lexical_content>(input.file_name));
 
         string_data_provider provider(input.content);
 

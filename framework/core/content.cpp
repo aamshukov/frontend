@@ -14,30 +14,13 @@
 
 BEGIN_NAMESPACE(core)
 
-content::content()
-       : my_count(0)
+content::content(const id_type& id)
+       : my_id(id), my_count(0)
 {
 }
 
 content::~content()
 {
-}
-
-const content::datum_type* content::data() const
-{
-    const datum_type* result(nullptr);
-
-    if(my_data)
-    {
-        result = my_data.get();
-    }
-
-    return result;
-}
-
-size_type content::count() const
-{
-    return my_count;
 }
 
 bool content::load(data_provider& provider, operation_status& status)
