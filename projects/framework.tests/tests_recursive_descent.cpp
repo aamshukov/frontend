@@ -211,7 +211,7 @@ void test_recursive_descent_with_backtracking()
 
     file_data_provider provider(file_name);
 
-    std::shared_ptr<lexical_content> content(std::make_shared<lexical_content>(file_name));
+    std::shared_ptr<lexical_content> content(std::make_shared<lexical_content>(1, file_name));
 
     operation_status status;
 

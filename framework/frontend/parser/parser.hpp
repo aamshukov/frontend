@@ -17,6 +17,7 @@ class parser : private noncopyable
         using tree_traits_type = TreeTraits;
 
         using lexical_analyzer_type = std::shared_ptr<lexical_analyzer<token_type>>;
+        using lexical_analyzers_type = std::vector<lexical_analyzer_type>;
 
         using tree_type = std::shared_ptr<parser_tree<token_type, tree_traits_type>>;
         using trees_type = std::vector<tree_type>;
@@ -25,7 +26,9 @@ class parser : private noncopyable
         using dags_type = std::vector<dag_type>;
 
     protected:
-        lexical_analyzer_type   my_lexical_analyzer;
+        lexical_analyzer_type   my_lexical_analyzer;    // master lexer
+        lexical_analyzers_type  my_lexical_analyzers;   // slave lexers, for example migh be introduced by #include(C/C++) or by import(arktur)
+
         trees_type              my_trees;
 
         operation_status        my_status;

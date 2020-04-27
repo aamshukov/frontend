@@ -55,6 +55,8 @@ struct token
 
     flags_type      flags;
 
+    int32_t         source;  // lexical analyser which recognizes this lexeme
+
     private:
         void accept(const token& other)
         {
@@ -68,6 +70,8 @@ struct token
                 literal = other.literal;
 
                 flags = other.flags;
+
+                source = other.source;
             }
         }
 
@@ -92,6 +96,8 @@ struct token
             literal = std::move(other.literal);
 
             flags = other.flags;
+
+            source = other.source;
         }
 
         const token& operator = (const token& other)
@@ -111,6 +117,8 @@ struct token
 
             flags = other.flags;
 
+            source = other.source;
+
             return *this;
         }
 
@@ -120,7 +128,8 @@ struct token
                    offset == other.offset &&
                    length == other.length &&
                    literal == other.literal &&
-                   flags == other.flags;
+                   flags == other.flags &&
+                   source == other.source;
         }
 
         void reset()
@@ -132,6 +141,8 @@ struct token
 
             flags = flags::clear;
             flags |= flags::genuine;
+
+            source = 0;
         }
 
         codepoints_type codepoints(const datum_type* content) const

@@ -16,12 +16,12 @@
 
 BEGIN_NAMESPACE(core)
 
-lexical_content::lexical_content(const id_type& id, uint8_t tab_size)
+lexical_content::lexical_content(const id_type& id, const source_type& source, uint8_t tab_size)
                : my_line_map_size(0),
                  my_cached_line(-1),
                  my_cached_line_position(-1),
                  my_tab_size(tab_size),
-                 content(id)
+                 content(id, source)
 {
 }
 
@@ -152,6 +152,15 @@ loc_type lexical_content::get_column_number(loc_type position)
 
         result = column + 1; // 1 is the first column
     }
+
+    return result;
+}
+
+bool lexical_content::load(data_provider& provider, operation_status& status)
+{
+    bool result = content::load(provider, status);
+
+    build_line_map();
 
     return result;
 }

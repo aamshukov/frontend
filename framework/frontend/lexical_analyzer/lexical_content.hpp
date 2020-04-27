@@ -27,17 +27,17 @@ class lexical_content : public content
         uint8_t         my_tab_size;        // tab size, default is 4
 
     private:
+        loc_type        find_line_number(loc_type position);
+        void            build_line_map();
 
     public:
-                        lexical_content(const id_type& id, uint8_t tab_size = 4);
+                        lexical_content(const id_type& id, const source_type& source, uint8_t tab_size = 4);
                        ~lexical_content();
 
         loc_type        get_line_number(loc_type position);
-        loc_type        find_line_number(loc_type position);
-
         loc_type        get_column_number(loc_type position);
 
-        void            build_line_map();
+        bool            load(data_provider& provider, operation_status& status) override;
 };
 
 END_NAMESPACE

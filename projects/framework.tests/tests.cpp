@@ -287,7 +287,7 @@ void test_re_dfa();
 
 void test_visitor();
 
-extern "C" double CombineA(int a, int b, int c, int d, int e, double f);
+//extern "C" double CombineA(int a, int b, int c, int d, int e, double f);
 extern "C" void _start();
 
 
@@ -357,7 +357,7 @@ int main()
     USINGNAMESPACE(core)
     USINGNAMESPACE(frontend)
 
-    std::cout << "CombineA: " << CombineA(1,2,3,4, 5, 6.1) << std::endl;
+    //std::cout << "CombineA: " << CombineA(1,2,3,4, 5, 6.1) << std::endl;
 
     std::string qstr("Quick+brown+fox");
     std::replace(qstr.begin(), qstr.end(), '+', ' ');
@@ -605,7 +605,7 @@ int main()
 
         file_data_provider provider(file_name);
 
-        content content(L"id");
+        content content(1, L"id");
 
         bool rc = content.load(provider, status);
 

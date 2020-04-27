@@ -300,7 +300,7 @@ void test_earley_parser()
 
         using content_type = lexical_analyzer<token<earley_token_traits>>::content_type;
 
-        content_type content(factory::create<lexical_content>(input.file_name));
+        content_type content(factory::create<lexical_content>(1, input.file_name));
 
         string_data_provider provider(input.content);
 

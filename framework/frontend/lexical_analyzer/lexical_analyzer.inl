@@ -120,6 +120,9 @@ inline void lexical_analyzer<Token>::epilog()
     my_token.length = static_cast<uint32_t>(std::ptrdiff_t(my_ptr - my_ptr_lexeme));
 
     my_token.literal.assign(my_ptr_lexeme, my_token.length);
+
+    my_token.flags = token_type::flags::clear;
+    my_token.source = (*my_content).id();
 }
 
 END_NAMESPACE

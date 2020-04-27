@@ -14,8 +14,8 @@
 
 BEGIN_NAMESPACE(core)
 
-content::content(const id_type& id)
-       : my_id(id), my_count(0)
+content::content(const id_type& id, const source_type& source)
+       : my_id(id), my_source(source), my_count(0)
 {
 }
 

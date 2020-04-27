@@ -64,14 +64,12 @@ bool java_lexical_analyzer::create(const string_type& file_name, lexical_analyze
 {
     file_data_provider provider(file_name);
 
-    auto content(factory::create<uilab::core::lexical_content>(file_name)); //??
+    auto content(factory::create<uilab::core::lexical_content>(1, file_name)); //??
 
     bool result = (*content).load(provider, status);
 
     if(result)
     {
-        (*content).build_line_map();
-        
         auto lexer(factory::create<java_lexical_analyzer>(content, tab_size));
 
         //(*lexer).build_line_map();
