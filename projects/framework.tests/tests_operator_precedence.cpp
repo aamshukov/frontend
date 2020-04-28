@@ -45,7 +45,7 @@
 #include <frontend/grammar/grammar_algorithm.hpp>
 #include <frontend/grammar/grammar_visualization.hpp>
 
-#include <symtable/symbol_table_record.hpp>
+#include <symtable/symbol_ir.hpp>
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
 

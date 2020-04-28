@@ -94,8 +94,8 @@
     <ClInclude Include="..\..\framework\symtable\scope\scope_namespace.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope_parameter.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope_structure.hpp" />
+    <ClInclude Include="..\..\framework\symtable\symbol_ir.hpp" />
     <ClInclude Include="..\..\framework\symtable\symbol_table.hpp" />
-    <ClInclude Include="..\..\framework\symtable\symbol_table_record.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\core\content.cpp" />

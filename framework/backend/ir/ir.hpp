@@ -24,11 +24,11 @@ class ir : private noncopyable
         using dag_type = typename parser<token_type, tree_traits_type>::dag_type;
         using dags_type = typename parser<token_type, tree_traits_type>::dags_type;
 
-        using record_type = typename symbol_table_record<token_type>::record_type;
+        using record_type = typename symbol_ir<token_type>::record_type;
 
         using dag_key_pair = std::tuple<typename token_type::token_type,
                                         typename token_type::codepoints_type,
-                                        typename symbol_table_record<token_type>::value_type>;
+                                        typename symbol_ir<token_type>::value_type>;
         using dag_key_type = std::vector<dag_key_pair>;
 
         struct dag_hash

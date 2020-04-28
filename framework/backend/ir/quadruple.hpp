@@ -17,8 +17,8 @@ struct quadruple
 {
     using token_type = Token;
 
-    using record_type = typename symbol_table_record<token_type>::record_type;
-    using records_type = typename symbol_table_record<token_type>::records_type;
+    using record_type = typename symbol_ir<token_type>::record_type;
+    using records_type = typename symbol_ir<token_type>::records_type;
 
     record_type operation;
     record_type argument1;

@@ -19,8 +19,8 @@ struct parser_dag : public dag, public visitable<parser_dag<Token, TreeTraits>>
 
     using symbol_type = grammar::symbol_type;
 
-    using record_type = typename symbol_table_record<token_type>::record_type;
-    using records_type = typename symbol_table_record<token_type>::records_type;
+    using record_type = typename symbol_ir<token_type>::record_type;
+    using records_type = typename symbol_ir<token_type>::records_type;
 
     using visitor_type = visitor<parser_dag<token_type, tree_traits_type>>;
 

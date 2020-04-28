@@ -202,9 +202,6 @@
     <ClInclude Include="..\..\framework\symtable\symbol_table.hpp">
       <Filter>symtable</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\symtable\symbol_table_record.hpp">
-      <Filter>symtable</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\core\context.hpp">
       <Filter>core</Filter>
     </ClInclude>
@@ -231,6 +228,9 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\frontend\lexical_analyzer\lexical_content.hpp">
       <Filter>frontend\lexical_analyzer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\symtable\symbol_ir.hpp">
+      <Filter>symtable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
