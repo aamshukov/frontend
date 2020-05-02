@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\framework\backend\ir\basic_block.hpp" />
+    <ClInclude Include="..\..\framework\backend\ir\control_flow_graph.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\ir.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\ir_visitor.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\ir_visualization.hpp" />
@@ -40,6 +42,9 @@
     <ClInclude Include="..\..\framework\core\enumerate.hpp" />
     <ClInclude Include="..\..\framework\core\factory.hpp" />
     <ClInclude Include="..\..\framework\core\flags.hpp" />
+    <ClInclude Include="..\..\framework\core\graph\edge.hpp" />
+    <ClInclude Include="..\..\framework\core\graph\graph.hpp" />
+    <ClInclude Include="..\..\framework\core\graph\vertex.hpp" />
     <ClInclude Include="..\..\framework\core\logger.hpp" />
     <ClInclude Include="..\..\framework\core\noncopyable.hpp" />
     <ClInclude Include="..\..\Framework\Core\pch.hpp" />
@@ -88,6 +93,7 @@
     <ClInclude Include="..\..\framework\frontend\parser\parser_tree.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\parser_visualization.hpp" />
     <ClInclude Include="..\..\framework\frontend\semantics\semantics.hpp" />
+    <ClInclude Include="..\..\framework\frontend\type\type.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope_block.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope_function.hpp" />
@@ -98,6 +104,8 @@
     <ClInclude Include="..\..\framework\symtable\symbol_table.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\framework\backend\ir\basic_block.cpp" />
+    <ClCompile Include="..\..\framework\backend\ir\control_flow_graph.cpp" />
     <ClCompile Include="..\..\framework\core\content.cpp" />
     <ClCompile Include="..\..\framework\core\domain_helper.cpp" />
     <ClCompile Include="..\..\framework\core\logger.cpp" />
@@ -136,6 +144,7 @@
     <ClCompile Include="..\..\framework\frontend\parser\operator_precedence\precedence_algorithm.cpp" />
     <ClCompile Include="..\..\framework\frontend\parser\operator_precedence\precedence_visualization.cpp" />
     <ClCompile Include="..\..\framework\frontend\parser\parser_algorithm.cpp" />
+    <ClCompile Include="..\..\framework\frontend\type\type.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="..\..\framework\backend\generator\x64\gen.asm">

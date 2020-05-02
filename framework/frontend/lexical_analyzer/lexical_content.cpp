@@ -14,7 +14,8 @@
 
 #include <frontend/lexical_analyzer/lexical_content.hpp>
 
-BEGIN_NAMESPACE(core)
+BEGIN_NAMESPACE(frontend)
+USINGNAMESPACE(core)
 
 lexical_content::lexical_content(const id_type& id, const source_type& source, uint8_t tab_size)
                : my_line_map_size(0),

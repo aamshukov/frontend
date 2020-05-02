@@ -37,3 +37,30 @@ class visitor<T, Types...> : public visitor<Types...>
 END_NAMESPACE
 
 #endif // __VISITOR_H__
+
+
+/*??
+
+// template declaration
+template <typename Return, typename Param, typename... Types>
+class visitor;
+
+// specialization for single type    
+template <typename TVisitable, typename TReturn, typename TParam>
+class visitor<TVisitable, TReturn, TParam>
+{
+    public:
+        virtual TReturn visit(TVisitable& visitable, const TParam& param) = 0;
+};
+
+// specialization for multiple types
+template <typename TVisitable, typename TReturn, typename TParam, typename... Types>
+class visitor<TVisitable, TReturn, TParam, Types...> : public visitor<TReturn, TParam, Types...>
+{
+    public:
+        using visitor<TReturn, TParam, Types...>::visit; // promote the function(s) from the base class
+
+        virtual Return visit(TVisitable& visitable, const TParam& param) = 0;
+};
+
+*/

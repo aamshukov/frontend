@@ -232,6 +232,24 @@
     <ClInclude Include="..\..\framework\symtable\symbol_ir.hpp">
       <Filter>symtable</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\framework\backend\ir\basic_block.hpp">
+      <Filter>backend\ir</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\backend\ir\control_flow_graph.hpp">
+      <Filter>backend\ir</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\graph\graph.hpp">
+      <Filter>core\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\graph\vertex.hpp">
+      <Filter>core\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\core\graph\edge.hpp">
+      <Filter>core\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\frontend\type\type.hpp">
+      <Filter>frontend\type</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="backend">
@@ -296,6 +314,12 @@
     </Filter>
     <Filter Include="frontend\parser\packrat">
       <UniqueIdentifier>{5eaa719c-0c5c-4234-b031-343a26a8a140}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="core\graph">
+      <UniqueIdentifier>{6de7775a-f2ca-46c0-ab12-fed50c8bcc06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\type">
+      <UniqueIdentifier>{c9fe2698-6137-43d2-ad00-2df29b25ac57}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -388,6 +412,15 @@
     </ClCompile>
     <ClCompile Include="..\..\framework\frontend\lexical_analyzer\lexical_content.cpp">
       <Filter>frontend\lexical_analyzer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\backend\ir\basic_block.cpp">
+      <Filter>backend\ir</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\backend\ir\control_flow_graph.cpp">
+      <Filter>backend\ir</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\framework\frontend\type\type.cpp">
+      <Filter>frontend\type</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

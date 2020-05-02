@@ -38,10 +38,12 @@ class symbol_ir : private noncopyable
         using records_type = std::vector<record_type>;
 
     private:
-        token_type          my_token;
-        value_type          my_value;
+        token_type          my_token;           // link with content
+        value_type          my_value;           // inffered value if any
 
         std::size_t         my_ssa_id;          // 0 - unassigned, 1+
+
+        //type                my_type;
 
     public:
                             symbol_ir() = default;

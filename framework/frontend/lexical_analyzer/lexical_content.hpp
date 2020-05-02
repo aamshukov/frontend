@@ -6,7 +6,8 @@
 
 #pragma once
 
-BEGIN_NAMESPACE(core)
+BEGIN_NAMESPACE(frontend)
+USINGNAMESPACE(core)
 
 class lexical_content : public content
 {
