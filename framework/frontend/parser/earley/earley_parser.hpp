@@ -133,7 +133,10 @@ class earley_parser : public parser<Token, TreeTraits>
 
         using rhs_stack_type = std::stack<rhs_stack_element>;
 
-        using earley_tree = parser_tree<token_type, tree_traits_type>;
+        using earley_tree = parse_tree<token_type, tree_traits_type>;
+
+        using tree_type = typename parser<token_type, tree_traits_type>::parse_tree_type;
+        using trees_type = typename parser<token_type, tree_traits_type>::parse_trees_type;
 
         struct parse_tree_element // (Tr = parsing tree, P = papa)
         {

@@ -1,10 +1,6 @@
 //..............................
 // UI Lab Inc. Arthur Amshukov .
 //..............................
-//
-// Andrew Durward:
-//      https://stackoverflow.com/questions/11796121/implementing-the-visitor-pattern-using-c-templates
-//
 #ifndef __VISITABLE_H__
 #define __VISITABLE_H__
 
@@ -12,11 +8,8 @@
 
 BEGIN_NAMESPACE(core)
 
-template <typename... Types>
-class visitable
+class visitable : private noncopyable
 {
-    public:
-        virtual void accept(visitor<Types...>& /*visitor*/) = 0;
 };
 
 END_NAMESPACE

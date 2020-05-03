@@ -18,11 +18,11 @@ class ir : private noncopyable
         using token_type = Token;
         using tree_traits_type = TreeTraits;
 
-        using tree_type = typename parser<token_type, tree_traits_type>::tree_type;
-        using trees_type = typename parser<token_type, tree_traits_type>::trees_type;
+        using parse_tree_type = typename parser<token_type, tree_traits_type>::parse_tree_type;
+        using parse_trees_type = typename parser<token_type, tree_traits_type>::parse_trees_type;
 
-        using dag_type = typename parser<token_type, tree_traits_type>::dag_type;
-        using dags_type = typename parser<token_type, tree_traits_type>::dags_type;
+        using parse_dag_type = typename parser<token_type, tree_traits_type>::parse_dag_type;
+        using parse_dags_type = typename parser<token_type, tree_traits_type>::parse_dags_type;
 
         using record_type = typename symbol_ir<token_type>::record_type;
 
@@ -54,20 +54,20 @@ class ir : private noncopyable
             }
         };
 
-        using dag_cache_type = std::unordered_map<dag_key_type, dag_type, dag_hash, dag_key_comparator>;
+        using dag_cache_type = std::unordered_map<dag_key_type, parse_dag_type, dag_hash, dag_key_comparator>;
 
-        using kids_type = std::vector<dag_type>;
+        using kids_type = std::vector<parse_dag_type>;
 
         using quadruple_type = quadruple<token_type>;
         using code_type = std::list<quadruple_type>; //??
 
     private:
-        static dag_key_type build_dag_key(const tree_type& tree);
-        static dag_type     find_dag(const dag_key_type& key, const dag_cache_type& cache);
+        static dag_key_type     build_dag_key(const parse_tree_type& tree);
+        static parse_dag_type   find_dag(const dag_key_type& key, const dag_cache_type& cache);
 
     public:
-        static void         cst_to_ast(tree_type& cst);
-        static void         ast_to_asd(const tree_type& ast, dag_type& result_asd);
+        static void             cst_to_ast(parse_tree_type& cst);
+        static void             ast_to_asd(const parse_tree_type& ast, parse_dag_type& result_asd);
 };
 
 END_NAMESPACE

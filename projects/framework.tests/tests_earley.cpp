@@ -62,8 +62,8 @@
 #include <frontend/lexical_analyzer/lexical_analyzer.hpp>
 #include <frontend/lexical_analyzer/lexical_analyzer.inl>
 
-#include <frontend/parser/parser_dag.hpp>
-#include <frontend/parser/parser_tree.hpp>
+#include <frontend/parser/parse_dag.hpp>
+#include <frontend/parser/parse_tree.hpp>
 #include <frontend/parser/parser.hpp>
 #include <frontend/parser/parser.inl>
 #include <frontend/parser/parser_algorithm.hpp>
@@ -193,7 +193,7 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>, my_ear
 
         tree_type handle_start(const item_type& item) override
         {
-            auto result(factory::create<parser_tree<token_type, my_earley_tree_traits>>());
+            auto result(factory::create<parse_tree<token_type, my_earley_tree_traits>>());
 
             (*result).symbol = ((*(*item).rule).lhs()[0]);
             (*result).record = factory::create<symbol_ir<token_type>>();
@@ -203,7 +203,7 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>, my_ear
 
         tree_type handle_terminal(const symbol_type& symbol, uint32_t position, const rule_type& rule, const token_type& token, const tree_type& node) override
         {
-            auto result(factory::create<parser_tree<token_type, my_earley_tree_traits>>());
+            auto result(factory::create<parse_tree<token_type, my_earley_tree_traits>>());
 
             (*result).symbol = symbol;
             (*result).record = factory::create<symbol_ir<token_type>>();
@@ -227,7 +227,7 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>, my_ear
 
         tree_type handle_before_nonterminal(const item_type& item, uint32_t position, const rule_type& rule, const tree_type& node, bool) override
         {
-            auto result(factory::create<parser_tree<token_type, my_earley_tree_traits>>());
+            auto result(factory::create<parse_tree<token_type, my_earley_tree_traits>>());
 
             (*result).symbol = ((*(*item).rule).lhs()[0]);
             (*result).record = factory::create<symbol_ir<token_type>>();
@@ -331,15 +331,15 @@ void test_earley_parser()
                 ir<token_type, my_earley_tree_traits>::cst_to_ast(cst);
                 ir_visualization<token_type, my_earley_tree_traits>::decorate_tree(cst, input.dot_file_name, 0);
 
-                ir<token_type, my_earley_tree_traits>::dag_type asd;
+                ir<token_type, my_earley_tree_traits>::parse_dag_type asd;
                 ir<token_type, my_earley_tree_traits>::ast_to_asd(cst, asd);
                 ir_visualization<token_type, my_earley_tree_traits>::decorate_dag(asd, input.dot_file_name);
 
                 tree_tac_visitor<token_type, my_earley_tree_traits> tree_visitor;
-                (*cst).accept(tree_visitor);
+                (*cst).accept<tree_tac_visitor<token_type, my_earley_tree_traits>>(tree_visitor, false);
 
                 dag_tac_visitor<token_type, my_earley_tree_traits> dag_visitor;
-                (*asd).accept(dag_visitor);
+                (*asd).accept<dag_tac_visitor<token_type, my_earley_tree_traits>>(dag_visitor, false);
             }
             else
             {

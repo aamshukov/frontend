@@ -2,8 +2,9 @@
 // UI Lab Inc. Arthur Amshukov .
 //..............................
 //
-// Andrew Durward:
+// based on Andrew Durward example:
 //      https://stackoverflow.com/questions/11796121/implementing-the-visitor-pattern-using-c-templates
+// ... added return and parameter types
 //
 #ifndef __VISITOR_H__
 #define __VISITOR_H__
@@ -13,54 +14,36 @@
 BEGIN_NAMESPACE(core)
 
 // template declaration
-template <typename... Types>
+template <typename TReturn, typename TParam, typename ... TVisitables>
 class visitor;
 
 // specialization for single type    
-template <typename T>
-class visitor<T>
+template <typename TReturn, typename TParam, typename TVisitable>
+class visitor<TReturn, TParam, TVisitable>
 {
     public:
-        virtual void visit(T& visitable) = 0;
-};
+        using return_type = TReturn;
+        using param_type = TParam;
 
-// specialization for multiple types
-template <typename T, typename... Types>
-class visitor<T, Types...> : public visitor<Types...>
-{
-    public:
-        using visitor<Types...>::visit; // promote the function(s) from the base class
-
-        virtual void visit(T& visitable) = 0;
-};
-
-END_NAMESPACE
-
-#endif // __VISITOR_H__
-
-
-/*??
-
-// template declaration
-template <typename Return, typename Param, typename... Types>
-class visitor;
-
-// specialization for single type    
-template <typename TVisitable, typename TReturn, typename TParam>
-class visitor<TVisitable, TReturn, TParam>
-{
     public:
         virtual TReturn visit(TVisitable& visitable, const TParam& param) = 0;
 };
 
 // specialization for multiple types
-template <typename TVisitable, typename TReturn, typename TParam, typename... Types>
-class visitor<TVisitable, TReturn, TParam, Types...> : public visitor<TReturn, TParam, Types...>
+template <typename TReturn, typename TParam, typename TVisitable, typename ... TVisitables>
+class visitor<TReturn, TParam, TVisitable, TVisitables ...> : public visitor<TReturn, TParam, TVisitables ...>
 {
     public:
-        using visitor<TReturn, TParam, Types...>::visit; // promote the function(s) from the base class
+        using return_type = TReturn;
+        using param_type = TParam;
 
-        virtual Return visit(TVisitable& visitable, const TParam& param) = 0;
+    public:
+        using visitor<TReturn, TParam, TVisitables ...>::visit; // promote the function(s) from the base class
+
+    public:
+        virtual TReturn visit(TVisitable& visitable, const TParam& param) = 0;
 };
 
-*/
+END_NAMESPACE
+
+#endif // __VISITOR_H__

@@ -28,27 +28,27 @@ class ir_visualization : private noncopyable
         using token_type = typename ir_type::token_type;
         using tree_traits_type = typename ir_type::tree_traits_type;
 
-        using tree_type = typename ir_type::tree_type;
-        using trees_type = typename ir_type::trees_type;
+        using parse_tree_type = typename ir_type::parse_tree_type;
+        using parse_trees_type = typename ir_type::parse_trees_type;
 
-        using dag_type = typename ir_type::dag_type;
-        using dags_type = typename ir_type::dags_type;
+        using parse_dag_type = typename ir_type::parse_dag_type;
+        using parse_dags_type = typename ir_type::parse_dags_type;
 
     private:
-        static void collect_tree_dot_labels(const tree_type& root, std::wostream& stream);
-        static void build_tree_dot_graph(const tree_type& tree, std::wostream& stream);
+        static void collect_tree_dot_labels(const parse_tree_type& root, std::wostream& stream);
+        static void build_tree_dot_graph(const parse_tree_type& tree, std::wostream& stream);
 
-        static void collect_dag_dot_labels(const dag_type& root, std::wostream& stream);
-        static void build_dag_dot_graph(const dag_type& dag, std::wostream& stream);
+        static void collect_dag_dot_labels(const parse_dag_type& root, std::wostream& stream);
+        static void build_dag_dot_graph(const parse_dag_type& dag, std::wostream& stream);
 
     public:
-        static void print_tree(const tree_type& tree, std::size_t level, std::wostream& stream);
-        static void print_trees(const trees_type& trees, std::wostream& stream);
+        static void print_tree(const parse_tree_type& tree, std::size_t level, std::wostream& stream);
+        static void print_trees(const parse_trees_type& trees, std::wostream& stream);
 
-        static void decorate_tree(const tree_type& tree, const string_type& dot_file_name, std::size_t k);
-        static void decorate_trees(const trees_type& trees, const string_type& dot_file_name);
+        static void decorate_tree(const parse_tree_type& tree, const string_type& dot_file_name, std::size_t k);
+        static void decorate_trees(const parse_trees_type& trees, const string_type& dot_file_name);
 
-        static void decorate_dag(const dag_type& dag, const string_type& dot_file_name);
+        static void decorate_dag(const parse_dag_type& dag, const string_type& dot_file_name);
 };
 
 END_NAMESPACE

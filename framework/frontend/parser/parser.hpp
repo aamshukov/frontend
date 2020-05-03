@@ -13,23 +13,23 @@ template <typename Token, typename TreeTraits>
 class parser : private noncopyable
 {
     public:
-        using token_type = Token;
-        using tree_traits_type = TreeTraits;
+        using token_type = typename parse_tree<Token, TreeTraits>::token_type;
+        using tree_traits_type = typename parse_tree<Token, TreeTraits>::tree_traits_type;
+
+        using parse_tree_type = std::shared_ptr<parse_tree<token_type, tree_traits_type>>;
+        using parse_trees_type = std::vector<parse_tree_type>;
+
+        using parse_dag_type = std::shared_ptr<parse_dag<token_type, tree_traits_type>>;
+        using parse_dags_type = std::vector<parse_dag_type>;
 
         using lexical_analyzer_type = std::shared_ptr<lexical_analyzer<token_type>>;
         using lexical_analyzers_type = std::vector<lexical_analyzer_type>;
-
-        using tree_type = std::shared_ptr<parser_tree<token_type, tree_traits_type>>;
-        using trees_type = std::vector<tree_type>;
-
-        using dag_type = std::shared_ptr<parser_dag<token_type, tree_traits_type>>;
-        using dags_type = std::vector<dag_type>;
 
     protected:
         lexical_analyzer_type   my_lexical_analyzer;    // master lexer
         lexical_analyzers_type  my_lexical_analyzers;   // slave lexers, for example migh be introduced by #include(C/C++) or by import(arktur)
 
-        trees_type              my_trees;
+        parse_trees_type        my_trees;
 
         operation_status        my_status;
 
@@ -40,14 +40,14 @@ class parser : private noncopyable
                                 parser(const lexical_analyzer_type& lexical_analyzer);
                                ~parser();
 
-        const trees_type&       trees() const;
+        const parse_trees_type& trees() const;
 
         const operation_status& status() const;
         operation_status&       status();
 };
 
 template <typename Token, typename TreeTraits>
-const typename parser<Token, TreeTraits>::trees_type& parser<Token, TreeTraits>::trees() const
+const typename parser<Token, TreeTraits>::parse_trees_type& parser<Token, TreeTraits>::trees() const
 {
     return my_trees;
 }

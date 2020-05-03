@@ -1,8 +1,8 @@
 //..............................
 // UI Lab Inc. Arthur Amshukov .
 //..............................
-#ifndef __ARCTURUS_TREE_H__
-#define __ARCTURUS_TREE_H__
+#ifndef __PARSE_DAG_H__
+#define __PARSE_DAG_H__
 
 #pragma once
 
@@ -12,24 +12,22 @@ USINGNAMESPACE(core)
 USINGNAMESPACE(symtable)
 
 template <typename Token, typename TreeTraits>
-struct arcturus_tree : public parse_tree<Token, TreeTraits>
+struct parse_dag : public dag, public visitable
 {
-    using token_type = typename parse_tree<Token, TreeTraits>::token_type;
-    using tree_traits_type = typename parse_tree<Token, TreeTraits>::tree_traits_type;
+    using token_type = Token;
+    using tree_traits_type = TreeTraits;
 
-    //using symbol_type = grammar::symbol_type;
+    using symbol_type = grammar::symbol_type;
 
-    //using record_type = typename symbol_ir<token_type>::record_type;
-    //using records_type = typename symbol_ir<token_type>::records_type;
+    using record_type = typename symbol_ir<token_type>::record_type;
+    using records_type = typename symbol_ir<token_type>::records_type;
 
-    //using visitable_type = arcturus_tree<token_type, tree_traits_type>;
-    //using visitor_type = visitor<visitable_type>;
+    using visitor_type = visitor<void, int, parse_dag<token_type, tree_traits_type>>;
 
-    arcturus_tree()
-    {
-    }
+    symbol_type symbol;
+    record_type record;
 
-    virtual ~arcturus_tree()
+    virtual ~parse_dag()
     {
     }
 
@@ -63,4 +61,4 @@ struct arcturus_tree : public parse_tree<Token, TreeTraits>
 
 END_NAMESPACE
 
-#endif // __ARCTURUS_TREE_H__
+#endif // __PARSE_DAG_H__

@@ -89,8 +89,8 @@
     <ClInclude Include="..\..\framework\frontend\parser\packrat\packrat_parser.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\parser.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\parser_algorithm.hpp" />
-    <ClInclude Include="..\..\framework\frontend\parser\parser_dag.hpp" />
-    <ClInclude Include="..\..\framework\frontend\parser\parser_tree.hpp" />
+    <ClInclude Include="..\..\framework\frontend\parser\parse_dag.hpp" />
+    <ClInclude Include="..\..\framework\frontend\parser\parse_tree.hpp" />
     <ClInclude Include="..\..\framework\frontend\parser\parser_visualization.hpp" />
     <ClInclude Include="..\..\framework\frontend\semantics\semantics.hpp" />
     <ClInclude Include="..\..\framework\frontend\type\type.hpp" />

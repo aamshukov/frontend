@@ -47,7 +47,7 @@
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
 
-#include <frontend/parser/parser_dag.hpp>
+#include <frontend/parser/parse_dag.hpp>
 
 #include <backend/ir/dag_tac_visitor.hpp>
 
@@ -60,53 +60,132 @@ struct A : private noncopyable
     virtual ~A() {}
 };
 
-template <typename T>
-struct my_tree : public A, public visitable<my_tree<T>, my_tree<T>, int>
+//template <typename V>
+//struct my_visitor;
+//struct my_visitor0;
+
+template <typename T, typename U>
+struct my_tree0 : public A, public visitable//<my_tree0<T, U>>
 {
     T k;
+    U u;
 
-    my_tree() : k(0)
+    my_tree0() : k(0), u(0)
     {
     }
 
-    my_tree(T i) : k(i)
+    my_tree0(T i, U u) : k(i), u(u)
+    {
+    }
+
+    virtual ~my_tree0() {}
+
+    //int accept(my_visitor& visitor, const char& param) override
+    //template <typename TReturn, typename TParam, typename TVisitor>
+    template <typename TVisitor>
+    typename TVisitor::return_type accept(TVisitor& visitor, const typename TVisitor::param_type& param)
+    {
+        if constexpr (std::is_void_v<typename TVisitor::return_type>)
+        {
+            visitor.visit(*this, param);
+        }
+        else
+        {
+            return visitor.visit(*this, param);
+        }
+    }
+
+
+    //using visitor_type = visitor<int, int, my_tree<T, U>, int>;
+
+    //int accept(visitor_type& visitor, const int& k) override
+    //{
+    //    return visitor.visit(*this, k);
+    //}
+
+    //template <typename TReturn, typename TParam> //??
+    //TReturn accept(visitor<my_tree<T, U>, int>& visitor, const TParam& param)
+    //{
+    //    return visitor.visit(*this, param);
+    //}
+};
+
+template <typename T, typename U>
+struct my_tree : public my_tree0<T, U>
+{
+    my_tree() : my_tree0(0, 0)
+    {
+    }
+
+    my_tree(T i, U u) : my_tree0(i, u)
     {
     }
 
     virtual ~my_tree() {}
 
-    using visitor_type = visitor<my_tree<T>, my_tree<T>, int>;
-
-    void accept(visitor_type& visitor) override
+    template <typename TVisitor>
+    typename TVisitor::return_type accept(TVisitor& visitor, const typename TVisitor::param_type& param)
     {
-        visitor.visit(*this);
+        if constexpr (std::is_void_v<typename TVisitor::return_type>)
+        {
+            if constexpr (std::is_void_v<typename TVisitor::param_type>)
+            {
+                visitor.visit(*this);
+            }
+            else
+            {
+                visitor.visit(*this, param);
+            }
+        }
+        else
+        {
+            if constexpr (std::is_void_v<typename TVisitor::param_type>)
+            {
+                return visitor.visit(*this);
+            }
+            else
+            {
+                return visitor.visit(*this, param);
+            }
+        }
     }
 };
 
-template <typename T>
-struct my_visitor : public visitor<my_tree<T>, my_tree<T>, int>
+//template <typename V>
+struct my_visitor : public visitor<int, char, my_tree<int, char>, my_tree<int, char>, my_tree<int, char>>, private noncopyable
 {
-    void visit(my_tree<T>& tree) override
+    int visit(my_tree<int, char>& tree, const char& param) override
     {
-        std::wcout << tree.k << std::endl;
+        std::wcout << tree.k + param << tree.u << std::endl;
+        return 0;
     }
 
-    void visit(int& integer) override
+    //int visit(int& integer, const int& k) override
+    //{
+    //    std::wcout << integer << std::endl;
+    //    return 0;
+    //}
+};
+
+struct my_visitor0 : public visitor<void, long, my_tree<int, char>>
+{
+    void visit(my_tree<int, char>& tree, const long& k) override
     {
-        std::wcout << integer << std::endl;
+        std::cout << tree.k + k << " - 0 - " << tree.u << std::endl;
     }
 };
 
 void test_visitor()
 {
-    std::vector<std::shared_ptr<my_tree<int>>> tree;
-    my_tree<int> t;
+    std::vector<std::shared_ptr<my_tree<int, char>>> tree;
 
-    tree.emplace_back(std::make_shared<my_tree<int>>(1));
-    tree.emplace_back(std::make_shared<my_tree<int>>(2));
-    tree.emplace_back(std::make_shared<my_tree<int>>(3));
-    tree.emplace_back(std::make_shared<my_tree<int>>(4));
-    tree.emplace_back(std::make_shared<my_tree<int>>(5));
+    my_tree<int, char> t;
+
+    tree.emplace_back(std::make_shared<my_tree<int, char>>(1, 'O'));
+    tree.emplace_back(std::make_shared<my_tree<int, char>>(2, 'D'));
+    tree.emplace_back(std::make_shared<my_tree<int, char>>(3, 'T'));
+    tree.emplace_back(std::make_shared<my_tree<int, char>>(4, 'C'));
+    tree.emplace_back(std::make_shared<my_tree<int, char>>(5, 'P'));
 
     std::vector<int> ints;
 
@@ -116,8 +195,16 @@ void test_visitor()
     ints.emplace_back(400);
     ints.emplace_back(500);
 
-    my_visitor<int> visitor;
+    //my_visitor<my_tree<int, char>> visitor;
+    my_visitor visitor;
 
-    std::for_each(tree.begin(), tree.end(), [&visitor](auto& tree){visitor.visit(*tree);});
-    std::for_each(ints.begin(), ints.end(), [&visitor](auto& intg){visitor.visit(intg);});
+    //std::for_each(tree.begin(), tree.end(), [&visitor](auto& tree){(*tree).accept(visitor, 5);});
+    //std::for_each(tree.begin(), tree.end(), [&visitor](auto& tree){(*tree).accept<int, char, my_visitor>(visitor, '4');});
+    std::for_each(tree.begin(), tree.end(), [&visitor](auto& tree){(*tree).accept<my_visitor>(visitor, '4');});
+
+    my_visitor0 visitor0;
+    std::for_each(tree.begin(), tree.end(), [&visitor0](auto& tree){(*tree).accept<my_visitor0>(visitor0, 15);});
+    //std::for_each(tree.begin(), tree.end(), [&visitor0](auto& tree){(*tree).accept<void, long, my_visitor0>(visitor0, 4);});
+
+    //std::for_each(ints.begin(), ints.end(), [&visitor](auto& intg){visitor.visit(intg, 6);});
 }

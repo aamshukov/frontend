@@ -62,8 +62,8 @@
 #include <frontend/lexical_analyzer/lexical_analyzer.hpp>
 #include <frontend/lexical_analyzer/lexical_analyzer.inl>
 
-#include <frontend/parser/parser_dag.hpp>
-#include <frontend/parser/parser_tree.hpp>
+#include <frontend/parser/parse_dag.hpp>
+#include <frontend/parser/parse_tree.hpp>
 #include <frontend/parser/parser.hpp>
 #include <frontend/parser/parser.inl>
 #include <frontend/parser/parser_algorithm.hpp>
@@ -72,12 +72,6 @@
 
 #include <frontend/lexical_analyzer/lexical_analyzer.hpp>
 #include <frontend/lexical_analyzer/lexical_analyzer.inl>
-
-#include <frontend/parser/parser_dag.hpp>
-#include <frontend/parser/parser_tree.hpp>
-#include <frontend/parser/parser.hpp>
-#include <frontend/parser/parser.inl>
-#include <frontend/parser/parser_algorithm.hpp>
 
 #include <frontend\parser\backtracking\recursive_descent_parser.hpp>
 #include <frontend\parser\backtracking\recursive_descent_parser.inl>

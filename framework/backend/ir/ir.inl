@@ -12,13 +12,13 @@ USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
 template <typename Token, typename TreeTraits>
-void ir<Token, TreeTraits>::cst_to_ast(typename ir<Token, TreeTraits>::tree_type& cst)
+void ir<Token, TreeTraits>::cst_to_ast(typename ir<Token, TreeTraits>::parse_tree_type& cst)
 {
     // will be split later ...
-    std::stack<tree_type> stack;
+    std::stack<parse_tree_type> stack;
 
-    std::queue<tree_type> queue;
-    std::queue<tree_type> empty_queue;
+    std::queue<parse_tree_type> queue;
+    std::queue<parse_tree_type> empty_queue;
 
     // apply ! operator
     queue.emplace(cst);
@@ -51,7 +51,7 @@ void ir<Token, TreeTraits>::cst_to_ast(typename ir<Token, TreeTraits>::tree_type
         for(std::size_t k = 0, n = (*node).kids.size(); k < n; k++)
         {
             auto kid = (*node).kids[k];
-            queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type, tree_traits_type>>(kid));
+            queue.emplace(std::dynamic_pointer_cast<parse_tree<token_type, tree_traits_type>>(kid));
         }
     }
 
@@ -70,7 +70,7 @@ void ir<Token, TreeTraits>::cst_to_ast(typename ir<Token, TreeTraits>::tree_type
         for(std::size_t k = 0, n = (*node).kids.size(); k < n; k++)
         {
             auto kid = (*node).kids[k];
-            queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type, tree_traits_type>>(kid));
+            queue.emplace(std::dynamic_pointer_cast<parse_tree<token_type, tree_traits_type>>(kid));
         }
     }
 
@@ -141,7 +141,7 @@ void ir<Token, TreeTraits>::cst_to_ast(typename ir<Token, TreeTraits>::tree_type
         for(std::size_t k = 0, n = (*node).kids.size(); k < n; k++)
         {
             auto kid = (*node).kids[k];
-            queue.emplace(std::dynamic_pointer_cast<parser_tree<token_type, tree_traits_type>>(kid));
+            queue.emplace(std::dynamic_pointer_cast<parse_tree<token_type, tree_traits_type>>(kid));
         }
     }
 
@@ -203,7 +203,7 @@ void ir<Token, TreeTraits>::cst_to_ast(typename ir<Token, TreeTraits>::tree_type
 }
 
 template <typename Token, typename TreeTraits>
-typename ir<Token, TreeTraits>::dag_key_type ir<Token, TreeTraits>::build_dag_key(const typename ir<Token, TreeTraits>::tree_type& tree)
+typename ir<Token, TreeTraits>::dag_key_type ir<Token, TreeTraits>::build_dag_key(const typename ir<Token, TreeTraits>::parse_tree_type& tree)
 {
     dag_key_type result;
 
@@ -213,7 +213,7 @@ typename ir<Token, TreeTraits>::dag_key_type ir<Token, TreeTraits>::build_dag_ke
                   (*tree).kids.end(),
                   [&result](const auto& kid)
                   {
-                      auto tree_kid(std::dynamic_pointer_cast<parser_tree<token_type, tree_traits_type>>(kid));
+                      auto tree_kid(std::dynamic_pointer_cast<parse_tree<token_type, tree_traits_type>>(kid));
                       result.emplace_back(std::make_tuple((*(*tree_kid).record).token().type, (*(*tree_kid).record).token().literal, (*(*tree_kid).record).value()));
                   });
 
@@ -221,9 +221,10 @@ typename ir<Token, TreeTraits>::dag_key_type ir<Token, TreeTraits>::build_dag_ke
 }
 
 template <typename Token, typename TreeTraits>
-typename ir<Token, TreeTraits>::dag_type ir<Token, TreeTraits>::find_dag(const typename ir<Token, TreeTraits>::dag_key_type& key, const typename ir<Token, TreeTraits>::dag_cache_type& cache)
+typename ir<Token, TreeTraits>::parse_dag_type ir<Token, TreeTraits>::find_dag(const typename ir<Token, TreeTraits>::dag_key_type& key,
+                                                                               const typename ir<Token, TreeTraits>::dag_cache_type& cache)
 {
-    dag_type result;
+    parse_dag_type result;
 
     auto it = cache.find(key);
 
@@ -236,7 +237,7 @@ typename ir<Token, TreeTraits>::dag_type ir<Token, TreeTraits>::find_dag(const t
 }
 
 template <typename Token, typename TreeTraits>
-void ir<Token, TreeTraits>::ast_to_asd(const typename ir<Token, TreeTraits>::tree_type& ast, typename ir<Token, TreeTraits>::dag_type& result_asd)
+void ir<Token, TreeTraits>::ast_to_asd(const typename ir<Token, TreeTraits>::parse_tree_type& ast, typename ir<Token, TreeTraits>::parse_dag_type& result_asd)
 {
     // collect nodes
 
@@ -245,8 +246,8 @@ void ir<Token, TreeTraits>::ast_to_asd(const typename ir<Token, TreeTraits>::tre
     //      2.1 Pop a node from first stack and push it to second stack.
     //      2.2 Push left and right children of the popped node to first stack.
     // 3. Process contents of second stack.
-    std::stack<tree_type> stack1;
-    std::stack<tree_type> stack2;
+    std::stack<parse_tree_type> stack1;
+    std::stack<parse_tree_type> stack2;
 
     // 1. Push root to first stack.
     stack1.push(ast);
@@ -266,17 +267,17 @@ void ir<Token, TreeTraits>::ast_to_asd(const typename ir<Token, TreeTraits>::tre
         for(std::size_t k = 0, n = (*tree).kids.size(); k < n; k++)
         {
             auto kid = (*tree).kids[k];
-            stack1.push(std::dynamic_pointer_cast<parser_tree<token_type, tree_traits_type>>(kid));
+            stack1.push(std::dynamic_pointer_cast<parse_tree<token_type, tree_traits_type>>(kid));
         }
     }
 
     // build dag
-    dag_type dag;
+    parse_dag_type dag;
     dag_cache_type cache;
 
     std::size_t id = 0;
 
-    using map_type = std::map<tree_type, dag_type>;
+    using map_type = std::map<parse_tree_type, parse_dag_type>;
     map_type map; // mapping an original tree node to the new dag node
 
     while(!stack2.empty())
@@ -296,7 +297,7 @@ void ir<Token, TreeTraits>::ast_to_asd(const typename ir<Token, TreeTraits>::tre
 
         if(dag == nullptr)
         {
-            dag = factory::create<parser_dag<token_type, tree_traits_type>>();
+            dag = factory::create<parse_dag<token_type, tree_traits_type>>();
 
             (*dag).symbol = (*tree).symbol;
             (*dag).record = (*tree).record;
@@ -307,7 +308,7 @@ void ir<Token, TreeTraits>::ast_to_asd(const typename ir<Token, TreeTraits>::tre
 
             for(const auto& tree_kid : (*tree).kids)
             {
-                auto it(map.find(std::dynamic_pointer_cast<parser_tree<token_type, tree_traits_type>>(tree_kid)));
+                auto it(map.find(std::dynamic_pointer_cast<parse_tree<token_type, tree_traits_type>>(tree_kid)));
                 auto dag_kid((*it).second);
 
                 (*dag).kids.emplace(dag_kid);
