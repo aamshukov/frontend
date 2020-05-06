@@ -19,8 +19,8 @@ struct arcturus_tree : public parse_tree<Token, TreeTraits>
 
     //using symbol_type = grammar::symbol_type;
 
-    //using record_type = typename symbol_ir<token_type>::record_type;
-    //using records_type = typename symbol_ir<token_type>::records_type;
+    //using record_type = typename ir_symbol<token_type>::record_type;
+    //using records_type = typename ir_symbol<token_type>::records_type;
 
     //using visitable_type = arcturus_tree<token_type, tree_traits_type>;
     //using visitor_type = visitor<visitable_type>;

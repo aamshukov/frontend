@@ -473,7 +473,7 @@ void earley_parser<Token, TreeTraits>::build_parse_trees(typename earley_parser<
 
                     (*new_node).symbol = symbol;
 
-                    (*new_node).record = factory::create<symbol_ir<token_type>>();
+                    (*new_node).record = factory::create<ir_symbol<token_type>>();
                     (*(*new_node).record).token() = token;
 
                     (*new_node).papa = parse_root.papa;
@@ -495,7 +495,7 @@ void earley_parser<Token, TreeTraits>::build_parse_trees(typename earley_parser<
 
                     (*new_node).symbol = symbol;
 
-                    (*new_node).record = factory::create<symbol_ir<token_type>>();
+                    (*new_node).record = factory::create<ir_symbol<token_type>>();
                     (*(*new_node).record).token() = token;
 
                     (*new_node).papa = parse_root.papa;
@@ -554,7 +554,7 @@ void earley_parser<Token, TreeTraits>::build_parse_trees(typename earley_parser<
 
                             (*new_node).symbol = symbol;
 
-                            (*new_node).record = factory::create<symbol_ir<token_type>>();
+                            (*new_node).record = factory::create<ir_symbol<token_type>>();
                             (*(*new_node).record).token() = token;
 
                             (*new_node).papa = parse_root.papa;
@@ -675,7 +675,7 @@ void earley_parser<Token, TreeTraits>::build_parse_trees()
 
             // ... добавить в него узел S как корень ...
             (*root).symbol = my_grammar.start_symbol();
-            (*root).record = factory::create<symbol_ir<token_type>>();
+            (*root).record = factory::create<ir_symbol<token_type>>();
             (*(*root).record).token() = (*(*current_item).master_chart).token;
 
             // ... добавить Tr в список trees

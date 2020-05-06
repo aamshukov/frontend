@@ -33,9 +33,11 @@
 
 #include <frontend/grammar/token.hpp>
 
-#include <symtable/symbol_ir.hpp>
+#include <symtable/ir_symbol.hpp>
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
+
+#include <backend/ir/quadruple.hpp>
 
 #include <backend/ir/basic_block.hpp>
 #include <backend/ir/control_flow_graph.hpp>

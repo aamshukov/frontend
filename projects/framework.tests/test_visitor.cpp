@@ -43,7 +43,7 @@
 #include <frontend/grammar/rule.hpp>
 #include <frontend/grammar/grammar.hpp>
 
-#include <symtable/symbol_ir.hpp>
+#include <symtable/ir_symbol.hpp>
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
 

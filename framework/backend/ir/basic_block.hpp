@@ -11,30 +11,42 @@ BEGIN_NAMESPACE(backend)
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
+template <typename Token>
 class basic_block : private noncopyable
 {
     public:
+        using token_type = Token;
+
+    public:
         using id_type = std::size_t;
+
+        using quadruple_type = std::shared_ptr<quadruple<token_traits>>;
+        using quadruples_type = std::list<quadruple_type>;
 
         using basic_block_type = std::shared_ptr<basic_block>;
         using basic_blocks_type = std::vector<basic_block_type>;
 
     private:
         id_type                     my_id; // 0 - entry-block, 1 - exit-block
-        string_type                 my_label;
+        string_type                 my_name;
+
+        quadruples_type             my_code;
 
         basic_blocks_type           my_successors;
         basic_blocks_type           my_predecessors;
 
     public:
-                                    basic_block(const id_type& id, const string_type& label);
+                                    basic_block(const id_type& id, const string_type& name);
                                    ~basic_block();
 
         const id_type&              id() const;
         id_type&                    id();
 
-        const string_type&          label() const;
-        string_type&                label();
+        const string_type&          name() const;
+        string_type&                name();
+
+        const quadruples_type&      code() const;
+        quadruples_type&            code();
 
         const basic_blocks_type&    successors() const;
         basic_blocks_type&          successors();
@@ -43,42 +55,62 @@ class basic_block : private noncopyable
         basic_blocks_type&          predecessors();
 };
 
-inline const typename basic_block::id_type& basic_block::id() const
+template <typename Token>
+inline const typename basic_block<Token>::id_type& basic_block<Token>::id() const
 {
     return my_id;
 }
 
-inline typename basic_block::id_type& basic_block::id()
+template <typename Token>
+inline typename basic_block<Token>::id_type& basic_block<Token>::id()
 {
     return my_id;
 }
 
-inline const string_type& basic_block::label() const
+template <typename Token>
+inline const string_type& basic_block<Token>::name() const
 {
-    return my_label;
+    return my_name;
 }
 
-inline string_type& basic_block::label()
+template <typename Token>
+inline string_type& basic_block<Token>::name()
 {
-    return my_label;
+    return my_name;
 }
 
-inline const typename basic_block::basic_blocks_type& basic_block::successors() const
+template <typename Token>
+inline const typename basic_block<Token>::quadruples_type& basic_block<Token>::code() const
+{
+    return my_code;
+}
+
+template <typename Token>
+inline typename basic_block<Token>::quadruples_type& basic_block<Token>::code()
+{
+    return my_code;
+}
+
+template <typename Token>
+inline const typename basic_block<Token>::basic_blocks_type& basic_block<Token>::successors() const
 {
     return my_successors;
 }
 
-inline typename basic_block::basic_blocks_type& basic_block::successors()
+template <typename Token>
+inline typename basic_block<Token>::basic_blocks_type& basic_block<Token>::successors()
 {
     return my_successors;
 }
 
-inline const typename basic_block::basic_blocks_type& basic_block::predecessors() const
+template <typename Token>
+inline const typename basic_block<Token>::basic_blocks_type& basic_block<Token>::predecessors() const
 {
     return my_predecessors;
 }
 
-inline typename basic_block::basic_blocks_type& basic_block::predecessors()
+template <typename Token>
+inline typename basic_block<Token>::basic_blocks_type& basic_block<Token>::predecessors()
 {
     return my_predecessors;
 }

@@ -1,8 +1,8 @@
 //..............................
 // UI Lab Inc. Arthur Amshukov .
 //..............................
-#ifndef __SYMBOL_IR_H__
-#define __SYMBOL_IR_H__
+#ifndef __IR_SYMBOL_H__
+#define __IR_SYMBOL_H__
 
 #pragma once
 
@@ -12,7 +12,7 @@ USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
 template <typename Token>
-class symbol_ir : private noncopyable
+class ir_symbol : private noncopyable
 {
     public:
         using token_type = Token;
@@ -34,8 +34,8 @@ class symbol_ir : private noncopyable
                                         datum_type,
                                         codepoints_type>;
 
-        using record_type = std::shared_ptr<symbol_ir<token_type>>;
-        using records_type = std::vector<record_type>;
+        using symbol_type = std::shared_ptr<ir_symbol<token_type>>;
+        using symbols_type = std::vector<symbol_type>;
 
     private:
         token_type          my_token;           // link with content
@@ -46,8 +46,8 @@ class symbol_ir : private noncopyable
         //type                my_type;
 
     public:
-                            symbol_ir() = default;
-                           ~symbol_ir() = default;
+                            ir_symbol() = default;
+                           ~ir_symbol() = default;
 
         const token_type&   token() const;
         token_type&         token();
@@ -60,41 +60,41 @@ class symbol_ir : private noncopyable
 };
 
 template <typename Token>
-inline const typename symbol_ir<Token>::token_type& symbol_ir<Token>::token() const
+inline const typename ir_symbol<Token>::token_type& ir_symbol<Token>::token() const
 {
     return my_token;
 }
 
 template <typename Token>
-inline typename symbol_ir<Token>::token_type& symbol_ir<Token>::token()
+inline typename ir_symbol<Token>::token_type& ir_symbol<Token>::token()
 {
     return my_token;
 }
 
 template <typename Token>
-inline const typename symbol_ir<Token>::value_type& symbol_ir<Token>::value() const
+inline const typename ir_symbol<Token>::value_type& ir_symbol<Token>::value() const
 {
     return my_value;
 }
 
 template <typename Token>
-inline typename symbol_ir<Token>::value_type& symbol_ir<Token>::value()
+inline typename ir_symbol<Token>::value_type& ir_symbol<Token>::value()
 {
     return my_value;
 }
 
 template <typename Token>
-inline std::size_t symbol_ir<Token>::ssa_id() const
+inline std::size_t ir_symbol<Token>::ssa_id() const
 {
     return my_ssa_id;
 }
 
 template <typename Token>
-inline std::size_t& symbol_ir<Token>::ssa_id()
+inline std::size_t& ir_symbol<Token>::ssa_id()
 {
     return my_ssa_id;
 }
 
 END_NAMESPACE
 
-#endif // __SYMBOL_IR_H__
+#endif // __IR_SYMBOL_H__

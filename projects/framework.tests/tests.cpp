@@ -45,7 +45,7 @@
 #include <frontend/grammar/grammar_algorithm.hpp>
 #include <frontend/grammar/grammar_visualization.hpp>
 
-#include <symtable/symbol_ir.hpp>
+#include <symtable/ir_symbol.hpp>
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
 
@@ -74,6 +74,10 @@
 #include <frontend/semantics/semantics.inl>
 
 #include <backend/ir/quadruple.hpp>
+#include <backend/ir/basic_block.hpp>
+#include <backend/ir/basic_block.inl>
+#include <backend/ir/code.hpp>
+#include <backend/ir/code.inl>
 
 #include <backend/ir/ir_visitor.hpp>
 #include <backend/ir/dag_tac_visitor.hpp>

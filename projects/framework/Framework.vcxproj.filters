@@ -223,9 +223,6 @@
     <ClInclude Include="..\..\framework\frontend\lexical_analyzer\lexical_content.hpp">
       <Filter>frontend\lexical_analyzer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\symtable\symbol_ir.hpp">
-      <Filter>symtable</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\backend\ir\basic_block.hpp">
       <Filter>backend\ir</Filter>
     </ClInclude>
@@ -249,6 +246,12 @@
     </ClInclude>
     <ClInclude Include="..\..\framework\frontend\parser\parse_dag.hpp">
       <Filter>frontend\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\symtable\ir_symbol.hpp">
+      <Filter>symtable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\backend\ir\code.hpp">
+      <Filter>backend\ir</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -413,9 +416,6 @@
     <ClCompile Include="..\..\framework\frontend\lexical_analyzer\lexical_content.cpp">
       <Filter>frontend\lexical_analyzer</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\framework\backend\ir\basic_block.cpp">
-      <Filter>backend\ir</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\framework\backend\ir\control_flow_graph.cpp">
       <Filter>backend\ir</Filter>
     </ClCompile>
@@ -465,6 +465,12 @@
     </None>
     <None Include="..\..\framework\frontend\parser\packrat\packrat_parser.inl">
       <Filter>frontend\parser\packrat</Filter>
+    </None>
+    <None Include="..\..\framework\backend\ir\basic_block.inl">
+      <Filter>backend\ir</Filter>
+    </None>
+    <None Include="..\..\framework\backend\ir\code.inl">
+      <Filter>backend\ir</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

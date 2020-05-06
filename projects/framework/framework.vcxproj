@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\backend\ir\basic_block.hpp" />
+    <ClInclude Include="..\..\framework\backend\ir\code.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\control_flow_graph.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\ir.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\ir_visitor.hpp" />
@@ -94,17 +95,16 @@
     <ClInclude Include="..\..\framework\frontend\parser\parser_visualization.hpp" />
     <ClInclude Include="..\..\framework\frontend\semantics\semantics.hpp" />
     <ClInclude Include="..\..\framework\frontend\type\type.hpp" />
+    <ClInclude Include="..\..\framework\symtable\ir_symbol.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope_block.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope_function.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope_namespace.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope_parameter.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope_structure.hpp" />
-    <ClInclude Include="..\..\framework\symtable\symbol_ir.hpp" />
     <ClInclude Include="..\..\framework\symtable\symbol_table.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\framework\backend\ir\basic_block.cpp" />
     <ClCompile Include="..\..\framework\backend\ir\control_flow_graph.cpp" />
     <ClCompile Include="..\..\framework\core\content.cpp" />
     <ClCompile Include="..\..\framework\core\domain_helper.cpp" />
@@ -153,6 +153,8 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Soft\nasm\nasm.exe -f win64 -gcv8 -l $(ProjectDir)..\..\Framework\backend\generator\x64\gen.lst $(ProjectDir)..\..\Framework\backend\generator\x64\gen.asm</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Projects\fe\framework\backend\generator\x64\gen.obj</Outputs>
     </MASM>
+    <None Include="..\..\framework\backend\ir\basic_block.inl" />
+    <None Include="..\..\framework\backend\ir\code.inl" />
     <None Include="..\..\framework\backend\ir\ir.inl" />
     <None Include="..\..\framework\backend\ir\ir_visualization.inl" />
     <None Include="..\..\framework\frontend\lexical_analyzer\lexical_analyzer.inl" />

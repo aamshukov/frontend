@@ -24,11 +24,11 @@ class ir : private noncopyable
         using parse_dag_type = typename parser<token_type, tree_traits_type>::parse_dag_type;
         using parse_dags_type = typename parser<token_type, tree_traits_type>::parse_dags_type;
 
-        using record_type = typename symbol_ir<token_type>::record_type;
+        using symbol_type = typename ir_symbol<token_type>::symbol_type;
 
         using dag_key_pair = std::tuple<typename token_type::token_type,
                                         typename token_type::codepoints_type,
-                                        typename symbol_ir<token_type>::value_type>;
+                                        typename ir_symbol<token_type>::value_type>;
         using dag_key_type = std::vector<dag_key_pair>;
 
         struct dag_hash
@@ -59,7 +59,7 @@ class ir : private noncopyable
         using kids_type = std::vector<parse_dag_type>;
 
         using quadruple_type = quadruple<token_type>;
-        using code_type = std::list<quadruple_type>; //??
+        using code_type = std::list<quadruple_type>;
 
     private:
         static dag_key_type     build_dag_key(const parse_tree_type& tree);

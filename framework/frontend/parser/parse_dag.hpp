@@ -19,13 +19,13 @@ struct parse_dag : public dag, public visitable
 
     using symbol_type = grammar::symbol_type;
 
-    using record_type = typename symbol_ir<token_type>::record_type;
-    using records_type = typename symbol_ir<token_type>::records_type;
+    using ir_symbol_type = typename ir_symbol<token_type>::symbol_type;
+    using ir_symbols_type = typename ir_symbol<token_type>::symbols_type;
 
     using visitor_type = visitor<void, int, parse_dag<token_type, tree_traits_type>>;
 
     symbol_type symbol;
-    record_type record;
+    ir_symbol_type record; //??
 
     virtual ~parse_dag()
     {

@@ -52,7 +52,7 @@
 #include <symtable/scope/scope_parameter.hpp>
 #include <symtable/scope/scope_block.hpp>
 
-#include <symtable/symbol_ir.hpp>
+#include <symtable/ir_symbol.hpp>
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
 

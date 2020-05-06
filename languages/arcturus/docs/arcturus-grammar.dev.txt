@@ -1256,3 +1256,24 @@ strings: always represented as unicode codepoint - 32 bits
    r"path 'c:\tmp\arktur\file.txt'"    r'path "c:\tmp\arktur\file.txt"'
     "path {path}", where {path} is substitued by variable 'path'
 
+
+
+
+
+
+
+?????
+do condition-opt ':'
+    break
+    continue
+    goto
+
+
+do char in chars:
+
+do
+    n: integer { 8 }
+    name: string { 'arktur' }
+    real: amount
+    d: B<integer, real, string> { s = 3.2, t = "text", f = 8 }
+
