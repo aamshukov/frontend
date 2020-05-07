@@ -12,18 +12,14 @@ USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 USINGNAMESPACE(symtable)
 
-template <typename Token>
-struct quadruple
+struct operation_code_traits
 {
-    using token_type = Token;
-
-    using symbol_type = std::shared_ptr<ir_symbol<token_type>>;
-    using quadruple_type = std::shared_ptr<quadruple<token_type>>;
-    using label_type = std::size_t;
-
-    enum class operation_code : uint32_t
-    {
+    DECLARE_ENUM
+    (
+        operation_code,
+        uint32_t,
         unknown             = 0,
+
         address_of          = 1,
 
         load_integer        = 20,
@@ -80,7 +76,20 @@ struct quadruple
 
 
         phi                 = 500
-    };
+    )
+};
+
+template <typename Token, typename Traits = operation_code_traits>
+struct quadruple
+{
+    using token_type = Token;
+    using traits = Traits;
+    using operation_code = typename traits::operation_code;
+
+    using symbol_type = std::shared_ptr<ir_symbol<token_type>>;
+    using quadruple_type = std::shared_ptr<quadruple<token_type>>;
+    using index_type = std::size_t;
+    using label_type = std::size_t;
 
     union result
     {
@@ -90,6 +99,8 @@ struct quadruple
     };
 
     using result_type = quadruple::result;
+
+    index_type      index;
 
     operation_code  operation;
     symbol_type     argument1;
