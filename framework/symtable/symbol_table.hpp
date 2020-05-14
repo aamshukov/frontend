@@ -30,9 +30,10 @@ class symbol_table : private noncopyable
         using scope_type = std::shared_ptr<scope>;
 
     private:
-        size_type               my_level; // current scope level
-        scope_type              my_scope; // current scope
+        scope_type              my_root;    // root of scope tree, might represent 'global' scope
 
+        size_type               my_level;   // current scope level
+        scope_type              my_scope;   // current scope
 
     public:
                                 symbol_table();
