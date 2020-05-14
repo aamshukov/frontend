@@ -1,8 +1,8 @@
 //..............................
 // UI Lab Inc. Arthur Amshukov .
 //..............................
-#ifndef __SYMBOL_H__
-#define __SYMBOL_H__
+#ifndef __GRAMMAR_SYMBOL_H__
+#define __GRAMMAR_SYMBOL_H__
 
 #pragma once
 
@@ -283,4 +283,4 @@ inline string_type& symbol::semantic_action()
 
 END_NAMESPACE
 
-#endif // __SYMBOL_H__
+#endif // __GRAMMAR_SYMBOL_H__

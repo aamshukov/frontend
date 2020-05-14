@@ -17,13 +17,13 @@ struct parse_tree : public tree, public visitable
     using token_type = Token;
     using tree_traits_type = TreeTraits;
 
-    using symbol_type = grammar::symbol_type;
+    using gr_symbol_type = grammar::symbol_type;
 
-    using ir_symbol_type = typename ir_symbol<token_type>::symbol_type;
-    using ir_symbols_type = typename ir_symbol<token_type>::symbols_type;
+    using ir_symbol_type = std::shared_ptr<symtable::symbol<token_type>>;
+    using ir_symbols_type = std::vector<ir_symbol_type>;
 
-    symbol_type symbol;
-    ir_symbol_type record; //??
+    gr_symbol_type gr_symbol;
+    ir_symbol_type ir_symbol;
 
     virtual ~parse_tree()
     {

@@ -48,7 +48,7 @@
 #include <frontend/type/type.hpp>
 #include <frontend/type/type.inl>
 
-#include <symtable/ir_symbol.hpp>
+#include <symtable/symbol.hpp>
 #include <symtable/scope/scope.hpp>
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
@@ -95,7 +95,7 @@ void test_operator_precedence()
 
     precedence_algorithm::operators_type operators;
 
-    operators.emplace(symbol::op_mark);
+    operators.emplace(uilab::frontend::symbol::op_mark);
     operators.emplace((*gr.pool().find(L"+")).second);
     operators.emplace((*gr.pool().find(L"*")).second);
     operators.emplace((*gr.pool().find(L"(")).second);

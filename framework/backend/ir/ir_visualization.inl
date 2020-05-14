@@ -19,10 +19,10 @@ void ir_visualization<Token, TreeTraits>::print_tree(const typename ir_visualiza
         stream << "    ";
     }
 
-    if(static_cast<uint32_t>((*(*tree).record).token().type) != 0)
-        stream << (*(*tree).symbol).name() << L":" << static_cast<uint32_t>((*(*tree).record).token().type) << std::endl;
+    if(static_cast<uint32_t>((*(*tree).ir_symbol).token().type) != 0)
+        stream << (*(*tree).gr_symbol).name() << L":" << static_cast<uint32_t>((*(*tree).ir_symbol).token().type) << std::endl;
     else
-        stream << (*(*tree).symbol).name() << std::endl;
+        stream << (*(*tree).gr_symbol).name() << std::endl;
 
     for(const auto& kid : (*tree).kids)
     {
@@ -61,7 +61,7 @@ void ir_visualization<Token, TreeTraits>::collect_tree_dot_labels(const typename
 
         queue.pop();
 
-        stream << L"    " << k++ << L" [label=\"" << (*(*entry).symbol).name() << L"\"];" << std::endl;
+        stream << L"    " << k++ << L" [label=\"" << (*(*entry).gr_symbol).name() << L"\"];" << std::endl;
 
         for(auto kid : (*entry).kids)
         {
@@ -114,7 +114,7 @@ void ir_visualization<Token, TreeTraits>::collect_dag_dot_labels(const typename 
 
         queue.pop();
 
-        stream << L"    " << (*dag).id << L" [label=\"" << (*(*dag).symbol).name() << L"  " << (*dag).papas.size() <<  "\"];" << std::endl;
+        stream << L"    " << (*dag).id << L" [label=\"" << (*(*dag).gr_symbol).name() << L"  " << (*dag).papas.size() <<  "\"];" << std::endl;
 
         for(auto kid : (*dag).kids)
         {

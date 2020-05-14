@@ -86,10 +86,15 @@ struct quadruple
     using traits = Traits;
     using operation_code = typename traits::operation_code;
 
-    using symbol_type = std::shared_ptr<ir_symbol<token_type>>;
+    using symbol_type = std::shared_ptr<symtable::symbol<token_type>>;
+    using symbols_type = std::vector<symbol_type>;
+
     using quadruple_type = std::shared_ptr<quadruple<token_type>>;
+
     using index_type = std::size_t;
-    using label_type = std::size_t;
+    using size_type = std::size_t;
+
+    using label_type = size_type;
 
     union result
     {

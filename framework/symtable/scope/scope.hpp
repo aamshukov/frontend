@@ -18,16 +18,16 @@ class scope : public tree
         using scope_type = std::shared_ptr<scope>;
 
     public:
-        enum class kind
-        {
-            scope_namespace = 1,
-            scope_structure = 2,
-            scope_function  = 3,
-            scope_parameter = 4
-        };
+        //enum class kind //?? inheritance instead
+        //{
+        //    scope_namespace = 1,
+        //    scope_structure = 2,
+        //    scope_function  = 3,
+        //    scope_parameter = 4
+        //};
 
     private:
-        scope::kind     my_kind;
+        //??scope::kind     my_kind;
         scope_type      my_papa;    // parent scope
 
         size_type       my_level;   // depth

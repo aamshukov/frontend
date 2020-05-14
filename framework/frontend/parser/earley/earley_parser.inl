@@ -397,8 +397,8 @@ void earley_parser<Token, TreeTraits>::clone_tree(const typename earley_parser<T
         {
             new_node = new_tree;
 
-            (*new_tree).symbol = (*source.tree).symbol;
-            (*new_tree).record = (*source.tree).record;
+            (*new_tree).gr_symbol = (*source.tree).gr_symbol;
+            (*new_tree).ir_symbol = (*source.tree).ir_symbol;
 
             (*new_tree).papa = nullptr;
         }
@@ -406,8 +406,8 @@ void earley_parser<Token, TreeTraits>::clone_tree(const typename earley_parser<T
         {
             new_node = factory::create<earley_tree>();
 
-            (*new_node).symbol = (*entry.org_node).symbol;
-            (*new_node).record = (*entry.org_node).record;
+            (*new_node).gr_symbol = (*entry.org_node).gr_symbol;
+            (*new_node).ir_symbol = (*entry.org_node).ir_symbol;
 
             (*new_node).papa = entry.new_papa;
             (*entry.new_papa).kids.emplace_back(new_node);
@@ -471,10 +471,10 @@ void earley_parser<Token, TreeTraits>::build_parse_trees(typename earley_parser<
                 {
                     auto new_node(factory::create<earley_tree>());
 
-                    (*new_node).symbol = symbol;
+                    (*new_node).gr_symbol = symbol;
 
-                    (*new_node).record = factory::create<ir_symbol<token_type>>();
-                    (*(*new_node).record).token() = token;
+                    (*new_node).ir_symbol = factory::create<uilab::symtable::symbol<token_type>>();
+                    (*(*new_node).ir_symbol).token() = token;
 
                     (*new_node).papa = parse_root.papa;
                     (*parse_root.papa).kids.emplace_back(new_node);
@@ -493,10 +493,10 @@ void earley_parser<Token, TreeTraits>::build_parse_trees(typename earley_parser<
                 {
                     auto new_node(factory::create<earley_tree>());
 
-                    (*new_node).symbol = symbol;
+                    (*new_node).gr_symbol = symbol;
 
-                    (*new_node).record = factory::create<ir_symbol<token_type>>();
-                    (*(*new_node).record).token() = token;
+                    (*new_node).ir_symbol = factory::create<uilab::symtable::symbol<token_type>>();
+                    (*(*new_node).ir_symbol).token() = token;
 
                     (*new_node).papa = parse_root.papa;
                     (*parse_root.papa).kids.emplace_back(new_node);
@@ -552,10 +552,10 @@ void earley_parser<Token, TreeTraits>::build_parse_trees(typename earley_parser<
                         {
                             auto new_node(factory::create<earley_tree>());
 
-                            (*new_node).symbol = symbol;
+                            (*new_node).gr_symbol = symbol;
 
-                            (*new_node).record = factory::create<ir_symbol<token_type>>();
-                            (*(*new_node).record).token() = token;
+                            (*new_node).ir_symbol = factory::create<uilab::symtable::symbol<token_type>>();
+                            (*(*new_node).ir_symbol).token() = token;
 
                             (*new_node).papa = parse_root.papa;
                             (*parse_root.papa).kids.emplace_back(new_node);
@@ -674,9 +674,9 @@ void earley_parser<Token, TreeTraits>::build_parse_trees()
             tree_type root(factory::create<earley_tree>());
 
             // ... добавить в него узел S как корень ...
-            (*root).symbol = my_grammar.start_symbol();
-            (*root).record = factory::create<ir_symbol<token_type>>();
-            (*(*root).record).token() = (*(*current_item).master_chart).token;
+            (*root).gr_symbol = my_grammar.start_symbol();
+            (*root).ir_symbol = factory::create<uilab::symtable::symbol<token_type>>();
+            (*(*root).ir_symbol).token() = (*(*current_item).master_chart).token;
 
             // ... добавить Tr в список trees
             trees.emplace_back(root);

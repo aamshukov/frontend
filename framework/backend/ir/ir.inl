@@ -207,14 +207,16 @@ typename ir<Token, TreeTraits>::dag_key_type ir<Token, TreeTraits>::build_dag_ke
 {
     dag_key_type result;
 
-    result.emplace_back(std::make_tuple((*(*tree).record).token().type, (*(*tree).record).token().literal, (*(*tree).record).value()));
+    result.emplace_back(std::make_tuple((*(*tree).ir_symbol).token().type, (*(*tree).ir_symbol).token().literal, (*(*tree).ir_symbol).value()));
 
     std::for_each((*tree).kids.begin(),
                   (*tree).kids.end(),
                   [&result](const auto& kid)
                   {
                       auto tree_kid(std::dynamic_pointer_cast<parse_tree<token_type, tree_traits_type>>(kid));
-                      result.emplace_back(std::make_tuple((*(*tree_kid).record).token().type, (*(*tree_kid).record).token().literal, (*(*tree_kid).record).value()));
+                      result.emplace_back(std::make_tuple((*(*tree_kid).ir_symbol).token().type,
+                                                          (*(*tree_kid).ir_symbol).token().literal,
+                                                          (*(*tree_kid).ir_symbol).value()));
                   });
 
     return result;
@@ -299,8 +301,8 @@ void ir<Token, TreeTraits>::ast_to_asd(const typename ir<Token, TreeTraits>::par
         {
             dag = factory::create<parse_dag<token_type, tree_traits_type>>();
 
-            (*dag).symbol = (*tree).symbol;
-            (*dag).record = (*tree).record;
+            (*dag).gr_symbol = (*tree).gr_symbol;
+            (*dag).ir_symbol = (*tree).ir_symbol;
 
             (*dag).id = ++id;
 

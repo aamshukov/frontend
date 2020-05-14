@@ -10,6 +10,7 @@ BEGIN_NAMESPACE(backend)
 
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
+USINGNAMESPACE(symtable)
 
 template <typename Token, typename TreeTraits>
 class ir : private noncopyable
@@ -24,11 +25,12 @@ class ir : private noncopyable
         using parse_dag_type = typename parser<token_type, tree_traits_type>::parse_dag_type;
         using parse_dags_type = typename parser<token_type, tree_traits_type>::parse_dags_type;
 
-        using symbol_type = typename ir_symbol<token_type>::symbol_type;
+        using symbol_type = std::shared_ptr<symtable::symbol<token_type>>;
+        using symbols_type = std::vector<symbol_type>;
 
         using dag_key_pair = std::tuple<typename token_type::token_type,
                                         typename token_type::codepoints_type,
-                                        typename ir_symbol<token_type>::value_type>;
+                                        typename symtable::symbol<token_type>::value_type>;
         using dag_key_type = std::vector<dag_key_pair>;
 
         struct dag_hash

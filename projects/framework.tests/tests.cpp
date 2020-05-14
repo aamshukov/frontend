@@ -48,7 +48,7 @@
 #include <frontend/type/type.hpp>
 #include <frontend/type/type.inl>
 
-#include <symtable/ir_symbol.hpp>
+#include <symtable/symbol.hpp>
 #include <symtable/scope/scope.hpp>
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
@@ -639,16 +639,16 @@ int main()
             t0 = std::move(tokens.front());
             tokens.pop();
 
-            symbol& es(*symbol::epsilon);
+            uilab::frontend::symbol& es(*uilab::frontend::symbol::epsilon);
             es.name();
 
-            std::vector<symbol> symbols;
-            symbol s0(0, string_type(L"S"), symbol::kind::nonterminal);
+            std::vector<uilab::frontend::symbol> symbols;
+            uilab::frontend::symbol s0(0, string_type(L"S"), uilab::frontend::symbol::kind::nonterminal);
             symbols.emplace_back(std::move(s0));
-            s0 = std::move(symbol(0, string_type(L"S"), symbol::kind::nonterminal));
-            symbol s1(1, string_type(L"S"), symbol::kind::nonterminal);
+            s0 = std::move(uilab::frontend::symbol(0, string_type(L"S"), uilab::frontend::symbol::kind::nonterminal));
+            uilab::frontend::symbol s1(1, string_type(L"S"), uilab::frontend::symbol::kind::nonterminal);
             symbols.emplace_back(s1);
-            s1 = symbol(1, string_type(L"S"), symbol::kind::nonterminal);
+            s1 = uilab::frontend::symbol(1, string_type(L"S"), uilab::frontend::symbol::kind::nonterminal);
             s1.id();
         }
 
@@ -3351,12 +3351,12 @@ void test_load_grammar()
 
         grammar::symbol_type sym((*gr.rules()[0]).lhs()[0]);
 
-        //std::set<grammar::symbol_type, symbol::symbol_key_comparator> set0;
+        //std::set<grammar::symbol_type, uilab::frontend::symbol::symbol_key_comparator> set0;
         //set0.emplace(sym);
         //set0.emplace(sym);
         //(*sym).first_sets().emplace(set0);
 
-        //std::set<grammar::symbol_type, symbol::symbol_key_comparator> set1;
+        //std::set<grammar::symbol_type, uilab::frontend::symbol::symbol_key_comparator> set1;
         //set1.emplace(sym);
         //set1.emplace(sym);
         //(*sym).first_sets().emplace(set1);
@@ -3442,27 +3442,27 @@ void test_load_grammar()
 
 void test_infix_op()
 {
-    grammar::symbol_type a(factory::create<symbol>(0, L"a", symbol::kind::terminal));
-    grammar::symbol_type b(factory::create<symbol>(1, L"b", symbol::kind::terminal));
-    grammar::symbol_type c(factory::create<symbol>(2, L"c", symbol::kind::terminal));
-    grammar::symbol_type d(factory::create<symbol>(3, L"d", symbol::kind::terminal));
-    grammar::symbol_type f(factory::create<symbol>(4, L"f", symbol::kind::terminal));
+    grammar::symbol_type a(factory::create<uilab::frontend::symbol>(0, L"a", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type b(factory::create<uilab::frontend::symbol>(1, L"b", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type c(factory::create<uilab::frontend::symbol>(2, L"c", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type d(factory::create<uilab::frontend::symbol>(3, L"d", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type f(factory::create<uilab::frontend::symbol>(4, L"f", uilab::frontend::symbol::kind::terminal));
 
-    grammar::symbol_type A(factory::create<symbol>(5, L"A", symbol::kind::terminal));
-    grammar::symbol_type B(factory::create<symbol>(6, L"B", symbol::kind::terminal));
-    grammar::symbol_type C(factory::create<symbol>(7, L"C", symbol::kind::terminal));
-    grammar::symbol_type D(factory::create<symbol>(8, L"D", symbol::kind::terminal));
+    grammar::symbol_type A(factory::create<uilab::frontend::symbol>(5, L"A", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type B(factory::create<uilab::frontend::symbol>(6, L"B", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type C(factory::create<uilab::frontend::symbol>(7, L"C", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type D(factory::create<uilab::frontend::symbol>(8, L"D", uilab::frontend::symbol::kind::terminal));
 
-    grammar::symbol_type _0(factory::create<symbol>(9, L"0", symbol::kind::terminal));
-    grammar::symbol_type _1(factory::create<symbol>(10, L"1", symbol::kind::terminal));
-    grammar::symbol_type _2(factory::create<symbol>(11, L"2", symbol::kind::terminal));
-    grammar::symbol_type _3(factory::create<symbol>(12, L"3", symbol::kind::terminal));
-    grammar::symbol_type _4(factory::create<symbol>(13, L"4", symbol::kind::terminal));
-    grammar::symbol_type _5(factory::create<symbol>(14, L"5", symbol::kind::terminal));
+    grammar::symbol_type _0(factory::create<uilab::frontend::symbol>(9, L"0", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type _1(factory::create<uilab::frontend::symbol>(10, L"1", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type _2(factory::create<uilab::frontend::symbol>(11, L"2", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type _3(factory::create<uilab::frontend::symbol>(12, L"3", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type _4(factory::create<uilab::frontend::symbol>(13, L"4", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type _5(factory::create<uilab::frontend::symbol>(14, L"5", uilab::frontend::symbol::kind::terminal));
 
-    grammar::symbol_type g(factory::create<symbol>(15, L"g", symbol::kind::terminal));
-    grammar::symbol_type h(factory::create<symbol>(16, L"h", symbol::kind::terminal));
-    grammar::symbol_type q(factory::create<symbol>(17, L"q", symbol::kind::terminal));
+    grammar::symbol_type g(factory::create<uilab::frontend::symbol>(15, L"g", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type h(factory::create<uilab::frontend::symbol>(16, L"h", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type q(factory::create<uilab::frontend::symbol>(17, L"q", uilab::frontend::symbol::kind::terminal));
 
     std::vector<grammar_algorithm::sets_type> sets;
     grammar_algorithm::sets_type result;
@@ -3473,7 +3473,7 @@ void test_infix_op()
     sets.clear();
     result.clear();
 
-    sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{symbol::epsilon}, grammar_algorithm::set_type{a,b,b}});
+    sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{uilab::frontend::symbol::epsilon}, grammar_algorithm::set_type{a,b,b}});
     sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{b}, grammar_algorithm::set_type{b,a,b}});
 
     grammar_algorithm::infix_operator(sets, 2, result);
@@ -3483,11 +3483,11 @@ void test_infix_op()
     sets.clear();
     result.clear();
 
-    sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{a}, grammar_algorithm::set_type{b}, grammar_algorithm::set_type{symbol::epsilon}});
+    sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{a}, grammar_algorithm::set_type{b}, grammar_algorithm::set_type{uilab::frontend::symbol::epsilon}});
     sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{a}});
     sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{b}});
     sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{d}});
-    sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{symbol::epsilon}});
+    sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{uilab::frontend::symbol::epsilon}});
 
     grammar_algorithm::infix_operator(sets, 3, result);
     std::wcout << grammar_visualization::decorate_sets(result) << std::endl;
@@ -3511,7 +3511,7 @@ void test_infix_op()
     sets.clear();
     result.clear();
 
-    sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{symbol::epsilon}, grammar_algorithm::set_type{a,b,b}});
+    sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{uilab::frontend::symbol::epsilon}, grammar_algorithm::set_type{a,b,b}});
     sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{b}, grammar_algorithm::set_type{b,a,b}});
     sets.emplace_back(grammar_algorithm::sets_type { grammar_algorithm::set_type{c,d}, grammar_algorithm::set_type{d,f}, grammar_algorithm::set_type{g, h}});
 
@@ -3700,11 +3700,11 @@ static void make_vector_unique2(typename grammar_algorithm::sets_type& sequence)
 
 void test_make_unique()
 {
-    grammar::symbol_type a(factory::create<symbol>(0, L"a", symbol::kind::terminal));
-    grammar::symbol_type b(factory::create<symbol>(1, L"b", symbol::kind::terminal));
-    grammar::symbol_type c(factory::create<symbol>(2, L"c", symbol::kind::terminal));
-    grammar::symbol_type d(factory::create<symbol>(3, L"d", symbol::kind::terminal));
-    grammar::symbol_type f(factory::create<symbol>(4, L"f", symbol::kind::terminal));
+    grammar::symbol_type a(factory::create<uilab::frontend::symbol>(0, L"a", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type b(factory::create<uilab::frontend::symbol>(1, L"b", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type c(factory::create<uilab::frontend::symbol>(2, L"c", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type d(factory::create<uilab::frontend::symbol>(3, L"d", uilab::frontend::symbol::kind::terminal));
+    grammar::symbol_type f(factory::create<uilab::frontend::symbol>(4, L"f", uilab::frontend::symbol::kind::terminal));
 
     // { cc c cc c }
     auto seq0(grammar_algorithm::sets_type { grammar_algorithm::set_type{c,c},
@@ -3837,9 +3837,9 @@ void test_sets()
 
         std::wcout << grammar_visualization::decorate_grammar(gr) << std::endl;
 
-        //grammar::symbol_type a(factory::create<symbol>(0, L"a", symbol::kind::terminal));
-        //grammar::symbol_type b(factory::create<symbol>(1, L"b", symbol::kind::terminal));
-        //grammar::symbol_type c(factory::create<symbol>(2, L"c", symbol::kind::terminal));
+        //grammar::symbol_type a(factory::create<symbol>(0, L"a", uilab::frontend::symbol::kind::terminal));
+        //grammar::symbol_type b(factory::create<symbol>(1, L"b", uilab::frontend::symbol::kind::terminal));
+        //grammar::symbol_type c(factory::create<symbol>(2, L"c", uilab::frontend::symbol::kind::terminal));
 
         //grammar_algorithm::sets_type new_fl_prime_a;
 
@@ -3847,7 +3847,7 @@ void test_sets()
 
         //infix_op_input.emplace_back(grammar_algorithm::sets_type{ grammar_algorithm::set_type{b}, grammar_algorithm::set_type{a,c} });
         //infix_op_input.emplace_back(grammar_algorithm::sets_type{ grammar_algorithm::set_type{c}});
-        //infix_op_input.emplace_back(grammar_algorithm::sets_type{ grammar_algorithm::set_type{symbol::epsilon}});
+        //infix_op_input.emplace_back(grammar_algorithm::sets_type{ grammar_algorithm::set_type{uilab::frontend::symbol::epsilon}});
         //infix_op_input.emplace_back(grammar_algorithm::sets_type{ grammar_algorithm::set_type{a}});
 
         //grammar_algorithm::infix_operator(infix_op_input, k, new_fl_prime_a); // TRUNCk(FIRSTk(ui+1) L)

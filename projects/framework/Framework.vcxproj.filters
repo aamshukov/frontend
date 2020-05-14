@@ -247,11 +247,11 @@
     <ClInclude Include="..\..\framework\frontend\parser\parse_dag.hpp">
       <Filter>frontend\parser</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\symtable\ir_symbol.hpp">
-      <Filter>symtable</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\backend\ir\code.hpp">
       <Filter>backend\ir</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\framework\symtable\symbol.hpp">
+      <Filter>symtable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

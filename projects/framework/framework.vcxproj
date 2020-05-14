@@ -95,7 +95,7 @@
     <ClInclude Include="..\..\framework\frontend\parser\parser_visualization.hpp" />
     <ClInclude Include="..\..\framework\frontend\semantics\semantics.hpp" />
     <ClInclude Include="..\..\framework\frontend\type\type.hpp" />
-    <ClInclude Include="..\..\framework\symtable\ir_symbol.hpp" />
+    <ClInclude Include="..\..\framework\symtable\symbol.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope_block.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope_function.hpp" />

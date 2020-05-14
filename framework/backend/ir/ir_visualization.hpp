@@ -10,16 +10,17 @@ BEGIN_NAMESPACE(backend)
 
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
+USINGNAMESPACE(symtable)
 
 template <typename Token, typename TreeTraits>
 class ir_visualization : private noncopyable
 {
     public:
-        using symbol_type = symbol::symbol_type;
-        using symbols_type = symbol::symbols_type;
+        using symbol_type = grammar::symbol_type;
+        using symbols_type = grammar::symbols_type;
 
-        using set_type = symbol::set_type;
-        using sets_type = symbol::sets_type;
+        using set_type = frontend::symbol::set_type;
+        using sets_type = frontend::symbol::sets_type;
 
         using rule_type = grammar::rule_type;
         using rules_type = grammar::rules_type;

@@ -12,7 +12,7 @@ USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
 template <typename Token>
-class ir_symbol : private noncopyable
+class symbol : private noncopyable
 {
     public:
         using token_type = Token;
@@ -36,10 +36,6 @@ class ir_symbol : private noncopyable
                                         void*,
                                         datum_type,
                                         codepoints_type>;
-
-        using symbol_type = std::shared_ptr<ir_symbol<token_type>>;
-        using symbols_type = std::vector<symbol_type>;
-
         using type_type = type;
 
         enum class flags : uint64_t
@@ -61,8 +57,8 @@ class ir_symbol : private noncopyable
         flags_type          my_flags;           // flags
 
     public:
-                            ir_symbol() = default;
-                           ~ir_symbol() = default;
+                            symbol() = default;
+                           ~symbol() = default;
 
         const token_type&   token() const;
         token_type&         token();
@@ -84,73 +80,73 @@ class ir_symbol : private noncopyable
 };
 
 template <typename Token>
-inline const typename ir_symbol<Token>::token_type& ir_symbol<Token>::token() const
+inline const typename symbol<Token>::token_type& symbol<Token>::token() const
 {
     return my_token;
 }
 
 template <typename Token>
-inline typename ir_symbol<Token>::token_type& ir_symbol<Token>::token()
+inline typename symbol<Token>::token_type& symbol<Token>::token()
 {
     return my_token;
 }
 
 template <typename Token>
-inline const typename ir_symbol<Token>::value_type& ir_symbol<Token>::value() const
+inline const typename symbol<Token>::value_type& symbol<Token>::value() const
 {
     return my_value;
 }
 
 template <typename Token>
-inline typename ir_symbol<Token>::value_type& ir_symbol<Token>::value()
+inline typename symbol<Token>::value_type& symbol<Token>::value()
 {
     return my_value;
 }
 
 template <typename Token>
-inline std::size_t ir_symbol<Token>::ssa_id() const
+inline std::size_t symbol<Token>::ssa_id() const
 {
     return my_ssa_id;
 }
 
 template <typename Token>
-inline std::size_t& ir_symbol<Token>::ssa_id()
+inline std::size_t& symbol<Token>::ssa_id()
 {
     return my_ssa_id;
 }
 
 template <typename Token>
-inline const typename ir_symbol<Token>::type_type& ir_symbol<Token>::type() const
+inline const typename symbol<Token>::type_type& symbol<Token>::type() const
 {
     return my_type;
 }
 
 template <typename Token>
-inline typename ir_symbol<Token>::type_type& ir_symbol<Token>::type()
+inline typename symbol<Token>::type_type& symbol<Token>::type()
 {
     return my_type;
 }
 
 template <typename Token>
-inline std::size_t ir_symbol<Token>::offset() const
+inline std::size_t symbol<Token>::offset() const
 {
     return my_offset;
 }
 
 template <typename Token>
-inline std::size_t& ir_symbol<Token>::offset()
+inline std::size_t& symbol<Token>::offset()
 {
     return my_offset;
 }
 
 template <typename Token>
-inline typename ir_symbol<Token>::flags_type ir_symbol<Token>::flags() const
+inline typename symbol<Token>::flags_type symbol<Token>::flags() const
 {
     return my_flags;
 }
 
 template <typename Token>
-inline typename ir_symbol<Token>::flags_type& ir_symbol<Token>::flags()
+inline typename symbol<Token>::flags_type& symbol<Token>::flags()
 {
     return my_flags;
 }

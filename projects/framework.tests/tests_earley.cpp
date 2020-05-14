@@ -48,7 +48,7 @@
 #include <frontend/type/type.hpp>
 #include <frontend/type/type.inl>
 
-#include <symtable/ir_symbol.hpp>
+#include <symtable/symbol.hpp>
 #include <symtable/scope/scope.hpp>
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
@@ -199,8 +199,8 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>, my_ear
         {
             auto result(factory::create<parse_tree<token_type, my_earley_tree_traits>>());
 
-            (*result).symbol = ((*(*item).rule).lhs()[0]);
-            (*result).record = factory::create<ir_symbol<token_type>>();
+            (*result).gr_symbol = ((*(*item).rule).lhs()[0]);
+            (*result).ir_symbol = factory::create<uilab::symtable::symbol<token_type>>();
 
             return result;
         }
@@ -209,9 +209,9 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>, my_ear
         {
             auto result(factory::create<parse_tree<token_type, my_earley_tree_traits>>());
 
-            (*result).symbol = symbol;
-            (*result).record = factory::create<ir_symbol<token_type>>();
-            (*(*result).record).token() = token;
+            (*result).gr_symbol = symbol;
+            (*result).ir_symbol = factory::create<uilab::symtable::symbol<token_type>>();
+            (*(*result).ir_symbol).token() = token;
             (*result).papa = node;
 
             if(node != nullptr && (*rule).rhs()[position] == symbol)
@@ -233,8 +233,8 @@ class my_earley_parser : public earley_parser<token<earley_token_traits>, my_ear
         {
             auto result(factory::create<parse_tree<token_type, my_earley_tree_traits>>());
 
-            (*result).symbol = ((*(*item).rule).lhs()[0]);
-            (*result).record = factory::create<ir_symbol<token_type>>();
+            (*result).gr_symbol = ((*(*item).rule).lhs()[0]);
+            (*result).ir_symbol = factory::create<uilab::symtable::symbol<token_type>>();
             (*result).papa = node;
 
             if(node != nullptr)
