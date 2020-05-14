@@ -20,6 +20,9 @@ class ir_symbol : private noncopyable
         using datum_type = text::datum_type;
         using codepoints_type = std::basic_string<datum_type>;
 
+        using index_type = std::size_t;
+        using size_type = std::size_t;
+
         using value_type = std::variant<int8_t,
                                         uint8_t,
                                         int16_t,
@@ -37,13 +40,25 @@ class ir_symbol : private noncopyable
         using symbol_type = std::shared_ptr<ir_symbol<token_type>>;
         using symbols_type = std::vector<symbol_type>;
 
+        using type_type = type;
+
+        enum class flags : uint64_t
+        {
+            clear = 0x0000
+        };
+
+        using flags_type = tmpl_flags<flags>;
+
     private:
         token_type          my_token;           // link with content
-        value_type          my_value;           // inffered value if any
+        value_type          my_value;           // inffered value if any, might be integer value, real value or identifier
 
         std::size_t         my_ssa_id;          // 0 - unassigned, 1+
 
-        //type                my_type;
+        type_type           my_type;
+        size_type           my_offset;          // runtime offset
+
+        flags_type          my_flags;           // flags
 
     public:
                             ir_symbol() = default;
@@ -57,6 +72,15 @@ class ir_symbol : private noncopyable
 
         std::size_t         ssa_id() const;
         std::size_t&        ssa_id();
+
+        const type_type&    type() const;
+        type_type&          type();
+
+        std::size_t         offset() const;
+        std::size_t&        offset();
+
+        flags_type          flags() const;
+        flags_type&         flags();
 };
 
 template <typename Token>
@@ -93,6 +117,42 @@ template <typename Token>
 inline std::size_t& ir_symbol<Token>::ssa_id()
 {
     return my_ssa_id;
+}
+
+template <typename Token>
+inline const typename ir_symbol<Token>::type_type& ir_symbol<Token>::type() const
+{
+    return my_type;
+}
+
+template <typename Token>
+inline typename ir_symbol<Token>::type_type& ir_symbol<Token>::type()
+{
+    return my_type;
+}
+
+template <typename Token>
+inline std::size_t ir_symbol<Token>::offset() const
+{
+    return my_offset;
+}
+
+template <typename Token>
+inline std::size_t& ir_symbol<Token>::offset()
+{
+    return my_offset;
+}
+
+template <typename Token>
+inline typename ir_symbol<Token>::flags_type ir_symbol<Token>::flags() const
+{
+    return my_flags;
+}
+
+template <typename Token>
+inline typename ir_symbol<Token>::flags_type& ir_symbol<Token>::flags()
+{
+    return my_flags;
 }
 
 END_NAMESPACE

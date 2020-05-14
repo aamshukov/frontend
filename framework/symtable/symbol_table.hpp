@@ -26,13 +26,22 @@ class symbol_table : private noncopyable
     //    stack_type              stack; // display
 
     public:
+        using size_type = std::size_t;
+        using scope_type = std::shared_ptr<scope>;
+
+    private:
+        size_type               my_level; // current scope level
+        scope_type              my_scope; // current scope
+
+
+    public:
                                 symbol_table();
                                ~symbol_table();
-    //    // enter scope
-    //    // leave scope
+    //    // enter scope ++my_level
+    //    // leave scope --my_level
 
-    //    // add
-    //    // get/lookup
+    //    // add symbol
+    //    // get/lookup symbol
 };
 
 END_NAMESPACE

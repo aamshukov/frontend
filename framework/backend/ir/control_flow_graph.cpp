@@ -33,7 +33,11 @@
 
 #include <frontend/grammar/token.hpp>
 
+#include <frontend/type/type.hpp>
+#include <frontend/type/type.inl>
+
 #include <symtable/ir_symbol.hpp>
+#include <symtable/scope/scope.hpp>
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
 

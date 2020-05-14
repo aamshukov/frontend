@@ -419,9 +419,6 @@
     <ClCompile Include="..\..\framework\backend\ir\control_flow_graph.cpp">
       <Filter>backend\ir</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\framework\frontend\type\type.cpp">
-      <Filter>frontend\type</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\framework\frontend\lexical_analyzer\lexical_analyzer.inl">
@@ -471,6 +468,9 @@
     </None>
     <None Include="..\..\framework\backend\ir\code.inl">
       <Filter>backend\ir</Filter>
+    </None>
+    <None Include="..\..\framework\frontend\type\type.inl">
+      <Filter>frontend\type</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

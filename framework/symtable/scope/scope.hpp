@@ -11,9 +11,10 @@ BEGIN_NAMESPACE(symtable)
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
-class scope : private noncopyable
+class scope : public tree
 {
     public:
+        using size_type = std::size_t;
         using scope_type = std::shared_ptr<scope>;
 
     public:
@@ -27,7 +28,10 @@ class scope : private noncopyable
 
     private:
         scope::kind     my_kind;
-        scope_type      my_papa; // parent scope
+        scope_type      my_papa;    // parent scope
+
+        size_type       my_level;   // depth
+        string_type     my_name;    // x:level
 
     public:
                        // scope();

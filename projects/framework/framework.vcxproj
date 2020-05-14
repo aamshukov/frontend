@@ -144,7 +144,6 @@
     <ClCompile Include="..\..\framework\frontend\parser\operator_precedence\precedence_algorithm.cpp" />
     <ClCompile Include="..\..\framework\frontend\parser\operator_precedence\precedence_visualization.cpp" />
     <ClCompile Include="..\..\framework\frontend\parser\parser_algorithm.cpp" />
-    <ClCompile Include="..\..\framework\frontend\type\type.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="..\..\framework\backend\generator\x64\gen.asm">
@@ -168,6 +167,7 @@
     <None Include="..\..\framework\frontend\parser\parser.inl" />
     <None Include="..\..\framework\frontend\parser\parser_visualization.inl" />
     <None Include="..\..\framework\frontend\semantics\semantics.inl" />
+    <None Include="..\..\framework\frontend\type\type.inl" />
     <None Include="..\..\framework\symtable\symbol_table.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
