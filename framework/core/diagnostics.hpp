@@ -14,14 +14,17 @@ class diagnostics : public singleton<diagnostics>
         using diagnostics_type = std::vector<string_type>;
         using collected_status_type = std::vector<status>;
 
+        using size_type = std::size_t;
+
     private:
         diagnostics_type                my_warnings;
         diagnostics_type                my_errors;
 
         collected_status_type           my_collected_status;
+        size_type                       my_spurious_errors; // how many spurious error before termination
 
     public:
-        diagnostics() = default;
+        diagnostics(size_type spurious_errors);
 
         // add diagnostic
         // dump diagnostics
@@ -32,6 +35,11 @@ class diagnostics : public singleton<diagnostics>
 
         const collected_status_type&    collected_status() const;
 };
+
+inline diagnostics::diagnostics(typename diagnostics::size_type spurious_errors)
+                  : my_spurious_errors(spurious_errors)
+{
+}
 
 inline const typename diagnostics::diagnostics_type& diagnostics::warnings() const
 {

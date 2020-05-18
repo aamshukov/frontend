@@ -20,6 +20,13 @@ parser<Token, TreeTraits>::~parser()
 {
 }
 
+template <typename Token, typename TreeTraits>
+typename parser<Token, TreeTraits>::tokens_type parser<Token, TreeTraits>::synchronization_tokens()
+{
+    tokens_type sync_tokens;
+    return sync_tokens;
+}
+
 END_NAMESPACE
 
 #endif // __PARSER_INL__

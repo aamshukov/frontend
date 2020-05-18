@@ -40,7 +40,8 @@ class symbol : private noncopyable
 
         enum class flags : uint64_t
         {
-            clear = 0x0000
+            clear = 0x0000,
+            reg   = 0x0001  // if the symbol's value is in a register
         };
 
         using flags_type = tmpl_flags<flags>;
@@ -52,7 +53,14 @@ class symbol : private noncopyable
         std::size_t         my_ssa_id;          // 0 - unassigned, 1+
 
         type_type           my_type;
+        string_type         my_machine_type; //??
+
         size_type           my_offset;          // runtime offset
+
+        size_type           my_size;            // runtime size in bytes, might be aligned
+        size_type           my_bitsize;         // runtime size in bits
+
+        //class_type          my_storage_class; //??
 
         flags_type          my_flags;           // flags
 
@@ -74,6 +82,9 @@ class symbol : private noncopyable
 
         std::size_t         offset() const;
         std::size_t&        offset();
+
+        std::size_t         size() const;
+        std::size_t&        size();
 
         flags_type          flags() const;
         flags_type&         flags();
@@ -137,6 +148,18 @@ template <typename Token>
 inline std::size_t& symbol<Token>::offset()
 {
     return my_offset;
+}
+
+template <typename Token>
+inline std::size_t symbol<Token>::size() const
+{
+    return my_size;
+}
+
+template <typename Token>
+inline std::size_t& symbol<Token>::size()
+{
+    return my_size;
 }
 
 template <typename Token>

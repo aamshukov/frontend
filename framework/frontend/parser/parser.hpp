@@ -14,6 +14,8 @@ class parser : private noncopyable
 {
     public:
         using token_type = typename parse_tree<Token, TreeTraits>::token_type;
+        using tokens_type = std::vector<token_type>;
+
         using tree_traits_type = typename parse_tree<Token, TreeTraits>::tree_traits_type;
 
         using parse_tree_type = std::shared_ptr<parse_tree<token_type, tree_traits_type>>;
@@ -35,6 +37,8 @@ class parser : private noncopyable
 
     protected:
         virtual void            parse() = 0;
+
+        virtual tokens_type     synchronization_tokens(); // anchor sets, not pure virtual cause another method for error handling might be used ...
 
     public:
                                 parser(const lexical_analyzer_type& lexical_analyzer);
