@@ -12,7 +12,7 @@ USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)
 
 template <typename Token>
-class symbol_table : private noncopyable
+class symbol_table : public singleton<symbol_table<Token>>
 {
     // hashtable and stack, LeBlanc/Cook
 
