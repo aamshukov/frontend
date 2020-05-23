@@ -105,6 +105,7 @@
     <ClInclude Include="..\..\framework\symtable\scope\scope_parameter.hpp" />
     <ClInclude Include="..\..\framework\symtable\scope\scope_structure.hpp" />
     <ClInclude Include="..\..\framework\symtable\symbol_table.hpp" />
+    <ClInclude Include="..\..\framework\symtable\symbol_table_builder.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\backend\generator\activation_record.cpp" />
@@ -173,6 +174,7 @@
     <None Include="..\..\framework\frontend\semantics\semantics.inl" />
     <None Include="..\..\framework\frontend\type\type.inl" />
     <None Include="..\..\framework\symtable\symbol_table.inl" />
+    <None Include="..\..\framework\symtable\symbol_table_builder.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C0F31E66-9BE9-4349-B2F9-5E7B688F9BA2}</ProjectGuid>

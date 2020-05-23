@@ -11,49 +11,54 @@ BEGIN_NAMESPACE(core)
 class diagnostics : public singleton<diagnostics>
 {
     public:
-        using diagnostics_type = std::vector<string_type>;
-        using collected_status_type = std::vector<status>;
-
+        using data_type = std::vector<status>;
         using size_type = std::size_t;
 
     private:
-        diagnostics_type                my_warnings;
-        diagnostics_type                my_errors;
-
-        collected_status_type           my_collected_status;
-        size_type                       my_spurious_errors; // how many spurious error before termination
+        data_type           my_data;
+        size_type           my_spurious_errors; // how many spurious error before termination
+        bool                my_state; // quick state check, true - valid (continue), false - erroneous
 
     public:
-        diagnostics(size_type spurious_errors);
+                            diagnostics(size_type spurious_errors);
+
+        const data_type&    warnings() const;
+        const data_type&    errors() const;
+
+        const data_type&    data() const;
+
+        bool                state() const;
 
         // add diagnostic
         // dump diagnostics
         // add status
-
-        const diagnostics_type&         warnings() const;
-        const diagnostics_type&         errors() const;
-
-        const collected_status_type&    collected_status() const;
 };
 
-inline diagnostics::diagnostics(typename diagnostics::size_type spurious_errors)
-                  : my_spurious_errors(spurious_errors)
+inline diagnostics::diagnostics(typename diagnostics::size_type spurious_errors = 100)
+                  : my_spurious_errors(spurious_errors), my_state(true)
 {
 }
 
-inline const typename diagnostics::diagnostics_type& diagnostics::warnings() const
+inline const typename diagnostics::data_type& diagnostics::warnings() const
 {
-    return my_warnings;
+    data_type result;
+    return result;
 }
 
-inline const typename diagnostics::diagnostics_type& diagnostics::errors() const
+inline const typename diagnostics::data_type& diagnostics::errors() const
 {
-    return my_errors;
+    data_type result;
+    return result;
 }
 
-inline const typename diagnostics::collected_status_type& diagnostics::collected_status() const
+inline const typename diagnostics::data_type& diagnostics::data() const
 {
-    return my_collected_status;
+    return my_data;
+}
+
+inline bool diagnostics::state() const
+{
+    return my_state;
 }
 
 END_NAMESPACE

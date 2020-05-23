@@ -50,10 +50,13 @@
 #include <symtable/scope/scope.hpp>
 #include <symtable/symbol_table.hpp>
 #include <symtable/symbol_table.inl>
+#include <symtable/symbol_table_builder.hpp>
+#include <symtable/symbol_table_builder.inl>
 
 #include <frontend/parser/parse_dag.hpp>
 
 #include <backend/ir/dag_tac_visitor.hpp>
+
 
 USINGNAMESPACE(core)
 USINGNAMESPACE(frontend)

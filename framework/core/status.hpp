@@ -17,15 +17,31 @@ class status
         enum class custom_code
         {
             success = 1,
-            error = -1
+            warning = 2,
+            error   = -1
+        };
+
+        enum class contributer
+        {
+            lexer     = 1,
+            parser    = 2,
+            semantics = 3,
+            lir       = 4,
+            mir       = 5,
+            hir       = 6,
+            generator = 7
         };
 
         using custom_code_type = custom_code;
         using system_code_type = uint32_t;
 
+        using contributer_type = contributer;
+
     private:
         custom_code_type    my_custom_code;
         system_code_type    my_system_code;
+
+        contributer_type    my_contributer;
 
         string_type         my_text;
 
@@ -44,6 +60,9 @@ class status
 
         system_code_type    system_code() const;
         system_code_type&   system_code();
+
+        contributer_type    contributer() const;
+        contributer_type&   contributer();
 
         const string_type&  text() const;
         string_type&        text();
@@ -70,6 +89,16 @@ inline status::system_code_type status::system_code() const
 inline status::system_code_type& status::system_code()
 {
     return my_system_code;
+}
+
+inline status::contributer_type status::contributer() const
+{
+    return my_contributer;
+}
+
+inline status::contributer_type& status::contributer()
+{
+    return my_contributer;
 }
 
 inline const string_type& status::text() const
