@@ -3935,6 +3935,23 @@ void test_re_dfa()
     }
 }
 
+
+/*
+    qpf_timer t;
+
+    t.start();
+    
+    t.pause();
+    t.resume();
+
+    t.stop();
+
+    auto s = t.elapsed_time_as_string();
+    auto s1 = t.total_elapsed_time_as_string();
+*/
+
+
+
 // for %i in (d:\tmp\fsa\*.dot) do D:\Soft\graphviz\2.38\release\bin\dot -Tpng %i -o %i.png
 // D:\Soft\graphviz\2.38\release\bin\dot -Tpng d:\tmp\FSA\nfa.dot -o d:\tmp\FSA\nfa.dot.png
 // for /r "D:\Tmp\Books\Parsing & Syntactic Theory" %f in (*) do @copy /Y "%f" .
