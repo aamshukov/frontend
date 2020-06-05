@@ -349,8 +349,24 @@ enum class color
     RED, BLUE, GREEN = 5
 };
 
+
+// https://devblogs.microsoft.com/oldnewthing/20200529-00/?p=103810
+template<typename... Args>
+struct Traits
+{
+    using Tuple = std::tuple<Args...>;
+    static constexpr auto Size = sizeof...(Args);
+    template <std::size_t N>
+    using Nth = typename std::tuple_element<N, Tuple>::type;
+    using First = Nth<0>;
+    using Last  = Nth<Size - 1>;
+};
+
+
 int main()
 {
+
+
     //test_recursive_descent_with_backtracking();
 
     auto enumname = name_impl<color>();
