@@ -365,8 +365,6 @@ struct Traits
 
 int main()
 {
-
-
     //test_recursive_descent_with_backtracking();
 
     auto enumname = name_impl<color>();
