@@ -10,7 +10,7 @@ BEGIN_NAMESPACE(frontend)
 USINGNAMESPACE(core)
 
 template <typename Token, typename TreeTraits>
-class packrat_parser : private parser<Token, TreeTraits>
+class packrat_parser : private recursive_descent_parser<Token, TreeTraits>
 {
     //?? Memoization table --> key<position(my_ptr), rule(my_id)>  value<tree>
     public:

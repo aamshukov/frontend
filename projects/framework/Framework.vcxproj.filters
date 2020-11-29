@@ -116,7 +116,7 @@
       <Filter>frontend\parser</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\frontend\parser\backtracking\recursive_descent_parser.hpp">
-      <Filter>frontend\parser\recursive_descent</Filter>
+      <Filter>frontend\parser\backtracking\recursive_descent</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\frontend\parser\ll\ll_parser.hpp">
       <Filter>frontend\parser\ll</Filter>
@@ -218,7 +218,7 @@
       <Filter>symtable\scope</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\frontend\parser\packrat\packrat_parser.hpp">
-      <Filter>frontend\parser\packrat</Filter>
+      <Filter>frontend\parser\backtracking\packrat</Filter>
     </ClInclude>
     <ClInclude Include="..\..\framework\frontend\lexical_analyzer\lexical_content.hpp">
       <Filter>frontend\lexical_analyzer</Filter>
@@ -309,9 +309,6 @@
     <Filter Include="frontend\parser\lr">
       <UniqueIdentifier>{fa4c992e-574b-44d2-bc93-4b90fd53ca3b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="frontend\parser\recursive_descent">
-      <UniqueIdentifier>{9f1c5b9f-b5de-4634-ba24-a75f062f8958}</UniqueIdentifier>
-    </Filter>
     <Filter Include="frontend\parser\precedence">
       <UniqueIdentifier>{edb6ffdc-735d-4d2f-9ca8-ba7d18d389c6}</UniqueIdentifier>
     </Filter>
@@ -324,14 +321,20 @@
     <Filter Include="symtable\scope">
       <UniqueIdentifier>{5878d3b6-8119-46dc-b042-84c978163a7d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="frontend\parser\packrat">
-      <UniqueIdentifier>{5eaa719c-0c5c-4234-b031-343a26a8a140}</UniqueIdentifier>
-    </Filter>
     <Filter Include="core\graph">
       <UniqueIdentifier>{6de7775a-f2ca-46c0-ab12-fed50c8bcc06}</UniqueIdentifier>
     </Filter>
     <Filter Include="frontend\type">
       <UniqueIdentifier>{c9fe2698-6137-43d2-ad00-2df29b25ac57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\parser\backtracking">
+      <UniqueIdentifier>{18360ae3-fa17-437e-ad84-5f2853aaf83d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\parser\backtracking\recursive_descent">
+      <UniqueIdentifier>{9f1c5b9f-b5de-4634-ba24-a75f062f8958}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="frontend\parser\backtracking\packrat">
+      <UniqueIdentifier>{5eaa719c-0c5c-4234-b031-343a26a8a140}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -443,7 +446,7 @@
       <Filter>frontend\parser</Filter>
     </None>
     <None Include="..\..\framework\frontend\parser\backtracking\recursive_descent_parser.inl">
-      <Filter>frontend\parser\recursive_descent</Filter>
+      <Filter>frontend\parser\backtracking\recursive_descent</Filter>
     </None>
     <None Include="..\..\framework\frontend\parser\ll\ll_parser.inl">
       <Filter>frontend\parser\ll</Filter>
@@ -476,7 +479,7 @@
       <Filter>symtable</Filter>
     </None>
     <None Include="..\..\framework\frontend\parser\packrat\packrat_parser.inl">
-      <Filter>frontend\parser\packrat</Filter>
+      <Filter>frontend\parser\backtracking\packrat</Filter>
     </None>
     <None Include="..\..\framework\backend\ir\basic_block.inl">
       <Filter>backend\ir</Filter>

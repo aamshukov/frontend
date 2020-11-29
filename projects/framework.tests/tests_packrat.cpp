@@ -74,6 +74,9 @@
 #include <frontend/parser/parser_visualization.hpp>
 #include <frontend/parser/parser_visualization.inl>
 
+#include <frontend/parser/backtracking/recursive_descent_parser.hpp>
+#include <frontend/parser/backtracking/recursive_descent_parser.inl>
+
 #include <frontend/parser/packrat/packrat_parser.hpp>
 #include <frontend/parser/packrat/packrat_parser.inl>
 
