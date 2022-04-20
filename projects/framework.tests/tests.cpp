@@ -2370,10 +2370,10 @@ void test_hexadecimal_floating_lit()
     double v5 = 0xf.p-1; v5;
     double v6 = 0x0.123p-1; v6;
     double v7 = 0xa.bp10l; v7;
-    double v10 = 0x0.12345p+012345f; v10;
-    double v11 = 0x0.12345p+01'23'45F; v11;
-    double v12 = 0x0.12345p-012345l; v12;
-    double v15 = 0x0.12345p-01'23'45L; v15;
+    double v10 = 0x0.12345p+0125f; v10;
+    double v11 = 0x0.12345p+2'5F; v11;
+    double v12 = 0x0.12345p-0145l; v12;
+    double v15 = 0x0.12345p-01'45L; v15;
 
     std::vector<string_type> inputs
     (
