@@ -75,7 +75,7 @@ rule::~rule()
 {
 }
 
-const rule& rule::operator = (const rule& other)
+const rule& rule::operator = (const rule& other) noexcept
 {
     if(this != &other)
     {
@@ -100,7 +100,7 @@ const rule& rule::operator = (const rule& other)
     return *this;
 }
 
-rule& rule::operator = (rule&& other)
+rule& rule::operator = (rule&& other) noexcept
 {
     if(this != &other)
     {

@@ -51,8 +51,8 @@ class rule
 
                                    ~rule();
 
-        const rule&                 operator = (const rule& other);
-        rule&                       operator = (rule&& other);
+        const rule&                 operator = (const rule& other) noexcept;
+        rule&                       operator = (rule&& other) noexcept;
 
         uint32_t                    id() const;
         uint32_t&                   id();

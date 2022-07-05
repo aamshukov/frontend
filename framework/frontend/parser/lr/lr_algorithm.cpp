@@ -555,7 +555,9 @@ void lr_algorithm::build_action_table(const grammar& gr,
 
                     if(!(*item).la.empty())
                     {
-                        std::for_each((*item).la.front().begin(), (*item).la.front().end(), [&eff_set_symbols](const auto& symb){ eff_set_symbols.emplace_back(symb); });
+                        std::for_each((*item).la.front().begin(),
+                                      (*item).la.front().end(),
+                                      [&eff_set_symbols](const auto& symb) { eff_set_symbols.emplace_back(symb); });
                     }
 
                     sets_type eff_set;
