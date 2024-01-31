@@ -256,9 +256,6 @@
     <ClInclude Include="..\..\framework\backend\generator\activation_record.hpp">
       <Filter>backend\generator</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\framework\backend\generator\x64\activation_record_amd64.hpp">
-      <Filter>backend\generator\x64</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\framework\symtable\symbol_table_builder.hpp">
       <Filter>symtable</Filter>
     </ClInclude>
@@ -311,9 +308,6 @@
     </Filter>
     <Filter Include="frontend\parser\precedence">
       <UniqueIdentifier>{edb6ffdc-735d-4d2f-9ca8-ba7d18d389c6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="backend\generator\x64">
-      <UniqueIdentifier>{99edacde-fd9e-49ea-aabb-23e15810fa7a}</UniqueIdentifier>
     </Filter>
     <Filter Include="symtable">
       <UniqueIdentifier>{2a72f62e-cd1b-4f0c-b493-edf005b33872}</UniqueIdentifier>
@@ -434,9 +428,6 @@
     <ClCompile Include="..\..\framework\backend\generator\activation_record.cpp">
       <Filter>backend\generator</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\framework\backend\generator\x64\activation_record_amd64.cpp">
-      <Filter>backend\generator\x64</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\framework\frontend\lexical_analyzer\lexical_analyzer.inl">
@@ -493,10 +484,5 @@
     <None Include="..\..\framework\symtable\symbol_table_builder.inl">
       <Filter>symtable</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <MASM Include="..\..\framework\backend\generator\x64\gen.asm">
-      <Filter>backend\generator\x64</Filter>
-    </MASM>
   </ItemGroup>
 </Project>

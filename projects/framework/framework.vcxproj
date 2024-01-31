@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\framework\backend\generator\activation_record.hpp" />
-    <ClInclude Include="..\..\framework\backend\generator\x64\activation_record_amd64.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\basic_block.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\code.hpp" />
     <ClInclude Include="..\..\framework\backend\ir\control_flow_graph.hpp" />
@@ -109,7 +108,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\framework\backend\generator\activation_record.cpp" />
-    <ClCompile Include="..\..\framework\backend\generator\x64\activation_record_amd64.cpp" />
     <ClCompile Include="..\..\framework\backend\ir\control_flow_graph.cpp" />
     <ClCompile Include="..\..\framework\core\content.cpp" />
     <ClCompile Include="..\..\framework\core\domain_helper.cpp" />
@@ -151,12 +149,6 @@
     <ClCompile Include="..\..\framework\frontend\parser\parser_algorithm.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="..\..\framework\backend\generator\x64\gen.asm">
-      <FileType>Document</FileType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Soft\nasm\nasm.exe -f win64 -gcv8 -l $(ProjectDir)..\..\Framework\backend\generator\x64\gen.lst $(ProjectDir)..\..\Framework\backend\generator\x64\gen.asm</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Projects\fe\framework\backend\generator\x64\gen.obj</Outputs>
-    </MASM>
     <None Include="..\..\framework\backend\ir\basic_block.inl" />
     <None Include="..\..\framework\backend\ir\code.inl" />
     <None Include="..\..\framework\backend\ir\ir.inl" />
